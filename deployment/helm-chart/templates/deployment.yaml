@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+{{ include "common.loggingAnnotation" . | indent 4 }}
+{{ include "common.requiredAnnotations" . | indent 4 }}
+  labels:
+{{ include "common.requiredLabels" . | indent 4 }}
+  name: {{ template "common.basename" . }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "common.basename" . }}
+  template:
+    metadata:
+      annotations:
+        deploymentTimestamp: {{ now | date "2006-01-02T15:04:05" }}
+        {{ template "common.loggingAnnotation" . }}
+{{ include "common.requiredAnnotations" . | indent 8 }}
+      labels:
+        app: {{ template "common.basename" . }}
+{{ include "common.requiredLabels" . | indent 8 }}
+    spec:
+      containers:
+      - name: {{ .Release.Name }}
+        envFrom:
+        - configMapRef:
+            name: {{ template "common.basename" . }}-configmap
+        image: {{ print .Values.image ":v" .Chart.Version}}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        {{- if .Values.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.livenessProbe.path }}
+            port: {{ default .Values.containerPort .Values.livenessProbe.port }}
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+        {{- end }}
+        name: {{ .Values.projectName }}
+        ports:
+        - containerPort: {{ .Values.containerPort }}
+        {{- if .Values.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.readinessProbe.path }}
+            port: {{ default .Values.containerPort .Values.readinessProbe.port}}
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+        {{- end }}
+        resources:
+          limits:
+            cpu: {{ .Values.resourceLimits.cpu }}
+            memory: {{ .Values.resourceLimits.memory }}
+          requests:
+            cpu: {{ .Values.resourceRequests.cpu }}
+            memory: {{ .Values.resourceRequests.memory }}
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecret }}
+      {{- if .Values.iamRoleARN }}
+      serviceAccountName: {{ template "common.basename" . }}-service-account
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}

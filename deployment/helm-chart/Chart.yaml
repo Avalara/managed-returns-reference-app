@@ -1,0 +1,28 @@
+apiVersion: v2
+
+# Update with your chart name
+name: managed-returns-reference-app
+
+# Update with your chart description
+description: Managed returns reference app
+
+type: application
+
+# This is the chart version. This version will be overwritten by the release version when the chart is packaged in the project's pipeline.
+version: 0.0.4
+
+icon: https://minnesotagrown.com/wp-content/uploads/2019/06/raspberry-icon-480x480.png
+
+maintainers:
+  - name: goodreturns
+    url: https://scm.platform.us-west-2.avalara.io/good-returns/managed-returns-reference-app
+
+sources:
+  - https://avalara.atlassian.net/wiki/spaces/RAAS/pages/8834711563/RaaS+Service+Catalog
+
+keywords:
+  - RaaS
+  - managed-returns-reference-app
+
+annotations:
+  category: ManagedReturnsReference

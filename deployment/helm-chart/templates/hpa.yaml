@@ -1,0 +1,19 @@
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  annotations:
+{{ include "common.loggingAnnotation" . | indent 4 }}
+{{ include "common.requiredAnnotations" . | indent 4 }}
+  labels:
+{{ include "common.requiredLabels" . | indent 4 }}
+  name: {{ template "common.basename" . }}-autoscaler
+spec:
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ template "common.basename" . }}
+  targetCPUUtilizationPercentage: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+{{- end }}

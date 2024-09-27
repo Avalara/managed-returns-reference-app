@@ -1,0 +1,116 @@
+## @section General
+
+## @param environment The environment for the deployment. ex: dev, qa, prd
+environment: dev
+## @param teamName The deploying team name. This value is included in labels for various kubernetes resources.
+teamName: goodreturns
+## @param iamRoleARN The ARN of an IAM role created with https://scm.platform.us-west-2.avalara.io/sre-public/tf-core-modules/-/tree/main/aws/iam/irsa-helper and with necessary permissions (e.g. to pull a secret). If null the service will not have AWS permissions.
+iamRoleARN: null
+## @param loggingEnabled flag to enable/disable log collection for Sumo Logic
+loggingEnabled: false
+## @param replicaCount The number of replicas (pods) for the deployment. Ignored if autoscaling.enabled is set to true
+replicaCount: 2
+## @param imagePullSecret the image pull secret used to fetch images from GitLab. A secret called raas-deploy-token is automatically created by RaaS service deployment pipelines
+imagePullSecret: raas-deploy-token
+
+## @section Ingress
+ingress:
+  ## @param ingress.enabled flag to enable/disable ingress
+  enabled: true
+  ## @param ingress.fqdn The domain where the service will be available to access from outside the cluster. This must be a subdomain of the cluster's domain.
+  fqdn: managed-returns-reference-app.foundation.raas.dev.avalara.io
+  ## @param ingress.ingressClassName The IngressClass name. Will likely be "nginx" when deploying to clusters built from the terraform-aws-ekscluster module and either "private" or "public" for newer phoenix clusters.
+  ingressClassName: nginx
+  ## @param ingress.maxRequestSize Sets the maximum allowed size of the client request body
+  maxRequestSize: 1m
+  ## @param ingress.tlsEnabled Whether TLS is enabled on ingress
+  tlsEnabled: false
+  ## @param ingress.secretName The name of kubernetes secret that contains the certificate
+  secretName: cluster-wildcard-tls
+
+## @section Environment Variables
+environmentVars:
+  VITE_CRR_URL: https://managed-returns.foundation.raas.qa.avalara.io/graphql
+  VITE_TOKEN_URL: https://ai-awsfqa.avlr.sh/connect/token
+
+## @section Autoscaling
+autoscaling:
+  ## @param autoscaling.enabled flag to enable/disable autoscaling
+  enabled: false
+  ## @param autoscaling.minReplicas min replicas
+  minReplicas: 2
+  ## @param autoscaling.maxReplicas max replicas
+  maxReplicas: 5
+  ## @param autoscaling.targetCPUUtilizationPercentage target CPU utilization percentage to scale around
+  targetCPUUtilizationPercentage: 80
+
+## @section Service Monitor
+serviceMonitor:
+  ## @param serviceMonitor.enabled flag to enable/disable service monitor
+  enabled: false
+  ## @param serviceMonitor.interval the interval for the monitoring requests
+  interval: 30s
+  ## @param serviceMonitor.path path to the metrics
+  path: /metrics
+  ## @param serviceMonitor.scrapeTimeout timeout for the monitoring requests
+  scrapeTimeout: 5s
+
+## @section Liveness Probe
+livenessProbe:
+  ## @param livenessProbe.enabled flag to enable/disable liveness probe
+  enabled: false
+  ## @param livenessProbe.path path to the service is available
+  path: /liveness
+  ## @param livenessProbe.initialDelaySeconds the initial delay for the liveness check
+  initialDelaySeconds: 30
+  ## @param livenessProbe.periodSeconds interval for the liveness check in sec
+  periodSeconds: 100
+
+## @section Readiness Probe
+readinessProbe:
+  ## @param readinessProbe.enabled flag to enable/disable readiness probe
+  enabled: false
+  ## @param readinessProbe.path path to the readiness check
+  path: /readiness
+  ## @param readinessProbe.initialDelaySeconds the initial delay for the readiness check
+  initialDelaySeconds: 30
+  ## @param readinessProbe.periodSeconds interval for the readiness check in sec
+  periodSeconds: 100
+
+## @section Resource Limits
+resourceLimits:
+  ## @param resourceLimits.cpu limits for CPU resources in millicores
+  cpu: 500m
+  ## @param resourceLimits.memory limits for Memory resources in bytes
+  memory: 1024Mi
+
+## @section Resource Requests
+resourceRequests:
+  ## @param resourceRequests.cpu requests for CPU resources in millicores
+  cpu: 100m
+  ## @param resourceRequests.memory requests for Memory resources in bytes
+  memory: 128Mi
+
+## @section Security Labels
+securityLabels:
+  ## @param securityLabels.userdata Identifies whether a resource contains PII. Can be either true or false.
+  userdata: false
+  ## @param securityLabels.dataclass Identifies the data classification of the resource. Can be public, internal, sensitive, or restricted.
+  dataclass: internal
+
+## @section Chart Owner Parameters
+
+## @param projectName The project name. This should generally match the GitLab project name containing the chart and service code. This value will be expanded to \<projectName\>-\<environment\> which will be included in many of the Kubernetes resource names.
+projectName: managed-returns-reference-app
+## @param image The URL for the container registry. This is essentially the image URL but WITHOUT including the image version.
+image: docker.platform.avalara.io/good-returns/managed-returns-reference-app/managed-returns-reference-app
+## @param containerPort The port that the container listens on.
+containerPort: 80
+## @param servicePort The port for the Kubernetes service to listen on. This value is only important when accessing the service from within the cluster.
+servicePort: 80
+## @param servicePortName a name for the service port
+servicePortName: service-port
+## @param imagePullPolicy image pull policy for the given image
+imagePullPolicy: Always
+## @param terminationGracePeriodSeconds the grace period to force shutdown after the SIGTERM signal
+terminationGracePeriodSeconds: 30
