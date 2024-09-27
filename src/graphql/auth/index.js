@@ -17,7 +17,7 @@ class AuthService {
     // console.log('creds', creds);
     const encodedCredentials = btoa(creds);
     // console.log('encodedCredentials', encodedCredentials);
-    // console.log('decoded creds', atob(encodedCredentials));
+    console.log('decoded creds', atob(encodedCredentials));
 
     try {
       response = await axios({
