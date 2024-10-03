@@ -1,14 +1,14 @@
 import { jwtDecode } from 'jwt-decode';
 import { ApolloLink, Observable } from '@apollo/client';
 import axios from 'axios';
+
+import config from '../../config';
+
+const AI_URL = config.AI_URL;
+
+console.log('AI_URL', AI_URL);
 class AuthService {
   async login() {
-    // Make a request to your auth endpoint to get the JWT token
-    const TOKEN_URL =
-      import.meta.env.VITE_TOKEN_URL ||
-      'https://ai-awsfqa.avlr.sh/connect/token';
-    console.log('TOKEN_URL', TOKEN_URL);
-
     let response;
     const creds = `${localStorage.getItem('clientId')}:${localStorage.getItem(
       'clientSecret',
@@ -22,7 +22,7 @@ class AuthService {
     try {
       response = await axios({
         method: 'post',
-        url: TOKEN_URL,
+        url: AI_URL,
         data: {
           grant_type: 'client_credentials',
         },
