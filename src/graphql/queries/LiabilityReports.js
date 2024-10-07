@@ -6,7 +6,7 @@ export const LiabilityReports = gql`
       companyId: $companyId
       year: $year
       month: $month
-      liabilityType: Original
+      liabilityType: ORIGINAL
     ) {
       carryOverCredit
       stateSummary
