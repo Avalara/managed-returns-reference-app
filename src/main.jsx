@@ -13,6 +13,9 @@ import ReturnDetails from './components/ReturnDetails';
 import Funding from './components/Funding';
 import GetStarted from './components/GetStarted';
 import SetUpReturns from './components/SetUpReturns';
+import Authentication from './components/Authentication';
+import Provisioning from './components/Provisioning';
+import DataIngest from './components/DataIngest';
 
 import ErrorPage from './routes/Error';
 
@@ -72,6 +75,36 @@ const router = createBrowserRouter([
             element: <GetStarted />,
             handle: {
               crumb: () => <Link to="/returns/get-started">Get started</Link>,
+            },
+          },
+        ],
+      },
+      {
+        path: 'developer',
+        children: [
+          {
+            path: 'authentication',
+            element: <Authentication />,
+            handle: {
+              crumb: () => (
+                <Link to="/developer/authentication">Authentication</Link>
+              ),
+            },
+          },
+          {
+            path: 'provisioning',
+            element: <Provisioning />,
+            handle: {
+              crumb: () => (
+                <Link to="/developer/provisioning">Provisioning</Link>
+              ),
+            },
+          },
+          {
+            path: 'data-ingest',
+            element: <DataIngest />,
+            handle: {
+              crumb: () => <Link to="/developer/data-ingest">Data ingest</Link>,
             },
           },
         ],
