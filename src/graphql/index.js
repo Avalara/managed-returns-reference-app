@@ -17,6 +17,11 @@ const httpLink = createHttpLink({
   uri: CRR_URL,
 });
 
+console.log('import.meta', JSON.stringify(import.meta));
+console.log('NODE_ENV', NODE_ENV);
+console.log('VITE_CRR_URL', VITE_CRR_URL);
+console.log('VITE_TOKEN_URL', VITE_TOKEN_URL);
+
 // TODO: auth will be jwt later
 // const authLink = setContext((_, { headers }) => {
 //   // get the authentication token from local storage if it exists
