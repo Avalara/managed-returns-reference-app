@@ -6,14 +6,14 @@ import {
   useNavigate,
   useMatches,
 } from 'react-router-dom';
-import { TableOutlined } from '@ant-design/icons';
+import { SettingOutlined, TableOutlined } from '@ant-design/icons';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
-
-import LoginModal from '../components/LoginModal';
 
 const { Header, Content, Sider } = Layout;
 
-const clientId = localStorage.getItem('clientId');
+const localStorageClientId = localStorage.getItem('clientId');
+const localStorageClientSecret = localStorage.getItem('clientSecret');
+const localStorageCompanyId = localStorage.getItem('companyId');
 
 const BreadcrumbMenu = () => {
   const location = useLocation();
@@ -77,10 +77,11 @@ const Home = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(!!clientId);
-  const [companyId, setCompanyId] = useState(localStorage.getItem('companyId'));
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorageClientId && !!localStorageClientSecret,
+  );
+  const [companyId, setCompanyId] = useState(localStorageCompanyId);
 
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(!isLoggedIn);
   const [selectedKeys, setSelectedKeys] = useState([]);
 
   const navigate = useNavigate();
@@ -97,10 +98,8 @@ const Home = () => {
     if (!clientId || !clientSecret) {
       console.log('clientId', clientId, 'clientSecret', clientSecret);
       setIsLoggedIn(false);
-      setIsLoginModalOpen(true);
     } else {
       setIsLoggedIn(true);
-      setIsLoginModalOpen(false);
     }
   }, []);
 
@@ -132,13 +131,39 @@ const Home = () => {
         navigate(e.keyPath.reverse().join('/')); // TODO: refactor the children key names and how this onClick works
       },
     },
+    {
+      key: 'developer',
+      icon: <SettingOutlined />,
+      label: `Developer tools`,
+      children: [
+        {
+          key: 'authentication',
+          label: 'Authentication',
+        },
+        {
+          key: 'provisioning',
+          label: 'Provisioning',
+        },
+        {
+          key: 'data-ingest',
+          label: 'Data ingest',
+        },
+      ],
+      onClick: (e) => {
+        console.log(e);
+        navigate(e.keyPath.reverse().join('/')); // TODO: refactor the children key names and how this onClick works
+      },
+    },
   ];
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      setIsLoginModalOpen(true);
+    if (!isLoggedIn && location.pathname !== '/developer/authentication') {
+      window.location.href = '/developer/authentication';
     }
-  }, [isLoggedIn]);
+  }, [location.pathname, isLoggedIn]);
+
+  const defaultOpenMenuItem =
+    location.pathname.indexOf('developer') > -1 ? 'developer' : 'returns';
 
   return (
     <Layout>
@@ -180,7 +205,7 @@ const Home = () => {
               borderRight: 0,
             }}
             items={menuItems}
-            openKeys={['returns']}
+            defaultOpenKeys={[defaultOpenMenuItem]}
             onClick={(e) => {
               setSelectedKeys([e.key]);
             }}
@@ -193,11 +218,6 @@ const Home = () => {
           }}
         >
           {/* <BreadcrumbMenu /> */}
-          <LoginModal
-            isLoginModalOpen={isLoginModalOpen}
-            setIsLoginModalOpen={setIsLoginModalOpen}
-            setIsLoggedIn={setIsLoggedIn}
-          />
           <Content
             style={{
               padding: 24,

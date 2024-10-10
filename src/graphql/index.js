@@ -8,15 +8,19 @@ import { loadErrorMessages, loadDevMessages } from '@apollo/client/dev';
 import apolloLogger from 'apollo-link-logger';
 
 import { authLink } from './auth';
-import config from '../config';
 
-const GRAPHQL_URL = config.GRAPHQL_URL;
-
-console.log('GRAPHQL_URL', GRAPHQL_URL);
+// const CRR_URL = import.meta.env.VITE_CRR_URL
+const CRR_URL = 'https://returns-api.foundation.raas.qa.avalara.io/graphql';
+// console.log('CRR_URL', CRR_URL);
 
 const httpLink = createHttpLink({
-  uri: GRAPHQL_URL,
+  uri: CRR_URL,
 });
+
+console.log('import.meta', JSON.stringify(import.meta));
+console.log('NODE_ENV', NODE_ENV);
+console.log('VITE_CRR_URL', VITE_CRR_URL);
+console.log('VITE_TOKEN_URL', VITE_TOKEN_URL);
 
 // TODO: auth will be jwt later
 // const authLink = setContext((_, { headers }) => {
@@ -37,7 +41,7 @@ if (import.meta.env.VITE_DEV) {
 }
 
 export const apolloClient = new ApolloClient({
-  uri: GRAPHQL_URL,
+  uri: CRR_URL,
   link: ApolloLink.from([apolloLogger, authLink, httpLink]),
   cache: new InMemoryCache(),
 });
