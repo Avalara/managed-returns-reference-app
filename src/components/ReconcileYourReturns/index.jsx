@@ -5,15 +5,19 @@ import utcPlugin from 'dayjs/plugin/utc';
 import timezonePlugin from 'dayjs/plugin/timezone';
 import { notification, theme, Layout } from 'antd';
 
+import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import Upper from './Upper';
 import Lower from './Lower';
 
-const { Content } = Layout;
+const { Header, Content } = Layout;
 
 dayjs.extend(utcPlugin);
 dayjs.extend(timezonePlugin);
 
 const ReconcileYourReturns = () => {
+  const {
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken();
   const [date, setDate] = useState(dayjs());
   const { companyId } = useOutletContext();
   const [amountDue, setAmountDue] = useState();
@@ -50,26 +54,44 @@ const ReconcileYourReturns = () => {
   }, [date]);
 
   return (
-    <div id="reconcile-your-returns">
-      <Content>
-        <h1>Reconcile your returns</h1>
-        <Upper
-          companyId={companyId}
-          date={date}
-          setDate={setDate}
-          amountDue={amountDue}
-        />
+    <>
+      <div
+        style={{
+          backgroundColor: 'white',
+          marginLeft: '-24px',
+          padding: '24px',
+        }}
+      >
+        <BreadcrumbMenu />
+        <Content>
+          <h1>Reconcile your returns</h1>
+          <Upper
+            companyId={companyId}
+            date={date}
+            setDate={setDate}
+            amountDue={amountDue}
+          />
+        </Content>
+      </div>
+      <Content
+        style={{
+          margin: 0,
+          minHeight: 280,
+          borderRadius: borderRadiusLG,
+        }}
+      >
+        <Layout>
+          <Lower
+            companyId={companyId}
+            setAmountDue={setAmountDue}
+            setReturnCount={setReturnCount}
+            year={filingPeriodParams.year}
+            month={filingPeriodParams.month}
+            country="US"
+          />
+        </Layout>
       </Content>
-
-      <Lower
-        companyId={companyId}
-        setAmountDue={setAmountDue}
-        setReturnCount={setReturnCount}
-        year={filingPeriodParams.year}
-        month={filingPeriodParams.month}
-        country="US"
-      />
-    </div>
+    </>
   );
 };
 

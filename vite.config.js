@@ -8,8 +8,8 @@ export default defineConfig(({ command, mode }) => {
   return {
     define: {
       NODE_ENV: JSON.stringify(env.NODE_ENV),
-      VITE_CRR_URL: JSON.stringify(env.VITE_CRR_URL),
-      VITE_TOKEN_URL: JSON.stringify(env.VITE_TOKEN_URL),
+      CRR_URL: JSON.stringify(env.VITE_CRR_URL),
+      TOKEN_URL: JSON.stringify(env.VITE_TOKEN_URL),
     },
     plugins: [react()],
 

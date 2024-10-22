@@ -1,76 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Outlet,
-  Link,
-  useLocation,
-  useNavigate,
-  useMatches,
-} from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { SettingOutlined, TableOutlined } from '@ant-design/icons';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
+import { Layout, Menu, theme } from 'antd';
+
+import BreadcrumbMenu from '../components/BreadCrumbMenu';
 
 const { Header, Content, Sider } = Layout;
 
 const localStorageClientId = localStorage.getItem('clientId');
 const localStorageClientSecret = localStorage.getItem('clientSecret');
 const localStorageCompanyId = localStorage.getItem('companyId');
-
-const BreadcrumbMenu = () => {
-  const location = useLocation();
-  const snippets = location.pathname.split('/').filter((key) => key);
-  // console.log('snippets', snippets);
-  // const matches = useMatches();
-  // console.log('matches', matches);
-
-  const items = [
-    {
-      path: '/',
-      title: 'Returns',
-      children: [
-        {
-          path: '/get-started',
-          title: 'Get started',
-        },
-        {
-          path: '/reconcile',
-          title: 'Reconcile',
-        },
-        {
-          path: '/set-up-returns',
-          title: 'Set up returns',
-        },
-        {
-          path: '/funding',
-          title: 'Set up funding',
-        },
-      ],
-    },
-  ];
-
-  function itemRender(currentRoute, params, items, paths) {
-    // console.log('currentRoute', currentRoute);
-    // console.log('params', params);
-    // console.log('paths', paths);
-
-    return snippets.map((snippet, snippetIdx) =>
-      snippetIdx === snippets.length - 1 ? (
-        <span key={snippetIdx}>{snippet}</span>
-      ) : (
-        <Link key={snippetIdx} to={`/${paths.join('/')}`}>
-          {currentRoute.title}
-        </Link>
-      ),
-    );
-  }
-
-  return (
-    <Breadcrumb
-      itemRender={itemRender}
-      items={items}
-      params={location.pathname}
-    />
-  );
-};
 
 const Home = () => {
   const {
@@ -132,7 +71,7 @@ const Home = () => {
       },
     },
     {
-      key: 'developer',
+      key: 'developer-tools',
       icon: <SettingOutlined />,
       label: `Developer tools`,
       children: [
@@ -157,13 +96,18 @@ const Home = () => {
   ];
 
   useEffect(() => {
-    if (!isLoggedIn && location.pathname !== '/developer/authentication') {
-      window.location.href = '/developer/authentication';
+    if (
+      (!isLoggedIn || !localStorageCompanyId) &&
+      location.pathname !== '/developer-tools/authentication'
+    ) {
+      window.location.href = '/developer-tools/authentication';
     }
   }, [location.pathname, isLoggedIn]);
 
   const defaultOpenMenuItem =
-    location.pathname.indexOf('developer') > -1 ? 'developer' : 'returns';
+    location.pathname.indexOf('developer-tools') > -1
+      ? 'developer-tools'
+      : 'returns';
 
   return (
     <Layout>
@@ -186,6 +130,8 @@ const Home = () => {
           style={{
             flex: 1,
             minWidth: 0,
+            fontSize: '18px',
+            fontWeight: 'bold',
           }}
         />
       </Header>
@@ -217,7 +163,16 @@ const Home = () => {
             padding: '0 24px 24px',
           }}
         >
-          {/* <BreadcrumbMenu /> */}
+          {/* <Header
+            style={{
+              backgroundColor: 'white',
+              marginLeft: '-24px',
+              paddingTop: '24px',
+            }}
+          >
+            <BreadcrumbMenu />
+          </Header>
+
           <Content
             style={{
               padding: 24,
@@ -230,17 +185,17 @@ const Home = () => {
               style={{
                 padding: '24px 0',
               }}
-            >
-              <Outlet
-                context={{
-                  isLoggedIn,
-                  setIsLoggedIn,
-                  companyId,
-                  setCompanyId,
-                }}
-              />
-            </Layout>
-          </Content>
+            > */}
+          <Outlet
+            context={{
+              isLoggedIn,
+              setIsLoggedIn,
+              companyId,
+              setCompanyId,
+            }}
+          />
+          {/* </Layout>
+          </Content> */}
         </Layout>
       </Layout>
     </Layout>
