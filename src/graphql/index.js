@@ -10,17 +10,14 @@ import apolloLogger from 'apollo-link-logger';
 import { authLink } from './auth';
 
 // const CRR_URL = import.meta.env.VITE_CRR_URL
-const CRR_URL = 'https://returns-api.foundation.raas.qa.avalara.io/graphql';
 // console.log('CRR_URL', CRR_URL);
 
 const httpLink = createHttpLink({
   uri: CRR_URL,
 });
 
-console.log('import.meta', JSON.stringify(import.meta));
-console.log('NODE_ENV', NODE_ENV);
-console.log('VITE_CRR_URL', VITE_CRR_URL);
-console.log('VITE_TOKEN_URL', VITE_TOKEN_URL);
+// console.log('import.meta', JSON.stringify(import.meta));
+// console.log('NODE_ENV', NODE_ENV);
 
 // TODO: auth will be jwt later
 // const authLink = setContext((_, { headers }) => {

@@ -80,14 +80,14 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: 'developer',
+        path: 'developer-tools',
         children: [
           {
             path: 'authentication',
             element: <Authentication />,
             handle: {
               crumb: () => (
-                <Link to="/developer/authentication">Authentication</Link>
+                <Link to="/developer-tools/authentication">Authentication</Link>
               ),
             },
           },
@@ -96,7 +96,7 @@ const router = createBrowserRouter([
             element: <Provisioning />,
             handle: {
               crumb: () => (
-                <Link to="/developer/provisioning">Provisioning</Link>
+                <Link to="/developer-tools/provisioning">Provisioning</Link>
               ),
             },
           },
@@ -104,7 +104,9 @@ const router = createBrowserRouter([
             path: 'data-ingest',
             element: <DataIngest />,
             handle: {
-              crumb: () => <Link to="/developer/data-ingest">Data ingest</Link>,
+              crumb: () => (
+                <Link to="/developer-tools/data-ingest">Data ingest</Link>
+              ),
             },
           },
         ],

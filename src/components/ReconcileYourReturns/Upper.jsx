@@ -80,12 +80,12 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
     });
 
     if (data && data.LiabilityReports) {
-      const byteArray = new Uint8Array(data.LiabilityReports?.returnSummary);
+      const byteArray = new Uint8Array(data.LiabilityReports?.reports);
       const blob = new Blob([byteArray], { type: 'application/octet-stream' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `LiabilityReport_${date.format('YY_MM_D')}.xlsx`;
+      link.download = `LiabilityReports_${date.format('YY-MM-D')}.zip`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
