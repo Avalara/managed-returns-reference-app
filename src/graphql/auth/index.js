@@ -4,9 +4,6 @@ import axios from 'axios';
 class AuthService {
   async login() {
     // Make a request to your auth endpoint to get the JWT token
-    const TOKEN_URL =
-      import.meta.env.VITE_TOKEN_URL ||
-      'https://ai-awsfqa.avlr.sh/connect/token';
     console.log('TOKEN_URL', TOKEN_URL);
 
     let response;
