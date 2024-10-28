@@ -30,8 +30,6 @@ ingress:
 
 ## @section Environment Variables
 environmentVars:
-  VITE_CRR_URL: https://managed-returns.foundation.raas.qa.avalara.io/graphql
-  VITE_TOKEN_URL: https://ai-awsfqa.avlr.sh/connect/token
 
 ## @section Autoscaling
 autoscaling:
