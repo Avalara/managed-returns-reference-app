@@ -1,10 +1,12 @@
 import { jwtDecode } from 'jwt-decode';
 import { ApolloLink, Observable } from '@apollo/client';
 import axios from 'axios';
+
+import config from '../../config';
 class AuthService {
   async login() {
     // Make a request to your auth endpoint to get the JWT token
-    console.log('TOKEN_URL', TOKEN_URL);
+    console.log('TOKEN_URL', config.TOKEN_URL);
 
     let response;
     const creds = `${localStorage.getItem('clientId')}:${localStorage.getItem(
@@ -19,7 +21,7 @@ class AuthService {
     try {
       response = await axios({
         method: 'post',
-        url: TOKEN_URL,
+        url: config.TOKEN_URL,
         data: {
           grant_type: 'client_credentials',
         },
