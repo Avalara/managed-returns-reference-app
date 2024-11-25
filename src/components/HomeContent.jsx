@@ -1,50 +1,21 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Button, Input, Typography } from 'antd';
 
 const HomeContent = () => {
-  const { isLoggedIn, setIsLoggedIn, companyId, setCompanyId } =
-    useOutletContext();
-  const [companyIdFormValue, setCompanyIdFormValue] = useState(companyId);
+  const { isLoggedIn, companyId } = useOutletContext();
 
-  return (
-    <div>
-      <h1>Home Content</h1>
-      {isLoggedIn ? (
-        <button
-          onClick={() => {
-            localStorage.removeItem('token');
-            setIsLoggedIn(false);
-          }}
-        >
-          Log out
-        </button>
-      ) : (
-        <button
-          onClick={() => console.log('did not log in. need to open modal')}
-        >
-          Log in
-        </button>
-      )}
-      <br />
-      <Typography.Title level={5}>Company Id:</Typography.Title>
-      <Input
-        value={companyIdFormValue}
-        onChange={(e) => {
-          setCompanyIdFormValue('' + e.target.value);
-        }}
-      />
-      <Button
-        type="primary"
-        onClick={() => {
-          setCompanyId(companyIdFormValue);
-          localStorage.setItem('companyId', companyIdFormValue);
-        }}
-      >
-        Submit
-      </Button>
-    </div>
-  );
+  useEffect(() => {
+    if (
+      (!isLoggedIn || !companyId) &&
+      location.pathname !== '/developer-tools/authentication'
+    ) {
+      window.location.href = '/developer-tools/authentication';
+    } else {
+      window.location.href = '/returns/reconcile';
+    }
+  }, [companyId, isLoggedIn]);
+
+  return <></>;
 };
 
 export default HomeContent;

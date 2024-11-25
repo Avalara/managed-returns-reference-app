@@ -10,28 +10,9 @@ import apolloLogger from 'apollo-link-logger';
 import { authLink } from './auth';
 import config from '../../src/config';
 
-// const CRR_URL = import.meta.env.VITE_CRR_URL
-// console.log('CRR_URL', CRR_URL);
-
 const httpLink = createHttpLink({
   uri: config.CRR_URL,
 });
-
-// console.log('import.meta', JSON.stringify(import.meta));
-// console.log('NODE_ENV', NODE_ENV);
-
-// TODO: auth will be jwt later
-// const authLink = setContext((_, { headers }) => {
-//   // get the authentication token from local storage if it exists
-//   const token = localStorage.getItem('token');
-//   // return the headers to the context so httpLink can read them
-//   return {
-//     headers: {
-//       ...headers,
-//       authorization: token ? `Bearer ${token}` : '',
-//     },
-//   };
-// });
 
 if (import.meta.env.VITE_DEV) {
   loadDevMessages();
