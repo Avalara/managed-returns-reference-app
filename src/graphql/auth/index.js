@@ -5,18 +5,12 @@ import axios from 'axios';
 import config from '../../config';
 class AuthService {
   async login() {
-    // Make a request to your auth endpoint to get the JWT token
-    console.log('TOKEN_URL', config.TOKEN_URL);
-
     let response;
     const creds = `${localStorage.getItem('clientId')}:${localStorage.getItem(
       'clientSecret',
     )}`;
 
-    // console.log('creds', creds);
     const encodedCredentials = btoa(creds);
-    // console.log('encodedCredentials', encodedCredentials);
-    console.log('decoded creds', atob(encodedCredentials));
 
     try {
       response = await axios({
@@ -35,14 +29,11 @@ class AuthService {
       throw fetchErr;
     }
 
-    console.log('response', response);
-
     if (response.status !== 200) {
       throw new Error('Login failed');
     }
 
     const access_token = await response?.data?.access_token;
-
     this.setToken(access_token);
     return access_token;
   }
@@ -65,8 +56,8 @@ class AuthService {
     if (!token) return true;
 
     const decodedToken = jwtDecode(token);
-    console.log('decodedToken', decodedToken);
     const currentTime = Date.now() / 1000;
+
     return decodedToken.exp < currentTime;
   }
 }
@@ -94,7 +85,6 @@ export const authLink = new ApolloLink((operation, forward) => {
         }
         const token = authService.getToken();
         if (token) {
-          console.log('found token', token);
           operation.setContext({
             headers: {
               authorization: `Bearer ${token}`,

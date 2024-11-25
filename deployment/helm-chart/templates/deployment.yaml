@@ -25,7 +25,7 @@ spec:
 {{ include "common.requiredLabels" . | indent 8 }}
     spec:
       containers:
-      - name: {{ .Release.Name }}
+      - name: {{ .Values.projectName }}
         envFrom:
         - configMapRef:
             name: {{ template "common.basename" . }}-configmap
@@ -39,7 +39,6 @@ spec:
           initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
         {{- end }}
-        name: {{ .Values.projectName }}
         ports:
         - containerPort: {{ .Values.containerPort }}
         {{- if .Values.readinessProbe.enabled }}
