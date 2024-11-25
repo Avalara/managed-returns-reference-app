@@ -3,18 +3,15 @@ import { useLazyQuery } from '@apollo/client';
 import { Button, DatePicker, Flex, Space } from 'antd';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DownloadOutlined, FilePdfOutlined } from '@ant-design/icons';
 
 import { LiabilityReports } from '../../graphql/queries/LiabilityReports';
 
 const FilingPeriodSelector = ({ date, setDate }) => {
   const navigate = useNavigate();
-  // const location = useLocation();
 
-  // console.log('window.origin', window.origin);
-  // console.log('location.pathname', location.pathname);
   return (
     <div>
       <h2>Filing period</h2>
@@ -92,17 +89,6 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
       URL.revokeObjectURL(url);
     }
   };
-
-  // useEffect(() => {
-  //   if (data) {
-  //     // setDownloadBlob(downloadData?.data?.LiabilityReport);
-  //     const blobData = new Blob(data?.data?.LiabilityReports?.returnSummary, {
-  //       type: 'octet/stream',
-  //     });
-  //     const url = window.URL.createObjectURL(blobData);
-  //     setDownloadLink(url);
-  //   }
-  // }, [data]);
 
   return (
     <Flex align="flex-start" justify="space-between">

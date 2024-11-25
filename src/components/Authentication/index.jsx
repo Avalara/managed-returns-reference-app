@@ -69,7 +69,7 @@ const Authentication = () => {
         if (companyIds.includes(parseInt(companyId))) {
           setSelectedCompanyId(companyId);
         } else {
-          setCompanyId(companyIds[0]);
+          // setCompanyId(companyIds[0]);
           setSelectedCompanyId(companyIds[0]);
         }
       }
@@ -226,7 +226,11 @@ const Authentication = () => {
             <Space direction="horizontal">
               <Select
                 // disabled={!companies || companies.length === 1}
-                disabled={companiesCallIsLoading || !editCompanyId}
+                disabled={
+                  companiesCallIsLoading ||
+                  !companies?.length ||
+                  (!editCompanyId && !!companyId)
+                }
                 dropdownStyle={{
                   width: 400,
                 }}
@@ -257,7 +261,7 @@ const Authentication = () => {
               width: 400,
             }}
           /> */}
-              {companies && !editCompanyId && !!selectedCompanyId && (
+              {companies && !editCompanyId && !!companyId && (
                 <Button
                   type="primary"
                   onClick={() => {
@@ -286,7 +290,7 @@ const Authentication = () => {
                   Update
                 </Button>
               )}
-              {!selectedCompanyId && (
+              {!companyId && !companiesCallIsLoading && (
                 <Button
                   type="primary"
                   onClick={() => {

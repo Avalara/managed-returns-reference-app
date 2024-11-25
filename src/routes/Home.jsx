@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { SettingOutlined, TableOutlined } from '@ant-design/icons';
 import { Layout, Menu, theme } from 'antd';
 
-import BreadcrumbMenu from '../components/BreadCrumbMenu';
-
-const { Header, Content, Sider } = Layout;
+const { Header, Sider } = Layout;
 
 const localStorageClientId = localStorage.getItem('clientId');
 const localStorageClientSecret = localStorage.getItem('clientSecret');
@@ -13,7 +11,7 @@ const localStorageCompanyId = localStorage.getItem('companyId');
 
 const Home = () => {
   const {
-    token: { colorBgContainer, borderRadiusLG },
+    token: { colorBgContainer },
   } = theme.useToken();
 
   const [isLoggedIn, setIsLoggedIn] = useState(
