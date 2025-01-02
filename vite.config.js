@@ -6,5 +6,14 @@ export default defineConfig(({ command, mode }) => {
   console.log('env', env);
   return {
     plugins: [react()],
+    server: {
+      proxy: {
+        '/connect': {
+          target: 'https://ai-awsfqa.avlr.sh',
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
   };
 });
