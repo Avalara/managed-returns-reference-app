@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Get the commit message file path from the first argument
+commit_msg_file=$1
+
+# Ensure the commit message file exists
+if [ ! -f "$commit_msg_file" ]; then
+  echo "❌ Commit message file does not exist: $commit_msg_file"
+  exit 1
+fi
+
+# Get the current branch name
+branch_name=$(git rev-parse --abbrev-ref HEAD)
+
+# Define the ticket regex (CASH-<number> or GRES-<number>)
+ticket_regex="^(CASH|GRES)-[0-9]+"
+
+# Extract ticket from the branch name
+if [[ $branch_name =~ $ticket_regex ]]; then
+  branch_ticket="${BASH_REMATCH[0]}"
+else
+  echo "❌ No valid ticket ID (CASH-<number> or GRES-<number>) found in branch name."
+  exit 1
+fi
+
+# Read the commit message
+commit_msg=$(cat "$commit_msg_file")
+
+# Extract the first line of the commit message
+first_line=$(echo "$commit_msg" | head -n 1)
+
+# Check if the branch ticket already exists in the commit message
+if echo "$first_line" | grep -q "$branch_ticket"; then
+  # If the ticket already exists, do nothing
+  echo "✔️ Branch ticket '$branch_ticket' already exists in the commit message."
+else
+  # Add the branch ticket to the first line
+  updated_first_line="$first_line $branch_ticket"
+
+  # Reassemble the commit message
+  remaining_lines=$(echo "$commit_msg" | tail -n +2) # Skip the first line
+  echo "$updated_first_line\n$remaining_lines" > "$commit_msg_file"
+fi
+
+npx --no -- commitlint --edit $commit_msg_file
