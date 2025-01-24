@@ -220,6 +220,7 @@ const Provisioning = () => {
     {
       name: 'city',
       label: 'City',
+      rules: [{ required: true, message: 'City is required' }],
       component: <Input />,
     },
     {
