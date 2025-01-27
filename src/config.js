@@ -1,14 +1,14 @@
 const ENVIRONMENTS = {
   SANDBOX: {
-    CRR_URL: 'https://returns-api.platform.raas.sbx.avalara.io/graphql',
+    CRR_URL: 'https://returns-api.gamma.sbx.us-west-2.aws.avalara.io/graphql',
     TOKEN_URL: 'https://ai-sbx.avlr.sh/connect/token',
   },
   QA: {
-    CRR_URL: 'https://returns-api.foundation.raas.qa.avalara.io/graphql',
+    CRR_URL: 'https://returns-api.gamma.qa.us-west-2.aws.avalara.io/graphql',
     TOKEN_URL: 'https://ai-awsfqa.avlr.sh/connect/token',
   },
   LOCAL: {
-    CRR_URL: 'https://returns-api.foundation.raas.qa.avalara.io/graphql',
+    CRR_URL: 'https://returns-api.gamma.qa.us-west-2.aws.avalara.io/graphql',
     TOKEN_URL: '/connect/token',
   },
 };
