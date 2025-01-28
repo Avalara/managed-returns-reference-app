@@ -16,10 +16,7 @@ const ENVIRONMENTS = {
 const getEnvironmentConfig = () => {
   const origin = window.location.origin;
 
-  if (
-    origin ===
-    'https://managed-returns-reference-app-raas.gamma.sbx.us-west-2.aws.avalara.io' // TODO: confirm sbx window origin
-  ) {
+  if (origin === 'https://returnsreference.sbx.avalara.com') {
     return ENVIRONMENTS.SANDBOX;
   }
 
