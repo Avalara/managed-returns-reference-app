@@ -25,7 +25,7 @@ export const columns = [
     title: 'State',
     dataIndex: 'state',
     key: 'state',
-    sorter: (a, b) => a.state.localeCompare(b.state),
+    sorter: (a, b) => (a && a.state ? a.state.localeCompare(b.state) : -1),
     responsive: ['lg'],
   },
   {
@@ -72,7 +72,7 @@ export const columns = [
     title: 'Status',
     dataIndex: 'status',
     key: 'status',
-    sorter: (a, b) => a.status.localeCompare(b.status),
+    sorter: (a, b) => (a && a.status ? a.status.localeCompare(b.status) : 1),
     render: (text, record) => {
       return <ReturnsStatus filingStatus={record.status} />;
     },
