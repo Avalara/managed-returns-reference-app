@@ -43,7 +43,7 @@ const Authentication = () => {
   const [
     getCompanies,
     { loading: companiesCallIsLoading, error: companiesCallError, data },
-  ] = useLazyQuery(query.Companies);
+  ] = useLazyQuery(query.companies);
 
   if (companiesCallError) setIsLoggedIn(false);
 
@@ -61,8 +61,8 @@ const Authentication = () => {
   }, [isLoggedIn, getCompanies, clientId, clientSecret]);
 
   useEffect(() => {
-    if (data && data.Companies) {
-      const companies = data.Companies.value;
+    if (data && data.companies) {
+      const companies = data.companies.value;
       setCompanies(companies);
       if (companies.length) {
         const companyIds = companies.map((c) => c.id);

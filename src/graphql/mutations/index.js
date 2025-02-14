@@ -1,5 +1,5 @@
-import { CreateAndLinkAccount } from './CreateAndLinkAccount';
+import { createAndLinkAccount } from './CreateAndLinkAccount';
 
 export default {
-  CreateAndLinkAccount,
+  createAndLinkAccount,
 };
