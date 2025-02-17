@@ -1,14 +1,14 @@
 import { gql } from '@apollo/client';
 
-export const Filings = gql`
-  query Filings(
+export const filings = gql`
+  query filings(
     $companyId: Int!
     $year: Int!
     $month: Int!
     $country: String!
     $region: String
   ) {
-    Filings(
+    filings(
       input: {
         companyId: $companyId
         year: $year

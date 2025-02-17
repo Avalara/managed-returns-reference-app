@@ -19,7 +19,7 @@ function saveByteArraysAsFiles(arrays, fileNames) {
   });
 }
 
-const arrays = Object.keys(json.data.LiabilityReports);
+const arrays = Object.keys(json.data.liabilityReports);
 
 // Example usage with the extracted arrays
 

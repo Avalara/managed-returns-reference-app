@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DownloadOutlined, FilePdfOutlined } from '@ant-design/icons';
 
-import { LiabilityReports } from '../../graphql/queries/LiabilityReports';
+import { liabilityReports } from '../../graphql/queries/LiabilityReports';
 
 const FilingPeriodSelector = ({ date, setDate }) => {
   const navigate = useNavigate();
@@ -65,7 +65,7 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
       loading,
       // data,
     },
-  ] = useLazyQuery(LiabilityReports);
+  ] = useLazyQuery(liabilityReports);
 
   const downloadLiabilityReports = async () => {
     const { data } = await downloadLiabilityReport({
@@ -76,8 +76,8 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
       },
     });
 
-    if (data && data.LiabilityReports) {
-      const byteArray = new Uint8Array(data.LiabilityReports?.reports);
+    if (data && data.liabilityReports) {
+      const byteArray = new Uint8Array(data.liabilityReports?.reports);
       const blob = new Blob([byteArray], { type: 'application/octet-stream' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');

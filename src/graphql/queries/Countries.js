@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
-export const Countries = gql`
-  query Countries {
-    Countries {
+export const countries = gql`
+  query countries {
+    countries {
       value {
         code
         alpha3Code

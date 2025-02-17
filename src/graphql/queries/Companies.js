@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
-export const Companies = gql`
-  query Companies($accountId: Int!) {
-    Companies(accountId: $accountId) {
+export const companies = gql`
+  query companies($accountId: Int!) {
+    companies(accountId: $accountId) {
       value {
         id
       }
