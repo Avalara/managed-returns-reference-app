@@ -170,7 +170,7 @@ const HistoryTable = ({
       status: 'Completed with errors',
     },
   ];
-  // const { loading, error, data } = useQuery(queries.Filings, {
+  // const { loading, error, data } = useQuery(queries.filings, {
   //   variables: {
   //     companyId: parseInt(companyId),
   //   },

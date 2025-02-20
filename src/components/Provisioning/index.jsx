@@ -50,7 +50,7 @@ const Provisioning = () => {
       error: getCountriesAndRegionsDidError,
       data: countriesAndRegionsData,
     },
-  ] = useLazyQuery(query.Countries);
+  ] = useLazyQuery(query.countries);
 
   useEffect(() => {
     const getCountryAndRegionIds = async () => {
@@ -60,8 +60,8 @@ const Provisioning = () => {
   }, [getCountriesAndRegions]);
 
   useEffect(() => {
-    if (countriesAndRegionsData && countriesAndRegionsData.Countries) {
-      const countriesAndRegions = countriesAndRegionsData.Countries.value;
+    if (countriesAndRegionsData && countriesAndRegionsData.countries) {
+      const countriesAndRegions = countriesAndRegionsData.countries.value;
       setCountriesAndRegions(countriesAndRegions);
 
       const options = countriesAndRegions
@@ -102,7 +102,7 @@ const Provisioning = () => {
       error: createAndLinkAccountDidError,
       data: createAndLinkAccountData,
     },
-  ] = useMutation(mutation.CreateAndLinkAccount);
+  ] = useMutation(mutation.createAndLinkAccount);
 
   const onFinish = async () => {
     try {
@@ -143,7 +143,7 @@ const Provisioning = () => {
       );
       setRegionOptions(selectedCountryRegionOptions);
 
-      const accountId = result.data.CreateAndLinkAccount.clientAccountId;
+      const accountId = result.data.createAndLinkAccount.clientAccountId;
 
       notification.success({
         message: 'Account successfully provisioned',

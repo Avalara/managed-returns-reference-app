@@ -17,7 +17,7 @@ function useFilingsData({
   setAvailableStates = () => {},
   setAvailableStatuses = () => {},
 }) {
-  const { loading, error, data } = useQuery(queries.Filings, {
+  const { loading, error, data } = useQuery(queries.filings, {
     variables: {
       companyId: parseInt(companyId),
       year,
@@ -30,7 +30,7 @@ function useFilingsData({
   // console.log('data', data);
 
   useEffect(() => {
-    setAmountDue(data?.Filings?.value?.[0]?.taxSummary?.remittanceAmount);
+    setAmountDue(data?.filings?.value?.[0]?.taxSummary?.remittanceAmount);
   }, [data, setAmountDue]);
 
   const flattenedData = useMemo(() => {
@@ -94,9 +94,9 @@ function useFilingsData({
 }
 
 function extractTileData(data, filters) {
-  if (!data?.Filings) return [];
+  if (!data?.filings) return [];
 
-  const regionData = data?.Filings?.value[0]?.filingRegions.filter((region) => {
+  const regionData = data?.filings?.value[0]?.filingRegions.filter((region) => {
     return (
       filters.state === 'All' || getRegionCode(filters.state) === region.region
     );
@@ -106,9 +106,9 @@ function extractTileData(data, filters) {
 }
 
 function extractTableData(data, filters) {
-  if (!data?.Filings) return [];
+  if (!data?.filings) return [];
 
-  const taxReturns = data.Filings.value.flatMap((filing) =>
+  const taxReturns = data.filings.value.flatMap((filing) =>
     filing.filingRegions
       ?.filter((region) => {
         return (
@@ -137,8 +137,8 @@ function extractTableData(data, filters) {
               status: taxReturn.status,
               country: region.country,
               regionCode: region.region,
-              year: data?.Filings?.value?.[0].year,
-              month: data?.Filings?.value?.[0].month,
+              year: data?.filings?.value?.[0].year,
+              month: data?.filings?.value?.[0].month,
             };
           });
       }),
