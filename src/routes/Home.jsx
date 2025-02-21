@@ -15,7 +15,7 @@ const Home = () => {
   } = theme.useToken();
 
   const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorageClientId && !!localStorageClientSecret,
+    !!localStorageClientId && !!localStorageClientSecret
   );
   const [companyId, setCompanyId] = useState(localStorageCompanyId);
 
@@ -65,7 +65,7 @@ const Home = () => {
       ],
       onClick: (e) => {
         console.log(e);
-        navigate(e.keyPath.reverse().join('/')); // TODO: refactor the children key names and how this onClick works
+        navigate(e.keyPath.reverse().join('/'));
       },
     },
     {
@@ -88,7 +88,7 @@ const Home = () => {
       ],
       onClick: (e) => {
         console.log(e);
-        navigate(e.keyPath.reverse().join('/')); // TODO: refactor the children key names and how this onClick works
+        navigate(e.keyPath.reverse().join('/'));
       },
     },
   ];

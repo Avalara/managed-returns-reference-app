@@ -7,7 +7,7 @@ class AuthService {
   async login() {
     let response;
     const creds = `${localStorage.getItem('clientId')}:${localStorage.getItem(
-      'clientSecret',
+      'clientSecret'
     )}`;
 
     const encodedCredentials = btoa(creds);
@@ -38,7 +38,6 @@ class AuthService {
     return access_token;
   }
 
-  // TODO: https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html#local-storage
   setToken(access_token) {
     localStorage.setItem('access_token', access_token);
   }
