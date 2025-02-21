@@ -1,0 +1,17 @@
+include:
+  - project: raas/raas-foundation/gitlab-templates
+    ref: main
+    file:
+      - templates/pipelines/node/ci.yml
+
+.tags:dev:
+  tags:
+    - aws
+    - prd
+    - us-west-2
+
+variables:
+  GT_RELEASE_BRANCH: main
+  GT_COMPONENT_NAME_OVERRIDE: '$CI_PROJECT_NAME'
+  GT_NODE_VERSION: 20
+  GT_SKIP_REFERENCE_CLUSTER_DEPLOY: true
