@@ -43,20 +43,13 @@ npm run dev
 ```
 
 ### Quick Start
-1. Configure Authentication:
-```javascript
-// Set your Avalara credentials in the browser's local storage
-localStorage.setItem('clientId', 'your-client-id');
-localStorage.setItem('clientSecret', 'your-client-secret');
-```
-
-2. Select Company:
+1. Select Company:
 ```javascript
 // Navigate to /developer-tools/authentication
 // Select your company from the dropdown menu
 ```
 
-3. Import Data:
+2. Import Data:
 ```javascript
 // Navigate to /developer-tools/data-ingest
 // Choose import type (Transactions or Summarized tax liability)
