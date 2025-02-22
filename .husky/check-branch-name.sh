@@ -4,7 +4,10 @@
 branch_name=$(git rev-parse --abbrev-ref HEAD)
 
 # Define the pattern
-valid_branch_regex="^(CASH|GRES)-[0-9]+/[a-z0-9.-]+$"
+# valid_branch_regex="^(CASH|GRES)-[0-9]+/[a-z0-9.-]+$"
+
+# Define the branch name pattern
+valid_branch_regex="^(feat|fix|chore)(!?)\/[a-z0-9\-]+$"
 
 # Validate the branch name
 if [[ ! $branch_name =~ $valid_branch_regex ]]; then
