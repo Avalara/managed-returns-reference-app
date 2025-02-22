@@ -18,6 +18,7 @@ import Provisioning from './components/Provisioning';
 import DataIngest from './components/DataIngest';
 
 import ErrorPage from './routes/Error';
+import SetUpStateReturns from "./components/SetUpRegionReturns/index.jsx";
 
 const router = createBrowserRouter([
   {
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
                 <Link to="/returns/set-up-returns">Set up returns</Link>
               ),
             },
+          },
+          {
+            path: 'set-up-returns/:region',
+            element: <SetUpStateReturns />,
           },
           {
             path: 'get-started',
