@@ -1,4 +1,3 @@
-// TODO: what do we name this section?
 import { useLazyQuery } from '@apollo/client';
 import { Button, DatePicker, Flex, Space } from 'antd';
 import dayjs from 'dayjs';
@@ -22,7 +21,7 @@ const FilingPeriodSelector = ({ date, setDate }) => {
             const newUrl = new URL(
               '.',
               window.origin +
-                `/returns/reconcile/${newDate.year()}/${newDate.month()}`,
+                `/returns/reconcile/${newDate.year()}/${newDate.month()}`
             );
 
             // console.log('newUrl', newUrl);
