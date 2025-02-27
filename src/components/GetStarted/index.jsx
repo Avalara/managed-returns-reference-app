@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   Button,
   Card,
@@ -8,9 +9,14 @@ import {
   Tag,
   theme,
   Typography,
+  Modal,
+  Radio,
+  Input,
+  Divider,
 } from 'antd';
 
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
+import PoaModal from '../POA/PoaModal';
 
 const { Text } = Typography;
 const { Content } = Layout;
@@ -55,6 +61,8 @@ const GetStarted = () => {
   const {
     token: { borderRadiusLG },
   } = theme.useToken();
+
+  const [poaModalOpen, setPoaModalOpen] = useState(false);
 
   return (
     <>
@@ -113,7 +121,7 @@ const GetStarted = () => {
               status="notStarted"
               text="This is required so that Avalara can make tax payments to tax
                 authorities on your behalf."
-              onClick={(e) => {}}
+              onClick={(e) => {setPoaModalOpen(true)}}
             />
             <GetStartedCard
               title="Submit your info for review"
@@ -122,6 +130,7 @@ const GetStarted = () => {
                 Avalara’s compliance team to review before your first filing."
               onClick={(e) => {}}
             />
+            <PoaModal open={poaModalOpen} setOpenState={setPoaModalOpen} />
           </Flex>
         </Layout>
       </Content>
