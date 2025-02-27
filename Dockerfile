@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20 AS builder
+FROM artifacts.platform.avalara.io/docker/node:20 AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
