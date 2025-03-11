@@ -9,7 +9,7 @@ export default defineConfig(({ command, mode }) => {
     server: {
       proxy: {
         '/connect': {
-          target: 'https://ai-awsfqa.avlr.sh',
+          target: 'https://identity.qa.avalara.io',
           changeOrigin: true,
           secure: false,
         },
