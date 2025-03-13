@@ -5,7 +5,7 @@ const ENVIRONMENTS = {
   },
   QA: {
     CRR_URL: 'https://returns-api.gamma.qa.us-west-2.aws.avalara.io/graphql',
-    TOKEN_URL: 'https://ai-awsfqa.avlr.sh/connect/token',
+    TOKEN_URL: 'https://identity.qa.avalara.io/connect/token',
   },
   LOCAL: {
     CRR_URL: 'https://returns-api.gamma.qa.us-west-2.aws.avalara.io/graphql',
