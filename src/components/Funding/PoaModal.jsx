@@ -3,29 +3,35 @@ import { Typography, Modal, Radio, Input, Divider } from 'antd';
 
 const { Text } = Typography;
 
-const POA_SELF = 'self';
-const POA_EMAIL = 'email';
+import { POA_SELF, POA_EMAIL } from '.';
 
 const isValidEmail = (email) => {
   const emailRegex = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i;
   return emailRegex.test(email);
 };
 
-const PoaModal = ({ open, setOpenState }) => {
+const PoaModal = ({ open, setPoaAuthorization, sendPOAEmail }) => {
   const [poaType, setPoaType] = useState('');
   const [signeeEmail, setSigneeEmail] = useState('');
   const [confirmLoading, setConfirmLoading] = useState(false);
   const signeeEmailIsValid = isValidEmail(signeeEmail);
 
-  const handlePoaAuthSelection = () => {
+  const handlePoaAuthSelection = async () => {
     setConfirmLoading(true);
-    if (poaType === POA_SELF) {
-      console.log('Open POA pdf');
-    } else if (poaType === POA_EMAIL) {
-      console.log('Send email to signee', signeeEmail);
+    if (poaType === POA_EMAIL) {
+      const response = await sendPOAEmail({ email: signeeEmail });
+      Modal.success({
+        content: 'Success',
+        onOk: () => {
+          window.location.href = '/returns/get-started';
+        },
+        onCancel: () => {
+          window.location.href = '/returns/get-started';
+        },
+      });
     }
     setConfirmLoading(false);
-    setOpenState(false);
+    setPoaAuthorization(poaType);
   };
 
   return (
@@ -37,7 +43,7 @@ const PoaModal = ({ open, setOpenState }) => {
       open={open}
       onOk={handlePoaAuthSelection}
       confirmLoading={confirmLoading}
-      onCancel={() => setOpenState(false)}
+      onCancel={() => (window.location.href = '/returns/get-started')}
       okButtonProps={{
         disabled:
           poaType === '' || (poaType === POA_EMAIL && !signeeEmailIsValid),

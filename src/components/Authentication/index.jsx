@@ -23,14 +23,18 @@ const Authentication = () => {
   const {
     token: { borderRadiusLG },
   } = theme.useToken();
-  const { isLoggedIn, setIsLoggedIn, companyId, setCompanyId } =
-    useOutletContext();
+  const {
+    isLoggedIn,
+    setIsLoggedIn,
+    companyId,
+    setCompanyId,
+  } = useOutletContext();
 
   const [selectedCompanyId, setSelectedCompanyId] = useState(companyId);
 
   const [clientId, setClientId] = useState(localStorage.getItem('clientId'));
   const [clientSecret, setClientSecret] = useState(
-    localStorage.getItem('clientSecret'),
+    localStorage.getItem('clientSecret')
   );
 
   const [editClientId, setEditClientId] = useState(false);
