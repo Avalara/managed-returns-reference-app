@@ -40,12 +40,10 @@ const TableFilters = ({
             ]}
             onChange={(value) => {
               setImportTypeSelection(value);
-              setFilters((prev) => {
-                return {
-                  ...prev,
-                  importType: value,
-                };
-              });
+              setFilters((prev) => ({
+                ...prev,
+                importType: value,
+              }));
             }}
           />
         </div>
@@ -60,18 +58,17 @@ const TableFilters = ({
             value={statusSelection}
             options={[
               { value: 'All', label: <span>All</span> },
-              ...availableStatuses.map((status) => {
-                return { value: status, label: <span>{status}</span> };
-              }),
+              ...availableStatuses.map((status) => ({
+                value: status,
+                label: <span>{status}</span>,
+              })),
             ]}
             onChange={(value) => {
               setStatusSelection(value);
-              setFilters((prev) => {
-                return {
-                  ...prev,
-                  status: value,
-                };
-              });
+              setFilters((prev) => ({
+                ...prev,
+                status: value,
+              }));
             }}
           />
         </div>
@@ -108,9 +105,7 @@ const columns = [
     dataIndex: 'batchName',
     key: 'batchName',
     fixed: true,
-    render: (text, record) => {
-      return record.name;
-    },
+    render: (text, record) => record.name,
   },
   {
     title: 'Import type',

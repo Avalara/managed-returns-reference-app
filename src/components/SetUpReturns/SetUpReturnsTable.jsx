@@ -1,7 +1,7 @@
-import {Table, Typography, Alert, Badge, Result} from "antd";
-import {useQuery} from '@apollo/client';
-import {nexuses} from '../../graphql/queries/Nexuses.js';
-import {Link, useNavigate} from "react-router-dom";
+import { Table, Typography, Alert, Badge, Result } from 'antd';
+import { useQuery } from '@apollo/client';
+import { nexuses } from '../../graphql/queries/Nexuses.js';
+import { Link, useNavigate } from 'react-router-dom';
 
 const mockDataSource = [
   {
@@ -13,7 +13,7 @@ const mockDataSource = [
     description: 'You collect tax here',
     returns: '0 returns set up',
     status: 'Not started',
-    action: ['Set up returns', 'Mark as completed']
+    action: ['Set up returns', 'Mark as completed'],
   },
   {
     id: '2',
@@ -24,7 +24,7 @@ const mockDataSource = [
     description: 'You collect tax here',
     returns: '2 returns set up',
     status: 'In progress',
-    action: ['Set up returns', 'Mark as completed']
+    action: ['Set up returns', 'Mark as completed'],
   },
   {
     id: '3',
@@ -35,7 +35,7 @@ const mockDataSource = [
     description: 'You collect tax here',
     returns: '3 returns set up',
     status: 'Completed',
-    action: ['Set up returns']
+    action: ['Set up returns'],
   },
   {
     id: '4',
@@ -46,7 +46,7 @@ const mockDataSource = [
     description: 'You collect tax here',
     returns: '10 returns set up',
     status: 'Completed',
-    action: ['Set up returns']
+    action: ['Set up returns'],
   },
   {
     id: '5',
@@ -57,7 +57,7 @@ const mockDataSource = [
     description: 'You collect tax here',
     returns: '2 returns set up',
     status: 'In progress',
-    action: ['Set up returns', 'Mark as completed']
+    action: ['Set up returns', 'Mark as completed'],
   },
   {
     id: '6',
@@ -68,40 +68,43 @@ const mockDataSource = [
     description: 'You collect tax here',
     returns: '0 returns set up',
     status: 'Not started',
-    action: ['Set up returns', 'Mark as completed']
+    action: ['Set up returns', 'Mark as completed'],
   },
 ];
 
-const SetUpReturnsTable = ({companyId}) => {
-  const navigate = useNavigate()
+const SetUpReturnsTable = ({ companyId }) => {
+  const navigate = useNavigate();
 
   const handleClick = (state, stateCode, countryCode) => {
     navigate(`${state}?stateCode=${stateCode}&countryCode=${countryCode}`, {
-      relative: "route"
+      relative: 'route',
     });
   };
 
   const { loading, error, data } = useQuery(nexuses, {
     variables: {
       companyId: parseInt(companyId),
-    }
+    },
   });
 
   if (error) {
-    return <Result
-      status="500"
-      subTitle="We are having a momentary issue. Please try again in sometime."
-    />
+    return (
+      <Result
+        status="500"
+        subTitle="We are having a momentary issue. Please try again in sometime."
+      />
+    );
   }
 
-  const dataSource = data?.nexuses?.value?.map(country => ({
-    key: country.id,
-    state: country.state,
-    description: country.description,
-    returns: country.returns,
-    status: country.status,
-    action: country.action
-  })) || [];
+  const dataSource =
+    data?.nexuses?.value?.map((country) => ({
+      key: country.id,
+      state: country.state,
+      description: country.description,
+      returns: country.returns,
+      status: country.status,
+      action: country.action,
+    })) || [];
 
   const pagination = {
     defaultPageSize: 5,
@@ -151,7 +154,7 @@ const SetUpReturnsTable = ({companyId}) => {
           default:
             status = 'warning';
         }
-        return <Badge status={status} text={statusText} />
+        return <Badge status={status} text={statusText} />;
       },
     },
     {
@@ -159,8 +162,10 @@ const SetUpReturnsTable = ({companyId}) => {
       dataIndex: 'action',
       key: 'action',
       render: (_, record) => {
-        const {state, stateCode, countryCode} = record;
-        const actions = Array.isArray(record.action) ? record.action : [record.action];
+        const { state, stateCode, countryCode } = record;
+        const actions = Array.isArray(record.action)
+          ? record.action
+          : [record.action];
         return actions.map((action, index) => (
           <Typography.Link
             key={index}
@@ -174,7 +179,14 @@ const SetUpReturnsTable = ({companyId}) => {
     },
   ];
 
-  return <Table dataSource={mockDataSource} columns={columns} loading={loading} pagination={pagination} />;
-}
+  return (
+    <Table
+      dataSource={mockDataSource}
+      columns={columns}
+      loading={loading}
+      pagination={pagination}
+    />
+  );
+};
 
 export default SetUpReturnsTable;

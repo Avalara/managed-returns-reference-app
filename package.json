@@ -7,6 +7,7 @@
     "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
+    "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "preview": "vite preview",
     "test": "vitest",
     "prepare": "husky"
@@ -35,12 +36,14 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^9.8.0",
+    "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
     "husky": "^9.1.7",
     "jsdom": "^26.0.0",
+    "prettier": "^3.5.3",
     "vite": "^5.4.0",
     "vitest": "^3.0.5"
   }

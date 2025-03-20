@@ -10,16 +10,14 @@ export const columns = [
     dataIndex: 'taxFormCode',
     key: 'taxFormCode',
     fixed: true,
-    render: (text, record) => {
-      return record.taxFormCode;
-      // return (
-      //   <Link
-      //     to={`${record.country}/${record.regionCode}/${record.year}/${record.month}`}
-      //   >
-      //     {record.taxFormCode}
-      //   </Link>
-      // );
-    },
+    render: (text, record) => record.taxFormCode,
+    // return (
+    //   <Link
+    //     to={`${record.country}/${record.regionCode}/${record.year}/${record.month}`}
+    //   >
+    //     {record.taxFormCode}
+    //   </Link>
+    // );
   },
   {
     title: 'State',
@@ -73,9 +71,7 @@ export const columns = [
     dataIndex: 'status',
     key: 'status',
     sorter: (a, b) => (a && a.status ? a.status.localeCompare(b.status) : 1),
-    render: (text, record) => {
-      return <ReturnsStatus filingStatus={record.status} />;
-    },
+    render: (text, record) => <ReturnsStatus filingStatus={record.status} />,
   },
   {
     title: '',
