@@ -39,15 +39,20 @@ export const columns = [
     responsive: ['lg'],
   },
   {
-    title: 'Total sales',
-    dataIndex: 'totalSales',
-    key: 'totalSales',
+    title: 'Gross sales',
+    dataIndex: 'grossSales',
+    key: 'grossSales',
   },
   {
-    title: 'Taxable sales',
-    dataIndex: 'taxableSales',
-    key: 'taxableSales',
+    title: 'Net sales',
+    dataIndex: 'netSales',
+    key: 'netSales',
     responsive: ['lg'],
+  },
+  {
+    title: 'Excempt sales',
+    dataIndex: 'exemptSales',
+    key: 'exemptSales',
   },
   {
     title: 'Total tax',
