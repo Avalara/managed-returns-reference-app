@@ -1,70 +1,91 @@
 import {Table, Typography, Alert, Badge, Result} from "antd";
 import {useQuery} from '@apollo/client';
 import {nexuses} from '../../graphql/queries/Nexuses.js';
+import {Link, useNavigate} from "react-router-dom";
+
+const mockDataSource = [
+  {
+    id: '1',
+    country: 'US',
+    state: 'Alabama',
+    stateCode: 'AL',
+    countryCode: 'US',
+    description: 'You collect tax here',
+    returns: '0 returns set up',
+    status: 'Not started',
+    action: ['Set up returns', 'Mark as completed']
+  },
+  {
+    id: '2',
+    country: 'US',
+    state: 'California',
+    stateCode: 'CA',
+    countryCode: 'US',
+    description: 'You collect tax here',
+    returns: '2 returns set up',
+    status: 'In progress',
+    action: ['Set up returns', 'Mark as completed']
+  },
+  {
+    id: '3',
+    country: 'US',
+    state: 'Florida',
+    stateCode: 'FL',
+    countryCode: 'US',
+    description: 'You collect tax here',
+    returns: '3 returns set up',
+    status: 'Completed',
+    action: ['Set up returns']
+  },
+  {
+    id: '4',
+    country: 'US',
+    state: 'Georgia',
+    stateCode: 'GA',
+    countryCode: 'US',
+    description: 'You collect tax here',
+    returns: '10 returns set up',
+    status: 'Completed',
+    action: ['Set up returns']
+  },
+  {
+    id: '5',
+    country: 'US',
+    state: 'Hawaii',
+    stateCode: 'HI',
+    countryCode: 'US',
+    description: 'You collect tax here',
+    returns: '2 returns set up',
+    status: 'In progress',
+    action: ['Set up returns', 'Mark as completed']
+  },
+  {
+    id: '6',
+    country: 'US',
+    state: 'Idaho',
+    stateCode: 'ID',
+    countryCode: 'US',
+    description: 'You collect tax here',
+    returns: '0 returns set up',
+    status: 'Not started',
+    action: ['Set up returns', 'Mark as completed']
+  },
+];
 
 const SetUpReturnsTable = ({companyId}) => {
+  const navigate = useNavigate()
+
+  const handleClick = (state, stateCode, countryCode) => {
+    navigate(`${state}?stateCode=${stateCode}&countryCode=${countryCode}`, {
+      relative: "route"
+    });
+  };
+
   const { loading, error, data } = useQuery(nexuses, {
     variables: {
       companyId: parseInt(companyId),
     }
   });
-
-  // const dataSource = [
-  //   {
-  //     id: '1',
-  //     country: 'US',
-  //     state: 'Alabama',
-  //     description: 'You collect tax here',
-  //     returns: '0 returns set up',
-  //     status: 'Not started',
-  //     action: ['Set up returns', 'Mark as completed']
-  //   },
-  //   {
-  //     id: '2',
-  //     country: 'US',
-  //     state: 'California',
-  //     description: 'You collect tax here',
-  //     returns: '2 returns set up',
-  //     status: 'In progress',
-  //     action: ['Set up returns', 'Mark as completed']
-  //   },
-  //   {
-  //     id: '3',
-  //     country: 'US',
-  //     state: 'Florida',
-  //     description: 'You collect tax here',
-  //     returns: '3 returns set up',
-  //     status: 'Completed',
-  //     action: ['Set up returns']
-  //   },
-  //   {
-  //     id: '4',
-  //     country: 'US',
-  //     state: 'Georgia',
-  //     description: 'You collect tax here',
-  //     returns: '10 returns set up',
-  //     status: 'Completed',
-  //     action: ['Set up returns']
-  //   },
-  //   {
-  //     id: '5',
-  //     country: 'US',
-  //     state: 'Hawaii',
-  //     description: 'You collect tax here',
-  //     returns: '2 returns set up',
-  //     status: 'In progress',
-  //     action: ['Set up returns', 'Mark as completed']
-  //   },
-  //   {
-  //     id: '6',
-  //     country: 'US',
-  //     state: 'Idaho',
-  //     description: 'You collect tax here',
-  //     returns: '0 returns set up',
-  //     status: 'Not started',
-  //     action: ['Set up returns', 'Mark as completed']
-  //   },
-  // ];
 
   if (error) {
     return <Result
@@ -138,9 +159,14 @@ const SetUpReturnsTable = ({companyId}) => {
       dataIndex: 'action',
       key: 'action',
       render: (_, record) => {
+        const {state, stateCode, countryCode} = record;
         const actions = Array.isArray(record.action) ? record.action : [record.action];
         return actions.map((action, index) => (
-          <Typography.Link key={index} style={{marginRight: '8px'}}>
+          <Typography.Link
+            key={index}
+            onClick={() => handleClick(state, stateCode, countryCode)}
+            style={{ marginRight: '8px' }}
+          >
             {action}
           </Typography.Link>
         ));
@@ -148,7 +174,7 @@ const SetUpReturnsTable = ({companyId}) => {
     },
   ];
 
-  return <Table dataSource={dataSource} columns={columns} loading={loading} pagination={pagination} />;
+  return <Table dataSource={mockDataSource} columns={columns} loading={loading} pagination={pagination} />;
 }
 
 export default SetUpReturnsTable;

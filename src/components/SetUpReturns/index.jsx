@@ -1,4 +1,4 @@
-import {Card, Layout, theme, Button, Space} from 'antd';
+import {Card, Layout, theme, Button, Space, Alert} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
@@ -47,6 +47,12 @@ const SetUpReturns = () => {
                 <h2 style={{margin: 0}}>States where you report tax</h2>
                 <Button icon={<PlusOutlined/>}>Add states</Button>
               </div>
+              <Alert
+                description="The data shown in this table is mock data for demonstration purposes and does not reflect actual API responses."
+                type="info"
+                showIcon
+                closable
+              />
               <div>
                 <SetUpReturnsTable companyId={companyId}/></div>
             </Space>
