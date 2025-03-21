@@ -1,5 +1,5 @@
 import { useLazyQuery } from '@apollo/client';
-import { Button, DatePicker, Flex, Space } from 'antd';
+import { Button, DatePicker, Flex, Space, Statistic } from 'antd';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
@@ -90,10 +90,9 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
   };
 
   return (
-    <Flex align="flex-start" justify="space-between">
-      <Flex vertical>
+    <Flex align="center" justify="space-between">
+      <Space direction="vertical">
         <FilingPeriodSelector date={date} setDate={setDate} />
-        <br />
         <Space>
           <Button
             type="default"
@@ -114,18 +113,16 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
             Download filing confirmations
           </Button>
         </Space>
-      </Flex>
-      {amountDue && (
-        <Flex vertical align="flex-end" justify="space-between" style={{}}>
-          <p>Amount due</p>
-          <h2>
-            {amountDue.toLocaleString('en-US', {
-              style: 'currency',
-              currency: 'USD',
-            })}{' '}
-            USD
-          </h2>
-        </Flex>
+      </Space>
+      {amountDue !== null && amountDue !== undefined && (
+        <Statistic
+          title="Amount due"
+          value={amountDue.toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+          })}
+          suffix="USD"
+        />
       )}
     </Flex>
   );

@@ -8,6 +8,9 @@ export const createAndLinkAccount = gql`
     $line: String!
     $postalCode: String!
     $region: String!
+    $email: String!
+    $firstName: String!
+    $lastName: String!
     $taxPayerIdNumber: String!
   ) {
     createAndLinkAccount(
@@ -20,6 +23,9 @@ export const createAndLinkAccount = gql`
           postalCode: $postalCode
           region: $region
         }
+        email: $email
+        firstName: $firstName
+        lastName: $lastName
         taxPayerIdNumber: $taxPayerIdNumber
       }
     ) {
@@ -27,6 +33,8 @@ export const createAndLinkAccount = gql`
       clientAccountName
       firmAccountId
       firmAccountName
+      firmContactEmail
+      firmContactName
       id
       isDeleted
       status

@@ -15,5 +15,10 @@ export default defineConfig(({ command, mode }) => {
         },
       },
     },
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: './tests/setup.js',
+    },
   };
 });
