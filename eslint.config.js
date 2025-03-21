@@ -33,9 +33,6 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
-    },
-    env:{
-      jest:true,
     }
   },
 ]
