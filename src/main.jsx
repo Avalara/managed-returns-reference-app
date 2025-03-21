@@ -16,7 +16,7 @@ import SetUpReturns from './components/SetUpReturns';
 import Authentication from './components/Authentication';
 import Provisioning from './components/Provisioning';
 import DataIngest from './components/DataIngest';
-
+import NotFound from './routes/NotFound';
 import ErrorPage from './routes/Error';
 
 const router = createBrowserRouter([
@@ -110,6 +110,10 @@ const router = createBrowserRouter([
             },
           },
         ],
+      },
+      {
+        path: '*',
+        element: <NotFound />,
       },
     ],
   },

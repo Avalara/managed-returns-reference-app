@@ -9,9 +9,9 @@ export default function ErrorPage() {
 
   return (
     <Result
-      status="404"
-      title="404"
-      subTitle="Sorry, the page you visited does not exist."
+      status="500"
+      title="500"
+      subTitle="Sorry, something went wrong."
       extra={<Button type="primary" onClick={() => navigate('/')}>Back Home</Button>}
     />
   );
