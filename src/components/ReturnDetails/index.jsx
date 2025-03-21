@@ -94,11 +94,11 @@ export default ReturnDetails;
 
 const columns = [
   { title: '', dataIndex: 'rowLabel', key: 'rowLabel' },
-  { title: 'Total sales', dataIndex: 'totalSales', key: 'totalSales' },
+  { title: 'Gross sales', dataIndex: 'grossSales', key: 'grossSales' },
   {
     title: 'Taxable sales',
-    dataIndex: 'taxableSales',
-    key: 'taxableSales',
+    dataIndex: 'netSales',
+    key: 'netSales',
   },
   {
     title: 'Payment to jurisdiction',
@@ -131,8 +131,8 @@ function extractTableData(returnData) {
       tableData.push({
         key: i,
         rowLabel: field,
-        totalSales: returnData[field].totalSales,
-        taxableSales: returnData[field].taxableSales,
+        grossSales: returnData[field].grossSales,
+        netSales: returnData[field].netSales,
         paymentToJurisdiction: returnData[field].paymentToJurisdiction,
         paymentToAvalara: returnData[field].paymentToAvalara,
       });

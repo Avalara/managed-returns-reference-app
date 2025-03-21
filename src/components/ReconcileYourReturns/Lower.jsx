@@ -155,22 +155,21 @@ const Lower = ({
           loading={loading}
         />
       </Card>
-
-      <br />
-
-      <ReturnsDataView
-        setLoading={setLoading}
-        viewMode={viewMode}
-        year={year}
-        month={month}
-        companyId={companyId}
-        country={country}
-        setAmountDue={setAmountDue}
-        setReturnCount={setReturnCount}
-        filters={filters}
-        setAvailableStates={setAvailableStates}
-        setAvailableStatuses={setAvailableStatuses}
-      />
+      <div style={{ marginTop: '20px' }}>
+        <ReturnsDataView
+          setLoading={setLoading}
+          viewMode={viewMode}
+          year={year}
+          month={month}
+          companyId={companyId}
+          country={country}
+          setAmountDue={setAmountDue}
+          setReturnCount={setReturnCount}
+          filters={filters}
+          setAvailableStates={setAvailableStates}
+          setAvailableStatuses={setAvailableStatuses}
+        />
+      </div>
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { Card, Collapse, Flex, Skeleton, Table, Typography } from 'antd';
+import { Card, Collapse, Skeleton, Space, Statistic, Table } from 'antd';
 import PropTypes from 'prop-types';
 
 import { columns } from './tableColumns';
@@ -11,8 +11,9 @@ const ReturnTile = ({ regionData }) => {
     state: getRegionName(regionData.region) || '',
     registrationId: taxReturn.registrationId,
     frequency: taxReturn.filingFrequency,
-    totalSales: taxReturn.returnTaxSummary.reportableSalesAmount,
-    taxableSales: taxReturn.returnTaxSummary.taxableAmount,
+    grossSales: taxReturn.returnTaxSummary.reportableSalesAmount,
+    netSales: taxReturn.returnTaxSummary.taxableAmount,
+    exemptSales: taxReturn.returnTaxSummary.nonTaxableAmount,
     totalTax: taxReturn.returnTaxSummary.taxAmount,
     adjustments: taxReturn.totalAdjustments,
     amountDue: taxReturn.returnTaxSummary.remittanceAmount,
@@ -29,6 +30,7 @@ const ReturnTile = ({ regionData }) => {
           dataSource={returnsDataSource}
           columns={columns}
           pagination={false}
+          scroll={{ x: 'max-content' }}
         />
       ),
     },
@@ -36,23 +38,24 @@ const ReturnTile = ({ regionData }) => {
   return (
     <Card
       bordered={false}
-      style={{
-        marginTop: 20,
-        marginBottom: 20,
-      }}
-    >
-      <Flex align="flex-start" justify="space-between">
-        <Typography.Title level={3}>
-          {getRegionName(regionData.region) || ''}
-        </Typography.Title>
-        <div style={{ alignItems: 'flex-end' }}>
-          <p>Amount due</p>
-          <Typography.Title level={3}>
-            {regionData?.regionTaxSummary?.remittanceAmount}
-          </Typography.Title>
+      style={{ marginBottom: 20 }}
+      title={<h3>{getRegionName(regionData.region) || ''}</h3>}
+      extra={
+        <div style={{ margin: '20px' }}>
+          <Statistic
+            title="Amount due"
+            value={regionData?.regionTaxSummary?.remittanceAmount.toLocaleString(
+              'en-US',
+              {
+                style: 'currency',
+                currency: 'USD',
+              }
+            )}
+            suffix="USD"
+          />
         </div>
-      </Flex>
-
+      }
+    >
       <Collapse items={collapseItems} onChange={() => {}} ghost />
     </Card>
   );
@@ -60,7 +63,9 @@ const ReturnTile = ({ regionData }) => {
 
 const ReturnTiles = ({ loading, dataSource }) =>
   loading ? (
-    <Skeleton active />
+    <Card>
+      <Skeleton active />
+    </Card>
   ) : (
     dataSource.map((region, idx) => (
       <ReturnTile key={idx} regionData={region} />
