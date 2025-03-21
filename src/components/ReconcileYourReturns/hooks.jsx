@@ -33,14 +33,16 @@ function useFilingsData({
     setAmountDue(data?.filings?.value?.[0]?.taxSummary?.remittanceAmount);
   }, [data, setAmountDue]);
 
-  const flattenedData = useMemo(() => {
-    return !data
-      ? []
-      : extractTableData(data, {
-          state: 'All',
-          status: 'All',
-        });
-  }, [data]);
+  const flattenedData = useMemo(
+    () =>
+      !data
+        ? []
+        : extractTableData(data, {
+            state: 'All',
+            status: 'All',
+          }),
+    [data]
+  );
 
   useEffect(() => {
     setAvailableStatuses(
@@ -50,9 +52,9 @@ function useFilingsData({
             ...new Set(
               flattenedData
                 .filter((taxReturn) => !!taxReturn.status)
-                .map((taxReturn) => taxReturn.status),
+                .map((taxReturn) => taxReturn.status)
             ),
-          ],
+          ]
     );
   }, [flattenedData, setAvailableStatuses]);
 
@@ -64,9 +66,9 @@ function useFilingsData({
             ...new Set(
               flattenedData
                 .filter((taxReturn) => !!taxReturn.state)
-                .map((taxReturn) => taxReturn.state),
+                .map((taxReturn) => taxReturn.state)
             ),
-          ],
+          ]
     );
   }, [flattenedData, setAvailableStates]);
 
@@ -80,7 +82,7 @@ function useFilingsData({
 
   useEffect(() => {
     const returnsToApprove = flattenedData.filter(
-      (tr) => tr.status === 'PendingApproval',
+      (tr) => tr.status === 'PendingApproval'
     );
     setReturnCount(returnsToApprove.length);
   }, [flattenedData, setReturnCount]);
@@ -96,11 +98,10 @@ function useFilingsData({
 function extractTileData(data, filters) {
   if (!data?.filings) return [];
 
-  const regionData = data?.filings?.value[0]?.filingRegions.filter((region) => {
-    return (
+  const regionData = data?.filings?.value[0]?.filingRegions.filter(
+    (region) =>
       filters.state === 'All' || getRegionCode(filters.state) === region.region
-    );
-  });
+  );
 
   return regionData;
 }
@@ -110,38 +111,35 @@ function extractTableData(data, filters) {
 
   const taxReturns = data.filings.value.flatMap((filing) =>
     filing.filingRegions
-      ?.filter((region) => {
-        return (
+      ?.filter(
+        (region) =>
           filters.state === 'All' ||
           getRegionCode(filters.state) === region.region
-        );
-      })
-      .flatMap((region) => {
-        return region?.returns
+      )
+      .flatMap((region) =>
+        region?.returns
           .filter(
             (taxReturn) =>
-              filters.status === 'All' || filters.status === taxReturn.status,
+              filters.status === 'All' || filters.status === taxReturn.status
           )
-          .map((taxReturn) => {
-            return {
-              key: taxReturn.id,
-              taxFormCode: taxReturn.formCode,
-              state: getRegionName(region.region) || '',
-              registrationId: taxReturn.registrationId,
-              frequency: taxReturn.filingFrequency,
-              totalSales: taxReturn.returnTaxSummary.reportableSalesAmount,
-              taxableSales: taxReturn.returnTaxSummary.taxableAmount,
-              totalTax: taxReturn.returnTaxSummary.taxAmount,
-              adjustments: taxReturn.totalAdjustments,
-              amountDue: taxReturn.returnTaxSummary.remittanceAmount,
-              status: taxReturn.status,
-              country: region.country,
-              regionCode: region.region,
-              year: data?.filings?.value?.[0].year,
-              month: data?.filings?.value?.[0].month,
-            };
-          });
-      }),
+          .map((taxReturn) => ({
+            key: taxReturn.id,
+            taxFormCode: taxReturn.formCode,
+            state: getRegionName(region.region) || '',
+            registrationId: taxReturn.registrationId,
+            frequency: taxReturn.filingFrequency,
+            totalSales: taxReturn.returnTaxSummary.reportableSalesAmount,
+            taxableSales: taxReturn.returnTaxSummary.taxableAmount,
+            totalTax: taxReturn.returnTaxSummary.taxAmount,
+            adjustments: taxReturn.totalAdjustments,
+            amountDue: taxReturn.returnTaxSummary.remittanceAmount,
+            status: taxReturn.status,
+            country: region.country,
+            regionCode: region.region,
+            year: data?.filings?.value?.[0].year,
+            month: data?.filings?.value?.[0].month,
+          }))
+      )
   );
 
   console.log('taxReturns', taxReturns);
@@ -174,20 +172,22 @@ function useListFilingsData({
     setAmountDue(data?.ListFilings?.value?.[0]?.taxSummary?.remittanceAmount);
   }, [data, setAmountDue]);
 
-  const flattenedData = useMemo(() => {
-    return !data
-      ? []
-      : datasourceTranslationListFilings(data, {
-          state: 'All',
-          status: 'All',
-        });
-  }, [data]);
+  const flattenedData = useMemo(
+    () =>
+      !data
+        ? []
+        : datasourceTranslationListFilings(data, {
+            state: 'All',
+            status: 'All',
+          }),
+    [data]
+  );
 
   useEffect(() => {
     setAvailableStatuses(
       !flattenedData
         ? []
-        : [...new Set(flattenedData.map((taxReturn) => taxReturn.status))],
+        : [...new Set(flattenedData.map((taxReturn) => taxReturn.status))]
     );
   }, [flattenedData, setAvailableStatuses]);
 
@@ -195,7 +195,7 @@ function useListFilingsData({
     setAvailableStates(
       !flattenedData
         ? []
-        : [...new Set(flattenedData.map((taxReturn) => taxReturn.state))],
+        : [...new Set(flattenedData.map((taxReturn) => taxReturn.state))]
     );
   }, [flattenedData, setAvailableStates]);
 
@@ -210,13 +210,11 @@ function useListFilingsData({
   useEffect(() => {
     if (data) {
       const flattenedReturns = data?.ListFilings?.value.flatMap((filing) =>
-        filing.filingRegions.flatMap((region) => {
-          return region?.returns;
-        }),
+        filing.filingRegions.flatMap((region) => region?.returns)
       );
 
       const returnsToApprove = flattenedReturns.filter(
-        (tr) => tr.status === 'PendingApproval',
+        (tr) => tr.status === 'PendingApproval'
       );
       setReturnCount(returnsToApprove.length);
     }
@@ -233,12 +231,8 @@ function useListFilingsData({
 function tileDataTranslationListFilings(data, filters) {
   if (!data?.ListFilings) return [];
   const regionData = data?.ListFilings?.value[0]?.filingRegions.filter(
-    (region) => {
-      return (
-        filters.state === 'All' ||
-        getRegionCode(filters.state) === region.region
-      );
-    },
+    (region) =>
+      filters.state === 'All' || getRegionCode(filters.state) === region.region
   );
 
   return regionData;
@@ -249,38 +243,35 @@ function datasourceTranslationListFilings(data, filters) {
 
   const taxReturns = data?.ListFilings?.value?.flatMap((filing) =>
     filing?.filingRegions
-      ?.filter((region) => {
-        return (
+      ?.filter(
+        (region) =>
           filters.state === 'All' ||
           getRegionCode(filters.state) === region.region
-        );
-      })
-      .flatMap((region) => {
-        return region?.returns
+      )
+      .flatMap((region) =>
+        region?.returns
           .filter(
             (taxReturn) =>
-              filters.status === 'All' || filters.status === taxReturn.status,
+              filters.status === 'All' || filters.status === taxReturn.status
           )
-          .map((taxReturn) => {
-            return {
-              key: taxReturn.id,
-              taxFormCode: taxReturn.formCode,
-              state: getRegionName(region.region) || '',
-              registrationId: taxReturn.registrationId,
-              frequency: taxReturn.filingFrequency,
-              totalSales: taxReturn.returnTaxSummary.reportableSalesAmount,
-              taxableSales: taxReturn.returnTaxSummary.taxableAmount,
-              totalTax: taxReturn.returnTaxSummary.taxAmount,
-              adjustments: taxReturn.totalAdjustments,
-              amountDue: taxReturn.returnTaxSummary.remittanceAmount,
-              status: taxReturn.status,
-              country: region.country,
-              regionCode: region.region,
-              year: data?.ListFilings?.value?.year,
-              month: data?.ListFilings?.value?.month,
-            };
-          });
-      }),
+          .map((taxReturn) => ({
+            key: taxReturn.id,
+            taxFormCode: taxReturn.formCode,
+            state: getRegionName(region.region) || '',
+            registrationId: taxReturn.registrationId,
+            frequency: taxReturn.filingFrequency,
+            totalSales: taxReturn.returnTaxSummary.reportableSalesAmount,
+            taxableSales: taxReturn.returnTaxSummary.taxableAmount,
+            totalTax: taxReturn.returnTaxSummary.taxAmount,
+            adjustments: taxReturn.totalAdjustments,
+            amountDue: taxReturn.returnTaxSummary.remittanceAmount,
+            status: taxReturn.status,
+            country: region.country,
+            regionCode: region.region,
+            year: data?.ListFilings?.value?.year,
+            month: data?.ListFilings?.value?.month,
+          }))
+      )
   );
 
   return taxReturns;

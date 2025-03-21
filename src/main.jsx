@@ -18,7 +18,7 @@ import Provisioning from './components/Provisioning';
 import DataIngest from './components/DataIngest';
 import NotFound from './routes/NotFound';
 import ErrorPage from './routes/Error';
-import SetUpStateReturns from "./components/SetUpRegionReturns/index.jsx";
+import SetUpStateReturns from './components/SetUpRegionReturns/index.jsx';
 
 const router = createBrowserRouter([
   {
@@ -129,5 +129,5 @@ createRoot(document.getElementById('root')).render(
     <StrictMode>
       <RouterProvider router={router} />
     </StrictMode>
-  </ApolloProvider>,
+  </ApolloProvider>
 );

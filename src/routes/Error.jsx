@@ -1,5 +1,5 @@
 import { useRouteError, useNavigate } from 'react-router-dom';
-import {Button, Result} from "antd";
+import { Button, Result } from 'antd';
 
 export default function ErrorPage() {
   const error = useRouteError();
@@ -12,7 +12,11 @@ export default function ErrorPage() {
       status="500"
       title="500"
       subTitle="Sorry, something went wrong."
-      extra={<Button type="primary" onClick={() => navigate('/')}>Back Home</Button>}
+      extra={
+        <Button type="primary" onClick={() => navigate('/')}>
+          Back Home
+        </Button>
+      }
     />
   );
 }

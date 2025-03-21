@@ -10,7 +10,7 @@ const OnboardingQuestion = ({
   question,
   answers,
   onAnswerSelect,
-  selectedAnswerIds
+  selectedAnswerIds,
 }) => {
   const handleAnswerChange = (e) => {
     onAnswerSelect(e.target.value);
@@ -27,12 +27,14 @@ const OnboardingQuestion = ({
         )}
       </div>
       {allowMultiSelect ? (
-        <Checkbox.Group
-          value={selectedAnswerIds ? selectedAnswerIds : []}
-        >
+        <Checkbox.Group value={selectedAnswerIds ? selectedAnswerIds : []}>
           <Space direction="vertical">
             {answers.map((answer, index) => (
-              <Checkbox key={index} value={answer.leadingQuestionAnswerId} onChange={handleAnswerChange}>
+              <Checkbox
+                key={index}
+                value={answer.leadingQuestionAnswerId}
+                onChange={handleAnswerChange}
+              >
                 {answer.answer}
                 {answer.answerHelpText && (
                   <Tooltip title={answer.answerHelpText}>
@@ -44,17 +46,16 @@ const OnboardingQuestion = ({
           </Space>
         </Checkbox.Group>
       ) : (
-        <Radio.Group
-          onChange={handleAnswerChange}
-          value={selectedAnswerIds}
-        >
+        <Radio.Group onChange={handleAnswerChange} value={selectedAnswerIds}>
           <Space direction="vertical">
             {answers.map((answer, index) => (
               <Radio
                 key={index}
                 value={answer.leadingQuestionAnswerId}
                 role="radio"
-                aria-checked={selectedAnswerIds === answer.leadingQuestionAnswerId}
+                aria-checked={
+                  selectedAnswerIds === answer.leadingQuestionAnswerId
+                }
               >
                 {answer.answer}
                 {answer.answerHelpText && (
@@ -82,14 +83,14 @@ OnboardingQuestion.propTypes = {
       answerHelpText: PropTypes.string,
       leadingQuestionAnswerId: PropTypes.number,
       nextQuestionId: PropTypes.number,
-      taxFormCode: PropTypes.string
+      taxFormCode: PropTypes.string,
     })
   ).isRequired,
   onAnswerSelect: PropTypes.func.isRequired,
   selectedAnswerIds: PropTypes.oneOfType([
     PropTypes.number,
-    PropTypes.arrayOf(PropTypes.number)
-  ])
+    PropTypes.arrayOf(PropTypes.number),
+  ]),
 };
 
 export default OnboardingQuestion;

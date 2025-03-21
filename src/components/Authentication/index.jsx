@@ -30,7 +30,7 @@ const Authentication = () => {
 
   const [clientId, setClientId] = useState(localStorage.getItem('clientId'));
   const [clientSecret, setClientSecret] = useState(
-    localStorage.getItem('clientSecret'),
+    localStorage.getItem('clientSecret')
   );
 
   const [editClientId, setEditClientId] = useState(false);
@@ -240,12 +240,10 @@ const Authentication = () => {
                 value={selectedCompanyId}
                 options={
                   companies
-                    ? companies.map((c) => {
-                        return {
-                          value: '' + c.id,
-                          label: <span>{'' + c.id}</span>,
-                        };
-                      })
+                    ? companies.map((c) => ({
+                        value: '' + c.id,
+                        label: <span>{'' + c.id}</span>,
+                      }))
                     : [{ value: 'Loading...', label: <span>Loading...</span> }]
                 }
                 onChange={(value) => {

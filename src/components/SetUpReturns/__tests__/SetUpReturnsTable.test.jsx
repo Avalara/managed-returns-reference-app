@@ -1,28 +1,27 @@
-import {nexuses} from '../../../graphql/queries/Nexuses.js';
-import {render, screen, fireEvent} from '@testing-library/react';
-import {MockedProvider} from "@apollo/client/testing";
-import SetUpReturnsTable from "../SetUpReturnsTable.jsx";
+import { nexuses } from '../../../graphql/queries/Nexuses.js';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { MockedProvider } from '@apollo/client/testing';
+import SetUpReturnsTable from '../SetUpReturnsTable.jsx';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock the useNavigate hook
 const mockNavigate = vi.fn();
-vi.mock(import("react-router-dom"), async (importOriginal) => {
-    const actual = await importOriginal()
-    return {
-      ...actual,
-      useNavigate: () => mockNavigate,
-      Link: ({ children }) => children,
-    }
-  }
-);
+vi.mock(import('react-router-dom'), async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    Link: ({ children }) => children,
+  };
+});
 
 const mocks = [
   {
     request: {
       query: nexuses,
       variables: {
-        companyId: 1
+        companyId: 1,
       },
     },
     result: {
@@ -38,7 +37,7 @@ const mocks = [
               description: 'You collect tax here',
               returns: '0 returns set up',
               status: 'Not started',
-              action: ['Set up returns', 'Mark as completed']
+              action: ['Set up returns', 'Mark as completed'],
             },
             {
               id: '2',
@@ -49,7 +48,7 @@ const mocks = [
               description: 'You collect tax here',
               returns: '2 returns set up',
               status: 'In progress',
-              action: ['Set up returns', 'Mark as completed']
+              action: ['Set up returns', 'Mark as completed'],
             },
             {
               id: '3',
@@ -60,7 +59,7 @@ const mocks = [
               description: 'You collect tax here',
               returns: '3 returns set up',
               status: 'Completed',
-              action: ['Set up returns']
+              action: ['Set up returns'],
             },
             {
               id: '4',
@@ -71,7 +70,7 @@ const mocks = [
               description: 'You collect tax here',
               returns: '10 returns set up',
               status: 'Completed',
-              action: ['Set up returns']
+              action: ['Set up returns'],
             },
             {
               id: '5',
@@ -82,7 +81,7 @@ const mocks = [
               description: 'You collect tax here',
               returns: '2 returns set up',
               status: 'In progress',
-              action: ['Set up returns', 'Mark as completed']
+              action: ['Set up returns', 'Mark as completed'],
             },
             {
               id: '6',
@@ -93,11 +92,11 @@ const mocks = [
               description: 'You collect tax here',
               returns: '0 returns set up',
               status: 'Not started',
-              action: ['Set up returns', 'Mark as completed']
+              action: ['Set up returns', 'Mark as completed'],
             },
           ],
         },
-      }
+      },
     },
   },
 ];
@@ -111,7 +110,7 @@ describe('SetUpReturnsTable', () => {
     render(
       <BrowserRouter>
         <MockedProvider mocks={mocks} addTypename={false}>
-          <SetUpReturnsTable companyId={1}/>
+          <SetUpReturnsTable companyId={1} />
         </MockedProvider>
       </BrowserRouter>
     );
@@ -136,7 +135,7 @@ describe('SetUpReturnsTable', () => {
         request: {
           query: nexuses,
           variables: {
-            companyId: 1
+            companyId: 1,
           },
         },
         error: new Error('An error occurred'),
@@ -146,7 +145,7 @@ describe('SetUpReturnsTable', () => {
     render(
       <BrowserRouter>
         <MockedProvider mocks={errorMock} addTypename={false}>
-          <SetUpReturnsTable companyId={1}/>
+          <SetUpReturnsTable companyId={1} />
         </MockedProvider>
       </BrowserRouter>
     );
@@ -162,7 +161,7 @@ describe('SetUpReturnsTable', () => {
     render(
       <BrowserRouter>
         <MockedProvider mocks={mocks} addTypename={false}>
-          <SetUpReturnsTable companyId={1}/>
+          <SetUpReturnsTable companyId={1} />
         </MockedProvider>
       </BrowserRouter>
     );
@@ -205,7 +204,7 @@ describe('SetUpReturnsTable', () => {
     render(
       <BrowserRouter>
         <MockedProvider mocks={mocks} addTypename={false}>
-          <SetUpReturnsTable companyId={1}/>
+          <SetUpReturnsTable companyId={1} />
         </MockedProvider>
       </BrowserRouter>
     );
@@ -218,8 +217,11 @@ describe('SetUpReturnsTable', () => {
     fireEvent.click(setupReturnsLinks[0]);
 
     // Verify navigation was called with correct parameters
-    expect(mockNavigate).toHaveBeenCalledWith('Alabama?stateCode=AL&countryCode=US', {
-      relative: 'route'
-    });
+    expect(mockNavigate).toHaveBeenCalledWith(
+      'Alabama?stateCode=AL&countryCode=US',
+      {
+        relative: 'route',
+      }
+    );
   });
 });

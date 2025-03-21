@@ -1,66 +1,66 @@
 import React from 'react';
-import {render, screen, fireEvent, waitFor} from '@testing-library/react';
-import {MockedProvider} from '@apollo/client/testing';
-import {ConfigProvider, theme} from 'antd';
-import {MemoryRouter, Route, Routes} from 'react-router-dom';
-import {describe, it, expect, vi, afterEach} from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MockedProvider } from '@apollo/client/testing';
+import { ConfigProvider, theme } from 'antd';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import SetUpRegionReturns from '../index';
-import {suggestedReturns as SUGGESTED_RETURNS_QUERY} from '../../../graphql/queries/SuggestedReturns';
-import {onboardingQuestionAnswer} from '../../../graphql/mutations/OnboardingQuestionAnswer';
+import { suggestedReturns as SUGGESTED_RETURNS_QUERY } from '../../../graphql/queries/SuggestedReturns';
+import { onboardingQuestionAnswer } from '../../../graphql/mutations/OnboardingQuestionAnswer';
 import * as reactRouterDom from 'react-router-dom';
 
 // Mock data
 const mockSuggestedReturns = [
   {
-    description: "Description 1",
+    description: 'Description 1',
     taxAuthorityId: 111,
-    taxFormCode: "TaxFormCode 1",
-    taxAuthorityName: "TaxAuthorityName 1",
-    taxFormName: "TaxFormName 1",
-    taxTypes: ["Tax Type 1", "Tax Type 2"],
+    taxFormCode: 'TaxFormCode 1',
+    taxAuthorityName: 'TaxAuthorityName 1',
+    taxFormName: 'TaxFormName 1',
+    taxTypes: ['Tax Type 1', 'Tax Type 2'],
     recommended: true,
-    purpose: "Purpose 1"
+    purpose: 'Purpose 1',
   },
   {
-    description: "Description 2",
+    description: 'Description 2',
     taxAuthorityId: 114,
-    taxFormCode: "TaxFormCode 2",
-    taxAuthorityName: "TaxAuthorityName 2",
-    taxFormName: "TaxFormName 2",
-    taxTypes: ["Tax Type 3", "Tax Type 4"],
+    taxFormCode: 'TaxFormCode 2',
+    taxAuthorityName: 'TaxAuthorityName 2',
+    taxFormName: 'TaxFormName 2',
+    taxTypes: ['Tax Type 3', 'Tax Type 4'],
     recommended: false,
-    purpose: "Purpose 2"
-  }
+    purpose: 'Purpose 2',
+  },
 ];
 
 const mockOnboardingQuestions = [
   {
     allowMultiSelect: false,
-    country: "US",
-    dataType: "BOOLEAN",
-    helpText: "Help Text 1",
-    question: "Question 1",
+    country: 'US',
+    dataType: 'BOOLEAN',
+    helpText: 'Help Text 1',
+    question: 'Question 1',
     questionId: 3,
-    region: "AK",
+    region: 'AK',
     sequence: 1,
     standard: false,
     answers: [
       {
-        answer: "Answer 1",
-        answerHelpText: "Answer Help Text 1",
+        answer: 'Answer 1',
+        answerHelpText: 'Answer Help Text 1',
         leadingQuestionAnswerId: null,
         nextQuestionId: null,
-        taxFormCode: "[\"TaxFormCode1\"]"
+        taxFormCode: '["TaxFormCode1"]',
       },
       {
-        answer: "Answer 2",
-        answerHelpText: "Answer Help Text 2",
+        answer: 'Answer 2',
+        answerHelpText: 'Answer Help Text 2',
         leadingQuestionAnswerId: null,
         nextQuestionId: null,
-        taxFormCode: "[\"TaxFormCode2\"]"
-      }
-    ]
-  }
+        taxFormCode: '["TaxFormCode2"]',
+      },
+    ],
+  },
 ];
 
 // Mock GraphQL responses
@@ -68,20 +68,24 @@ const defaultMocks = [
   {
     request: {
       query: SUGGESTED_RETURNS_QUERY,
-      variables: {companyId: 123}
+      variables: { companyId: 123 },
     },
     result: {
       data: {
         companies: {
-          value: [{
-            suggestedReturns: [{
-              suggestedReturns: mockSuggestedReturns,
-              onboardingQuestions: mockOnboardingQuestions
-            }]
-          }]
-        }
-      }
-    }
+          value: [
+            {
+              suggestedReturns: [
+                {
+                  suggestedReturns: mockSuggestedReturns,
+                  onboardingQuestions: mockOnboardingQuestions,
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
   },
   // {
   //   request: {
@@ -108,8 +112,8 @@ const defaultMocks = [
 
 // Mock context values
 const mockOutletContext = {
-  accountId: "123",
-  companyId: "123"
+  accountId: '123',
+  companyId: '123',
 };
 
 // Mock useOutletContext hooks
@@ -121,22 +125,18 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-const renderComponent = (mocks = null) => {
-  return render(
+const renderComponent = (mocks = null) =>
+  render(
     <MockedProvider mocks={mocks ? mocks : defaultMocks}>
       <ConfigProvider>
         <MemoryRouter initialEntries={['/setup/Arkansas']}>
           <Routes>
-            <Route
-              path="/setup/:region"
-              element={<SetUpRegionReturns/>}
-            />
+            <Route path="/setup/:region" element={<SetUpRegionReturns />} />
           </Routes>
         </MemoryRouter>
       </ConfigProvider>
     </MockedProvider>
   );
-};
 
 describe('SetUpRegionReturns page', () => {
   afterEach(() => {
@@ -166,7 +166,7 @@ describe('SetUpRegionReturns page', () => {
 
     // Find the search input using a more specific selector
     const searchInput = document.querySelector('.ant-input');
-    fireEvent.change(searchInput, {target: {value: 'Description 1'}});
+    fireEvent.change(searchInput, { target: { value: 'Description 1' } });
 
     expect(screen.getByText('Description 1')).toBeInTheDocument();
     expect(screen.queryByText('Description 2')).not.toBeInTheDocument();
@@ -201,15 +201,17 @@ describe('SetUpRegionReturns page', () => {
     const errorMock = {
       request: {
         query: SUGGESTED_RETURNS_QUERY,
-        variables: {companyId: 123}
+        variables: { companyId: 123 },
       },
-      error: new Error('An error occurred')
+      error: new Error('An error occurred'),
     };
 
     renderComponent([errorMock]);
 
     await waitFor(() => {
-      expect(screen.getByText(/We are having a momentary issue/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/We are having a momentary issue/i)
+      ).toBeInTheDocument();
     });
   });
 });

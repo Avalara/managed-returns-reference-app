@@ -1,6 +1,6 @@
 import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
-import * as matchers from "@testing-library/jest-dom/matchers";
+import * as matchers from '@testing-library/jest-dom/matchers';
 
 expect.extend(matchers);
 
@@ -24,11 +24,9 @@ Object.defineProperty(window, 'matchMedia', {
 
 Object.defineProperty(window, 'getComputedStyle', {
   value: (element) => ({
-    getPropertyValue: (prop) => {
-      return '';
-    },
+    getPropertyValue: (prop) => '',
     display: 'none',
     margin: '0',
     padding: '0',
-  })
+  }),
 });

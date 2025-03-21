@@ -5,22 +5,20 @@ import { columns } from './tableColumns';
 import { getRegionName } from '../shared/USRegions';
 
 const ReturnTile = ({ regionData }) => {
-  const returnsDataSource = regionData?.returns.map((taxReturn) => {
-    return {
-      key: taxReturn.id,
-      taxFormCode: taxReturn.formCode,
-      state: getRegionName(regionData.region) || '',
-      registrationId: taxReturn.registrationId,
-      frequency: taxReturn.filingFrequency,
-      totalSales: taxReturn.returnTaxSummary.reportableSalesAmount,
-      taxableSales: taxReturn.returnTaxSummary.taxableAmount,
-      totalTax: taxReturn.returnTaxSummary.taxAmount,
-      adjustments: taxReturn.totalAdjustments,
-      amountDue: taxReturn.returnTaxSummary.remittanceAmount,
-      status: taxReturn.status,
-      link: '',
-    };
-  });
+  const returnsDataSource = regionData?.returns.map((taxReturn) => ({
+    key: taxReturn.id,
+    taxFormCode: taxReturn.formCode,
+    state: getRegionName(regionData.region) || '',
+    registrationId: taxReturn.registrationId,
+    frequency: taxReturn.filingFrequency,
+    totalSales: taxReturn.returnTaxSummary.reportableSalesAmount,
+    taxableSales: taxReturn.returnTaxSummary.taxableAmount,
+    totalTax: taxReturn.returnTaxSummary.taxAmount,
+    adjustments: taxReturn.totalAdjustments,
+    amountDue: taxReturn.returnTaxSummary.remittanceAmount,
+    status: taxReturn.status,
+    link: '',
+  }));
 
   const collapseItems = [
     {
@@ -60,15 +58,14 @@ const ReturnTile = ({ regionData }) => {
   );
 };
 
-const ReturnTiles = ({ loading, dataSource }) => {
-  return loading ? (
+const ReturnTiles = ({ loading, dataSource }) =>
+  loading ? (
     <Skeleton active />
   ) : (
-    dataSource.map((region, idx) => {
-      return <ReturnTile key={idx} regionData={region} />;
-    })
+    dataSource.map((region, idx) => (
+      <ReturnTile key={idx} regionData={region} />
+    ))
   );
-};
 
 ReturnTiles.propTypes = {
   loading: PropTypes.bool.isRequired,

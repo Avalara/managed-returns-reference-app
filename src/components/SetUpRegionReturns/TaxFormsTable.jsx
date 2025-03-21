@@ -1,9 +1,8 @@
-import {Button, Space, Table, Tag} from 'antd';
+import { Button, Space, Table, Tag } from 'antd';
 import PropTypes from 'prop-types';
-import {useState} from "react";
+import { useState } from 'react';
 
-const TaxFormsTable = ({dataSource, loading}) => {
-
+const TaxFormsTable = ({ dataSource, loading }) => {
   const pageSize = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -22,37 +21,41 @@ const TaxFormsTable = ({dataSource, loading}) => {
       title: '',
       dataIndex: 'recommended',
       key: 'recommended',
-      render: (recommended) => (
-        recommended ? <Tag color="green">Recommended</Tag> : null
-      ),
+      render: (recommended) =>
+        recommended ? <Tag color="green">Recommended</Tag> : null,
     },
     {
       title: '',
       key: 'action',
       render: (_, record) => (
-        <Button color="primary" variant="link">Set up returns</Button>
+        <Button color="primary" variant="link">
+          Set up returns
+        </Button>
       ),
-    }
-  ]
+    },
+  ];
 
   const pagination = {
     current: currentPage,
     pageSize: pageSize,
     total: dataSource.length,
-    showSizeChanger: false
-  }
+    showSizeChanger: false,
+  };
 
-  const currentPageData = dataSource.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const currentPageData = dataSource.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   return (
     <Table
       dataSource={dataSource}
       columns={columns}
-      style={{width: '100%'}}
+      style={{ width: '100%' }}
       loading={loading}
       pagination={pagination}
       onChange={(page) => {
-        setCurrentPage(page.current)
+        setCurrentPage(page.current);
       }}
       rowKey="taxFormCode"
       expandable={{
@@ -61,12 +64,20 @@ const TaxFormsTable = ({dataSource, loading}) => {
             {record.purpose}
             <table>
               <tr>
-                <td><b>Tax type </b></td>
-                <td style={{paddingLeft: '10px'}}>{record.taxTypes.join(', ')}</td>
+                <td>
+                  <b>Tax type </b>
+                </td>
+                <td style={{ paddingLeft: '10px' }}>
+                  {record.taxTypes.join(', ')}
+                </td>
               </tr>
               <tr>
-                <td><b>Tax authority </b></td>
-                <td style={{paddingLeft: '10px'}}>{record.taxAuthorityName}</td>
+                <td>
+                  <b>Tax authority </b>
+                </td>
+                <td style={{ paddingLeft: '10px' }}>
+                  {record.taxAuthorityName}
+                </td>
               </tr>
             </table>
           </Space>
@@ -77,14 +88,16 @@ const TaxFormsTable = ({dataSource, loading}) => {
 };
 
 TaxFormsTable.propTypes = {
-  dataSource: PropTypes.arrayOf(PropTypes.shape({
-    description: PropTypes.string,
-    taxAuthorityName: PropTypes.string,
-    taxTypes: PropTypes.arrayOf(PropTypes.string),
-    purpose: PropTypes.string,
-    taxFormName: PropTypes.string,
-    recommended: PropTypes.bool
-  })).isRequired,
+  dataSource: PropTypes.arrayOf(
+    PropTypes.shape({
+      description: PropTypes.string,
+      taxAuthorityName: PropTypes.string,
+      taxTypes: PropTypes.arrayOf(PropTypes.string),
+      purpose: PropTypes.string,
+      taxFormName: PropTypes.string,
+      recommended: PropTypes.bool,
+    })
+  ).isRequired,
   loading: PropTypes.bool,
 };
 
