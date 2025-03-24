@@ -105,11 +105,13 @@ const TaxFormsTable = ({ dataSource, loading }) => {
         }}
       />
 
-      <AddReturn
-        visible={drawerVisible}
-        onClose={handleCloseDrawer}
-        taxForm={selectedTaxForm}
-      />
+      {selectedTaxForm && (
+        <AddReturn
+          visible={drawerVisible}
+          onClose={handleCloseDrawer}
+          taxForm={selectedTaxForm}
+        />
+      )}
     </>
   );
 };
