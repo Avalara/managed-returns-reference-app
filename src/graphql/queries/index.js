@@ -1,13 +1,7 @@
-import { companies } from './Companies';
-import { nexuses } from './Nexuses.js';
-import { countries } from './Countries';
-import { filings } from './Filings';
-import { liabilityReports } from './LiabilityReports';
-
-export default {
-  companies,
-  countries,
-  filings,
-  liabilityReports,
-  nexuses,
-};
+export { companies } from './Companies.js';
+export { nexuses } from './Nexuses.js';
+export { countries } from './Countries.js';
+export { filings } from './Filings.js';
+export { liabilityReports } from './LiabilityReports.js';
+export { taxForms } from './TaxForms.js';
+export { suggestedTaxForms } from './SuggestedTaxForms.js';

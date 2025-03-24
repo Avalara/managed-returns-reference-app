@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLazyQuery, useMutation } from '@apollo/client';
-import query from '../../graphql/queries';
-import mutation from '../../graphql/mutations';
+import { countries as COUNTRIES } from '../../graphql/queries';
+import { createAndLinkAccount as CREATE_AND_LINK_ACCOUNT } from '../../graphql/mutations';
 
 import {
   Button,
@@ -50,7 +50,7 @@ const Provisioning = () => {
       error: getCountriesAndRegionsDidError,
       data: countriesAndRegionsData,
     },
-  ] = useLazyQuery(query.countries);
+  ] = useLazyQuery(COUNTRIES);
 
   useEffect(() => {
     const getCountryAndRegionIds = async () => {
@@ -102,7 +102,7 @@ const Provisioning = () => {
       error: createAndLinkAccountDidError,
       data: createAndLinkAccountData,
     },
-  ] = useMutation(mutation.createAndLinkAccount);
+  ] = useMutation(CREATE_AND_LINK_ACCOUNT);
 
   const onFinish = async () => {
     try {

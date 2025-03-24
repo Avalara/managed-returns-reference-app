@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DownloadOutlined, FilePdfOutlined } from '@ant-design/icons';
 
-import { liabilityReports } from '../../graphql/queries/LiabilityReports';
+import { liabilityReports as LIABILITY_REPORTS } from '../../graphql/queries';
 
 const FilingPeriodSelector = ({ date, setDate }) => {
   const navigate = useNavigate();
@@ -64,7 +64,7 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
       loading,
       // data,
     },
-  ] = useLazyQuery(liabilityReports);
+  ] = useLazyQuery(LIABILITY_REPORTS);
 
   const downloadLiabilityReports = async () => {
     const { data } = await downloadLiabilityReport({

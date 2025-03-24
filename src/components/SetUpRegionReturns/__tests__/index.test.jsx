@@ -5,7 +5,7 @@ import { ConfigProvider, theme } from 'antd';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import SetUpRegionReturns from '../index';
-import { suggestedReturns as SUGGESTED_RETURNS_QUERY } from '../../../graphql/queries/SuggestedReturns';
+import { suggestedTaxForms as SUGGESTED_TAX_FORMS } from '../../../graphql/queries/SuggestedTaxForms.js';
 import { onboardingQuestionAnswer } from '../../../graphql/mutations/OnboardingQuestionAnswer';
 import * as reactRouterDom from 'react-router-dom';
 
@@ -67,7 +67,7 @@ const mockOnboardingQuestions = [
 const defaultMocks = [
   {
     request: {
-      query: SUGGESTED_RETURNS_QUERY,
+      query: SUGGESTED_TAX_FORMS,
       variables: { companyId: 123 },
     },
     result: {
@@ -200,7 +200,7 @@ describe('SetUpRegionReturns page', () => {
   it('should handle GraphQL errors gracefully', async () => {
     const errorMock = {
       request: {
-        query: SUGGESTED_RETURNS_QUERY,
+        query: SUGGESTED_TAX_FORMS,
         variables: { companyId: 123 },
       },
       error: new Error('An error occurred'),
