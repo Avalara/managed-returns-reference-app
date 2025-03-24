@@ -69,7 +69,7 @@ const TaxFormsTable = ({ dataSource, loading }) => {
                     <b>Tax type </b>
                   </td>
                   <td style={{ paddingLeft: '10px' }}>
-                    {record.taxTypes.join(', ')}
+                    {record.taxTypes ? record.taxTypes.join(', ') : ''}
                   </td>
                 </tr>
                 <tr>
