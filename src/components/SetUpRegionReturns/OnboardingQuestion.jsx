@@ -11,7 +11,7 @@ const OnboardingQuestion = ({
   answers,
   onAnswerSelect,
   selectedAnswerIds,
-  disabled,
+  disabled = false,
 }) => {
   const handleAnswerChange = (e) => {
     onAnswerSelect(e.target.value);
@@ -46,7 +46,7 @@ const OnboardingQuestion = ({
       ) : (
         <Radio.Group
           onChange={handleAnswerChange}
-          value={selectedAnswerIds[0]}
+          value={selectedAnswerIds ? selectedAnswerIds[0] : ''}
           disabled={disabled}
         >
           <Space direction="vertical">
@@ -55,9 +55,6 @@ const OnboardingQuestion = ({
                 key={index}
                 value={answer.leadingQuestionAnswerId}
                 role="radio"
-                aria-checked={
-                  selectedAnswerIds[0] === answer.leadingQuestionAnswerId
-                }
                 disabled={disabled}
               >
                 {answer.answer}{' '}
@@ -93,10 +90,6 @@ OnboardingQuestion.propTypes = {
     PropTypes.arrayOf(PropTypes.number),
   ]),
   disabled: PropTypes.bool,
-};
-
-OnboardingQuestion.defaultProps = {
-  disabled: false,
 };
 
 export default OnboardingQuestion;

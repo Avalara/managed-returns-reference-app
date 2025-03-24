@@ -1,122 +1,106 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
-import { ConfigProvider, theme } from 'antd';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { describe, it, expect, vi, afterEach } from 'vitest';
 import SetUpRegionReturns from '../index';
-import { suggestedTaxForms as SUGGESTED_TAX_FORMS } from '../../../graphql/queries/SuggestedTaxForms.js';
-import { onboardingQuestionAnswer } from '../../../graphql/mutations/OnboardingQuestionAnswer';
-import * as reactRouterDom from 'react-router-dom';
+import {
+  suggestedTaxForms as SUGGESTED_TAX_FORMS,
+  taxForms as TAX_FORMS,
+} from '../../../graphql/queries';
 
-// Mock data
-const mockSuggestedReturns = [
-  {
-    description: 'Description 1',
-    taxAuthorityId: 111,
-    taxFormCode: 'TaxFormCode 1',
-    taxAuthorityName: 'TaxAuthorityName 1',
-    taxFormName: 'TaxFormName 1',
-    taxTypes: ['Tax Type 1', 'Tax Type 2'],
-    recommended: true,
-    purpose: 'Purpose 1',
-  },
-  {
-    description: 'Description 2',
-    taxAuthorityId: 114,
-    taxFormCode: 'TaxFormCode 2',
-    taxAuthorityName: 'TaxAuthorityName 2',
-    taxFormName: 'TaxFormName 2',
-    taxTypes: ['Tax Type 3', 'Tax Type 4'],
-    recommended: false,
-    purpose: 'Purpose 2',
-  },
-];
-
-const mockOnboardingQuestions = [
-  {
-    allowMultiSelect: false,
-    country: 'US',
-    dataType: 'BOOLEAN',
-    helpText: 'Help Text 1',
-    question: 'Question 1',
-    questionId: 3,
-    region: 'AK',
-    sequence: 1,
-    standard: false,
-    answers: [
+const mockTaxFormsData = {
+  taxForms: {
+    value: [
       {
-        answer: 'Answer 1',
-        answerHelpText: 'Answer Help Text 1',
-        leadingQuestionAnswerId: null,
-        nextQuestionId: null,
-        taxFormCode: '["TaxFormCode1"]',
+        taxFormCode: 'TEST-001',
+        taxFormName: 'Test Form 1',
+        description: 'Test Description 1',
+        taxTypes: ['Sales Tax'],
+        purpose: 'File sales tax returns for Washington state',
+        taxAuthority: 'Washington Department of Revenue',
       },
       {
-        answer: 'Answer 2',
-        answerHelpText: 'Answer Help Text 2',
-        leadingQuestionAnswerId: null,
-        nextQuestionId: null,
-        taxFormCode: '["TaxFormCode2"]',
+        taxFormCode: 'TEST-002',
+        taxFormName: 'Test Form 2',
+        description: 'Test Description 2',
+        taxTypes: ['Use Tax'],
+        purpose: 'File use tax returns for Washington state',
+        taxAuthority: 'Washington State Tax Authority',
       },
     ],
   },
-];
+};
 
-// Mock GraphQL responses
-const defaultMocks = [
+const mockSuggestedTaxFormsData = {
+  companies: {
+    value: [
+      {
+        suggestedTaxForms: [
+          {
+            suggestedReturns: [
+              {
+                taxFormCode: 'TEST-001',
+              },
+            ],
+            onboardingQuestions: [
+              {
+                questionId: 1,
+                question: 'Test Question 1',
+                allowMultiSelect: false,
+                helpText: '',
+                answers: [
+                  {
+                    leadingQuestionAnswerId: 1,
+                    answer: 'Answer 1',
+                    answerHelpText: '',
+                  },
+                  {
+                    leadingQuestionAnswerId: 2,
+                    answer: 'Answer 2',
+                    answerHelpText: '',
+                  },
+                ],
+              },
+            ],
+            answeredQuestions: [
+              {
+                questionId: 1,
+                onboardingQuestionAnswerId: 'answer-1',
+                answerId: 1,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+};
+
+const mocks = [
+  {
+    request: {
+      query: TAX_FORMS,
+      variables: { country: 'US', region: 'WA' },
+    },
+    result: {
+      data: mockTaxFormsData,
+    },
+  },
   {
     request: {
       query: SUGGESTED_TAX_FORMS,
-      variables: { companyId: 123 },
+      variables: { companyId: 123, country: 'US', region: 'WA' },
     },
     result: {
-      data: {
-        companies: {
-          value: [
-            {
-              suggestedReturns: [
-                {
-                  suggestedReturns: mockSuggestedReturns,
-                  onboardingQuestions: mockOnboardingQuestions,
-                },
-              ],
-            },
-          ],
-        },
-      },
+      data: mockSuggestedTaxFormsData,
     },
   },
-  // {
-  //   request: {
-  //     query: onboardingQuestionAnswer,
-  //     variables: {
-  //       accountId: 123,
-  //       companyId: 123,
-  //       country: "US",
-  //       region: "AK",
-  //       questionId: 3,
-  //       answerId: 1,
-  //       operation: "CREATE"
-  //     }
-  //   },
-  //   result: {
-  //     data: {
-  //       onboardingQuestionAnswer: {
-  //         success: true
-  //       }
-  //     }
-  //   }
-  // }
 ];
 
-// Mock context values
 const mockOutletContext = {
   accountId: '123',
   companyId: '123',
 };
 
-// Mock useOutletContext hooks
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
@@ -125,72 +109,69 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-const renderComponent = (mocks = null) =>
+const renderComponent = (mocks = []) =>
   render(
-    <MockedProvider mocks={mocks ? mocks : defaultMocks}>
-      <ConfigProvider>
-        <MemoryRouter initialEntries={['/setup/Arkansas']}>
-          <Routes>
-            <Route path="/setup/:region" element={<SetUpRegionReturns />} />
-          </Routes>
-        </MemoryRouter>
-      </ConfigProvider>
-    </MockedProvider>
+    <MockedProvider mocks={mocks} addTypename={false}>
+      <MemoryRouter
+        initialEntries={['/setup/Washington?countryCode=US&regionCode=WA']}
+      >
+        <Routes>
+          <Route path="/setup/:region" element={<SetUpRegionReturns />} />
+        </Routes>
+      </MemoryRouter>
+    </MockedProvider>,
+    {
+      wrapper: ({ children }) => <div>{children}</div>,
+    }
   );
 
 describe('SetUpRegionReturns page', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
-
   it('should render the component heading', () => {
-    renderComponent();
-    expect(screen.getByText(/Set up Arkansas returns/i)).toBeInTheDocument();
+    renderComponent(mocks);
+    expect(screen.getByText('Set up Washington returns')).toBeInTheDocument();
   });
 
-  it('should display returns after loading', async () => {
-    renderComponent();
-
+  it('should display tax forms after loading', async () => {
+    renderComponent(mocks);
     await waitFor(() => {
-      expect(screen.getByText('Description 1')).toBeInTheDocument();
-      expect(screen.getByText('Description 2')).toBeInTheDocument();
+      expect(screen.getByText('Test Form 1')).toBeInTheDocument();
+      expect(screen.getByText('Test Form 2')).toBeInTheDocument();
     });
   });
 
-  it('should filter returns based on search text', async () => {
-    renderComponent();
-
+  it('should filter tax forms based on search text', async () => {
+    renderComponent(mocks);
     await waitFor(() => {
-      expect(screen.getByText('Description 1')).toBeInTheDocument();
+      expect(screen.getByText('Test Form 1')).toBeInTheDocument();
     });
 
-    // Find the search input using a more specific selector
-    const searchInput = document.querySelector('.ant-input');
-    fireEvent.change(searchInput, { target: { value: 'Description 1' } });
+    const searchInput = screen.getByLabelText(/Search by return name/i);
+    fireEvent.change(searchInput, { target: { value: 'Test Form 1' } });
 
-    expect(screen.getByText('Description 1')).toBeInTheDocument();
-    expect(screen.queryByText('Description 2')).not.toBeInTheDocument();
+    expect(screen.getByText('Test Form 1')).toBeInTheDocument();
+    expect(screen.queryByText('Test Form 2')).not.toBeInTheDocument();
   });
 
-  it('should filter recommended returns when toggle is switched', async () => {
-    renderComponent();
-
+  it('should show only recommended returns when toggle is switched', async () => {
+    renderComponent(mocks);
     await waitFor(() => {
-      expect(screen.getByText('Description 1')).toBeInTheDocument();
+      expect(screen.getByText('Test Form 1')).toBeInTheDocument();
     });
 
     const recommendedSwitch = document.querySelector('.ant-switch');
     fireEvent.click(recommendedSwitch);
 
-    expect(screen.getByText('Description 1')).toBeInTheDocument();
-    expect(screen.queryByText('Description 2')).not.toBeInTheDocument();
+    expect(screen.getByText('Test Form 1')).toBeInTheDocument();
+    expect(screen.queryByText('Test Form 2')).not.toBeInTheDocument();
   });
 
-  it('should display onboarding questions', async () => {
-    renderComponent();
-
+  it('should display onboarding questions with existing answers', async () => {
+    renderComponent(mocks);
     await waitFor(() => {
-      expect(screen.getByText('Question 1')).toBeInTheDocument();
+      expect(screen.getByText('Test Question 1')).toBeInTheDocument();
     });
 
     expect(screen.getByText('Answer 1')).toBeInTheDocument();
@@ -198,16 +179,17 @@ describe('SetUpRegionReturns page', () => {
   });
 
   it('should handle GraphQL errors gracefully', async () => {
-    const errorMock = {
-      request: {
-        query: SUGGESTED_TAX_FORMS,
-        variables: { companyId: 123 },
+    const errorMocks = [
+      {
+        request: {
+          query: TAX_FORMS,
+          variables: { country: 'US', region: 'WA' },
+        },
+        error: new Error('Failed to load tax forms'),
       },
-      error: new Error('An error occurred'),
-    };
+    ];
 
-    renderComponent([errorMock]);
-
+    renderComponent(errorMocks);
     await waitFor(() => {
       expect(
         screen.getByText(/We are having a momentary issue/i)

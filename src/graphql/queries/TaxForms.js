@@ -5,9 +5,7 @@ export const taxForms = gql`
     taxForms(country: $country, region: $region) {
       value {
         description
-        displayName
         taxFormName
-        taxFormNameDescription
         taxFormCode
         taxTypes
         purpose

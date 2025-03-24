@@ -10,7 +10,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
  * @param {string|React.ReactNode} props.title - Content to display in the tooltip
  * @param {boolean} props.dangerouslySetInnerHTML - Whether to render content as HTML
  * @param {React.ReactNode} props.icon - Custom icon to use (defaults to InfoCircleTwoTone)
- * @param {Object} props.overlayStyle - Additional styles for the tooltip overlay
+ * @param {Object} props.overlayStyle - Additional styles for the tooltip overlay (deprecated)
  * @param {Object} props.tooltipProps - Additional props to pass to the Ant Design Tooltip component
  * @returns {React.ReactElement} The CustomTooltip component
  */
@@ -21,12 +21,6 @@ const CustomTooltip = ({
   overlayStyle = {},
   tooltipProps = {},
 }) => {
-  // Default overlay style with option to override or extend
-  const defaultOverlayStyle = {
-    maxWidth: '400px',
-    ...overlayStyle,
-  };
-
   // Prepare content based on whether it should be rendered as HTML
   const tooltipTitle = dangerouslySetInnerHTML ? (
     <div dangerouslySetInnerHTML={{ __html: title }} />
@@ -34,12 +28,16 @@ const CustomTooltip = ({
     title
   );
 
+  // Use the new styles API instead of overlayStyle
+  const styles = {
+    root: {
+      maxWidth: '400px',
+      ...overlayStyle,
+    },
+  };
+
   return (
-    <Tooltip
-      title={tooltipTitle}
-      overlayStyle={defaultOverlayStyle}
-      {...tooltipProps}
-    >
+    <Tooltip title={tooltipTitle} styles={styles} {...tooltipProps}>
       {icon}
     </Tooltip>
   );
