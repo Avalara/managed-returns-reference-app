@@ -74,7 +74,6 @@ OnboardingQuestion.propTypes = {
   allowMultiSelect: PropTypes.bool.isRequired,
   helpText: PropTypes.string,
   question: PropTypes.string.isRequired,
-  questionId: PropTypes.number.isRequired,
   answers: PropTypes.arrayOf(
     PropTypes.shape({
       answer: PropTypes.string.isRequired,

@@ -129,6 +129,7 @@ describe('SetUpRegionReturns page', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
+
   it('should render the component heading', () => {
     renderComponent(mocks);
     expect(screen.getByText('Set up Washington returns')).toBeInTheDocument();
@@ -173,7 +174,6 @@ describe('SetUpRegionReturns page', () => {
     await waitFor(() => {
       expect(screen.getByText('Test Question 1')).toBeInTheDocument();
     });
-
     expect(screen.getByText('Answer 1')).toBeInTheDocument();
     expect(screen.getByText('Answer 2')).toBeInTheDocument();
   });

@@ -294,7 +294,6 @@ const Provisioning = () => {
         <Layout>
           <Card
             title="Customer details"
-            bordered={false}
             style={{
               boxShadow: 'none',
               marginTop: 20,

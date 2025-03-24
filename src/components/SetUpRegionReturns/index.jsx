@@ -142,7 +142,7 @@ const SetUpRegionReturns = () => {
           answerId: answerValue || 0,
         },
       })
-        .catch((err) => {
+        .catch(() => {
           message.error(
             'Unable to update answer. Please try again or contact support if the problem persists.'
           );
@@ -283,7 +283,7 @@ const SetUpRegionReturns = () => {
             </Col>
             <Col className="gutter-row" span={8}>
               <Card
-                title="Improve your reccomendations"
+                title="Improve your recommendations"
                 style={{ height: '70vh' }}
               >
                 <Row gutter={[16, 24]}>

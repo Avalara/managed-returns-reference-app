@@ -202,7 +202,6 @@ const ImportHistory = () => {
     <>
       <>
         <Card
-          bordered={false}
           style={{
             boxShadow: 'none',
             marginTop: 20,

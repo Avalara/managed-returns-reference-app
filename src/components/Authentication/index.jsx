@@ -103,7 +103,6 @@ const Authentication = () => {
       >
         <Layout>
           <Card
-            bordered={false}
             style={{
               boxShadow: 'none',
               marginTop: 20,

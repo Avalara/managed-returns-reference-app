@@ -52,6 +52,7 @@ const multiSelectProps = {
     },
   ],
   selectedAnswerIds: [],
+  onAnswerSelect: vi.fn(),
 };
 
 describe('OnboardingQuestion', () => {

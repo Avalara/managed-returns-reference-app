@@ -39,7 +39,6 @@ const SetUpReturns = () => {
       >
         <Layout>
           <Card
-            bordered={false}
             style={{
               boxShadow: 'none',
               width: '100%',

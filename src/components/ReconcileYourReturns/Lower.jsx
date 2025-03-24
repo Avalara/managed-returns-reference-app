@@ -140,7 +140,6 @@ const Lower = ({
   return (
     <>
       <Card
-        bordered={false}
         style={{
           boxShadow: 'none',
           marginTop: 20,

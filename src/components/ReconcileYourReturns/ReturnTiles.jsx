@@ -37,7 +37,6 @@ const ReturnTile = ({ regionData }) => {
   ];
   return (
     <Card
-      bordered={false}
       style={{ marginBottom: 20 }}
       title={<h3>{getRegionName(regionData.region) || ''}</h3>}
       extra={
