@@ -50,7 +50,7 @@ export const columns = [
     responsive: ['lg'],
   },
   {
-    title: 'Excempt sales',
+    title: 'Exempt sales',
     dataIndex: 'exemptSales',
     key: 'exemptSales',
   },
