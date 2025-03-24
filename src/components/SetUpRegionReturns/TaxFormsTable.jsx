@@ -76,9 +76,7 @@ const TaxFormsTable = ({ dataSource, loading }) => {
                   <td>
                     <b>Tax authority </b>
                   </td>
-                  <td style={{ paddingLeft: '10px' }}>
-                    {record.taxAuthorityName}
-                  </td>
+                  <td style={{ paddingLeft: '10px' }}>{record.taxAuthority}</td>
                 </tr>
               </tbody>
             </table>
@@ -93,7 +91,7 @@ TaxFormsTable.propTypes = {
   dataSource: PropTypes.arrayOf(
     PropTypes.shape({
       description: PropTypes.string,
-      taxAuthorityName: PropTypes.string,
+      taxAuthority: PropTypes.string,
       taxTypes: PropTypes.arrayOf(PropTypes.string),
       purpose: PropTypes.string,
       taxFormName: PropTypes.string,
