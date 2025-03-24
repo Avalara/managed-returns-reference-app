@@ -1,7 +1,7 @@
-import { Table, Typography, Alert, Badge, Result } from 'antd';
+import { Table, Typography, Badge, Result } from 'antd';
 import { useQuery } from '@apollo/client';
-import { nexuses } from '../../graphql/queries/Nexuses.js';
-import { Link, useNavigate } from 'react-router-dom';
+import { nexuses as NEXUSES } from '../../graphql/queries/Nexuses.js';
+import { useNavigate } from 'react-router-dom';
 
 const mockDataSource = [
   {
@@ -76,12 +76,12 @@ const SetUpReturnsTable = ({ companyId }) => {
   const navigate = useNavigate();
 
   const handleClick = (state, stateCode, countryCode) => {
-    navigate(`${state}?stateCode=${stateCode}&countryCode=${countryCode}`, {
+    navigate(`${state}?regionCode=${stateCode}&countryCode=${countryCode}`, {
       relative: 'route',
     });
   };
 
-  const { loading, error, data } = useQuery(nexuses, {
+  const { loading, error, data } = useQuery(NEXUSES, {
     variables: {
       companyId: parseInt(companyId),
     },

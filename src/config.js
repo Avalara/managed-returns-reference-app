@@ -1,6 +1,6 @@
 const ENVIRONMENTS = {
   SANDBOX: {
-    CRR_URL: 'https://returns-api.gamma.sbx.us-west-2.aws.avalara.io/graphql',
+    CRR_URL: 'https://returns-api.sbx.avalara.com/graphql',
     TOKEN_URL: 'https://ai-sbx.avlr.sh/connect/token',
   },
   QA: {

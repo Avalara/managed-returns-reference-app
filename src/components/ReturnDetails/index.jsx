@@ -82,7 +82,7 @@ const ReturnDetails = () => {
       <h1>Return details and adjustments</h1>
 
       <ReturnSummary returnData={tableData} />
-      <Card bordered={false}>
+      <Card>
         <Button type="text">+ Add an adjustment</Button>
         <Table loading={loading} dataSource={dataSource} columns={columns} />
       </Card>

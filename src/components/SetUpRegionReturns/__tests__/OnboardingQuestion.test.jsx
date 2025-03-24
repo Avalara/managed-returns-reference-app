@@ -52,6 +52,7 @@ const multiSelectProps = {
     },
   ],
   selectedAnswerIds: [],
+  onAnswerSelect: vi.fn(),
 };
 
 describe('OnboardingQuestion', () => {
@@ -136,7 +137,9 @@ describe('OnboardingQuestion', () => {
   });
 
   it('should render with pre-selected value for single select', () => {
-    render(<OnboardingQuestion {...singleSelectProps} selectedAnswerIds={1} />);
+    render(
+      <OnboardingQuestion {...singleSelectProps} selectedAnswerIds={[1]} />
+    );
 
     // Check if the radio with value 1 is selected using class
     const selectedRadio = document.querySelector('.ant-radio-checked');

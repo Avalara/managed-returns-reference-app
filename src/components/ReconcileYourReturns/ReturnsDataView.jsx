@@ -48,7 +48,7 @@ function ReturnsDataView({
     );
 
   return viewMode === 'table' ? (
-    <Card bordered={false} style={{ boxShadow: 'none' }}>
+    <Card style={{ boxShadow: 'none' }}>
       <Table
         loading={loading}
         dataSource={tableData}

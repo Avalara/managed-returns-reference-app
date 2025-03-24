@@ -88,7 +88,6 @@ const DataIngest = () => {
         <Layout>
           <Card
             title="Upload files"
-            bordered={false}
             style={{
               boxShadow: 'none',
               marginTop: 20,

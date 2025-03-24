@@ -39,7 +39,6 @@ const SetUpReturns = () => {
       >
         <Layout>
           <Card
-            bordered={false}
             style={{
               boxShadow: 'none',
               width: '100%',
@@ -64,7 +63,6 @@ const SetUpReturns = () => {
                 description="The data shown in this table is mock data for demonstration purposes and does not reflect actual API responses."
                 type="info"
                 showIcon
-                closable
               />
               <div>
                 <SetUpReturnsTable companyId={companyId} />

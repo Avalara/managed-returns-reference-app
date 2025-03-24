@@ -27,7 +27,7 @@ const TaxFormsTable = ({ dataSource, loading }) => {
     {
       title: '',
       key: 'action',
-      render: (_, record) => (
+      render: () => (
         <Button color="primary" variant="link">
           Set up returns
         </Button>
@@ -63,22 +63,24 @@ const TaxFormsTable = ({ dataSource, loading }) => {
           <Space direction="vertical">
             {record.purpose}
             <table>
-              <tr>
-                <td>
-                  <b>Tax type </b>
-                </td>
-                <td style={{ paddingLeft: '10px' }}>
-                  {record.taxTypes.join(', ')}
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <b>Tax authority </b>
-                </td>
-                <td style={{ paddingLeft: '10px' }}>
-                  {record.taxAuthorityName}
-                </td>
-              </tr>
+              <tbody>
+                <tr>
+                  <td>
+                    <b>Tax type </b>
+                  </td>
+                  <td style={{ paddingLeft: '10px' }}>
+                    {record.taxTypes.join(', ')}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <b>Tax authority </b>
+                  </td>
+                  <td style={{ paddingLeft: '10px' }}>
+                    {record.taxAuthorityName}
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </Space>
         ),
