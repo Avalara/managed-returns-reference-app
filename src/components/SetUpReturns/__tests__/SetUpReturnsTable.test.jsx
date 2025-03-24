@@ -1,4 +1,4 @@
-import { nexuses } from '../../../graphql/queries/Nexuses.js';
+import { nexuses as NEXUSES } from '../../../graphql/queries/Nexuses.js';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
 import SetUpReturnsTable from '../SetUpReturnsTable.jsx';
@@ -19,7 +19,7 @@ vi.mock(import('react-router-dom'), async (importOriginal) => {
 const mocks = [
   {
     request: {
-      query: nexuses,
+      query: NEXUSES,
       variables: {
         companyId: 1,
       },
@@ -133,7 +133,7 @@ describe('SetUpReturnsTable', () => {
     const errorMock = [
       {
         request: {
-          query: nexuses,
+          query: NEXUSES,
           variables: {
             companyId: 1,
           },
@@ -218,7 +218,7 @@ describe('SetUpReturnsTable', () => {
 
     // Verify navigation was called with correct parameters
     expect(mockNavigate).toHaveBeenCalledWith(
-      'Alabama?stateCode=AL&countryCode=US',
+      'Alabama?regionCode=AL&countryCode=US',
       {
         relative: 'route',
       }

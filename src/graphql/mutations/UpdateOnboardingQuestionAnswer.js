@@ -1,18 +1,18 @@
 import { gql } from '@apollo/client';
 
-export const onboardingQuestionAnswer = gql`
-  mutation onboardingQuestionAnswer(
+export const updateOnboardingQuestionAnswer = gql`
+  mutation updateOnboardingQuestionAnswer(
+    $onboardingQuestionAnswerId: Float!
     $accountId: Int!
     $companyId: Int!
     $country: String!
     $region: String!
     $questionId: Float!
     $answerId: Float!
-    $operation: Operation!
   ) {
-    onboardingQuestionAnswer(
+    updateOnboardingQuestionAnswer(
+      id: $onboardingQuestionAnswerId
       companyId: $companyId
-      operation: $operation
       input: {
         accountId: $accountId
         answerId: $answerId
@@ -20,17 +20,10 @@ export const onboardingQuestionAnswer = gql`
         country: $country
         questionId: $questionId
         region: $region
+        onboardingQuestionAnswerId: $onboardingQuestionAnswerId
       }
     ) {
-      createUpdateResult {
-        accountId
-        answerId
-        companyId
-        country
-        onboardingQuestionAnswerId
-        questionId
-        region
-      }
+      onboardingQuestionAnswerId
     }
   }
 `;

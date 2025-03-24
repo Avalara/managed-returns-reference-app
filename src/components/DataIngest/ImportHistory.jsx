@@ -2,9 +2,6 @@ import { Button, Card, Flex, Segmented, Select, Space, Table } from 'antd';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
-
-import queries from '../../graphql/queries';
 
 const TableFilters = ({
   loading,
@@ -205,7 +202,6 @@ const ImportHistory = () => {
     <>
       <>
         <Card
-          bordered={false}
           style={{
             boxShadow: 'none',
             marginTop: 20,

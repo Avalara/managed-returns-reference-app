@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import { Typography, Radio, Space, Tooltip, Checkbox } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Typography, Radio, Space, Checkbox } from 'antd';
+import { CustomTooltip } from '../shared';
 
 const { Text } = Typography;
 
@@ -11,6 +11,7 @@ const OnboardingQuestion = ({
   answers,
   onAnswerSelect,
   selectedAnswerIds,
+  disabled = false,
 }) => {
   const handleAnswerChange = (e) => {
     onAnswerSelect(e.target.value);
@@ -19,49 +20,46 @@ const OnboardingQuestion = ({
   return (
     <Space direction="vertical">
       <div>
-        <Text>{question}</Text>
-        {helpText && (
-          <Tooltip title={helpText}>
-            <QuestionCircleOutlined style={{ marginLeft: '8px' }} />
-          </Tooltip>
-        )}
+        <Text>{question}</Text> {helpText && <CustomTooltip title={helpText} />}
       </div>
       {allowMultiSelect ? (
-        <Checkbox.Group value={selectedAnswerIds ? selectedAnswerIds : []}>
+        <Checkbox.Group
+          value={selectedAnswerIds ? selectedAnswerIds : []}
+          disabled={disabled}
+        >
           <Space direction="vertical">
             {answers.map((answer, index) => (
               <Checkbox
                 key={index}
                 value={answer.leadingQuestionAnswerId}
                 onChange={handleAnswerChange}
+                disabled={disabled}
               >
-                {answer.answer}
+                {answer.answer}{' '}
                 {answer.answerHelpText && (
-                  <Tooltip title={answer.answerHelpText}>
-                    <QuestionCircleOutlined style={{ marginLeft: '8px' }} />
-                  </Tooltip>
+                  <CustomTooltip title={answer.answerHelpText} />
                 )}
               </Checkbox>
             ))}
           </Space>
         </Checkbox.Group>
       ) : (
-        <Radio.Group onChange={handleAnswerChange} value={selectedAnswerIds}>
+        <Radio.Group
+          onChange={handleAnswerChange}
+          value={selectedAnswerIds ? selectedAnswerIds[0] : ''}
+          disabled={disabled}
+        >
           <Space direction="vertical">
             {answers.map((answer, index) => (
               <Radio
                 key={index}
                 value={answer.leadingQuestionAnswerId}
                 role="radio"
-                aria-checked={
-                  selectedAnswerIds === answer.leadingQuestionAnswerId
-                }
+                disabled={disabled}
               >
-                {answer.answer}
+                {answer.answer}{' '}
                 {answer.answerHelpText && (
-                  <Tooltip title={answer.answerHelpText}>
-                    <QuestionCircleOutlined style={{ marginLeft: '8px' }} />
-                  </Tooltip>
+                  <CustomTooltip title={answer.answerHelpText} />
                 )}
               </Radio>
             ))}
@@ -76,7 +74,6 @@ OnboardingQuestion.propTypes = {
   allowMultiSelect: PropTypes.bool.isRequired,
   helpText: PropTypes.string,
   question: PropTypes.string.isRequired,
-  questionId: PropTypes.number.isRequired,
   answers: PropTypes.arrayOf(
     PropTypes.shape({
       answer: PropTypes.string.isRequired,
@@ -91,6 +88,7 @@ OnboardingQuestion.propTypes = {
     PropTypes.number,
     PropTypes.arrayOf(PropTypes.number),
   ]),
+  disabled: PropTypes.bool,
 };
 
 export default OnboardingQuestion;

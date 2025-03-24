@@ -1,57 +1,177 @@
-import { Card, Col, Layout, Row, Space, Switch, theme, Result } from 'antd';
+import {
+  Card,
+  Col,
+  Layout,
+  Row,
+  Space,
+  Switch,
+  theme,
+  Result,
+  message,
+} from 'antd';
 import { useState, useMemo } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
-import { suggestedReturns as SUGGESTED_RETURNS_QUERY } from '../../graphql/queries/SuggestedReturns';
-import { onboardingQuestionAnswer } from '../../graphql/mutations/OnboardingQuestionAnswer';
+import { useQuery, useMutation, NetworkStatus } from '@apollo/client';
+import {
+  suggestedTaxForms as SUGGESTED_TAX_FORMS,
+  taxForms as TAX_FORMS,
+} from '../../graphql/queries';
+import {
+  createOnboardingQuestionAnswer as CREATE_ONBOARDING__QUESTION_ANSWER,
+  updateOnboardingQuestionAnswer as UPDATE_ONBOARDING_QUESTION_ANSWER,
+} from '../../graphql/mutations/';
 
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import TaxFormsTable from './TaxFormsTable';
+import OnboardingQuestion from './OnboardingQuestion';
+import { useOutletContext, useParams, useSearchParams } from 'react-router-dom';
 import Search from 'antd/es/input/Search.js';
-import OnboardingQuestion from './OnboardingQuestion.jsx';
 import FormItem from 'antd/es/form/FormItem/index.js';
-import { useOutletContext, useParams } from 'react-router-dom';
 
 const { Content } = Layout;
 
 const SetUpRegionReturns = () => {
   const { accountId, companyId } = useOutletContext();
   const { region } = useParams();
+  const [searchParams] = useSearchParams();
+  const countryCode = searchParams.get('countryCode');
+  const regionCode = searchParams.get('regionCode');
   const {
     token: { borderRadiusLG },
   } = theme.useToken();
+
   const [searchText, setSearchText] = useState('');
   const [showRecommended, setShowRecommended] = useState(false);
 
-  const [submitAnswer] = useMutation(onboardingQuestionAnswer);
-
-  const handleAnswerSelect = (question, answerValue) => {
-    submitAnswer({
+  // Create/Update onboarding answer
+  const [createAnswer, { loading: createLoading }] = useMutation(
+    CREATE_ONBOARDING__QUESTION_ANSWER,
+    {
       variables: {
-        accountId: parseInt(parseInt(accountId)),
-        companyId: parseInt(parseInt(companyId)),
-        country: question.country,
-        region: question.region,
-        questionId: question.questionId,
-        answerId: answerValue || 0,
-        operation: 'CREATE',
+        accountId: parseInt(accountId),
+        companyId: parseInt(companyId),
+        country: countryCode,
+        region: regionCode,
       },
-    }).catch((err) => console.error('Error submitting answer:', err));
-  };
+    }
+  );
 
-  const { loading, error, data } = useQuery(SUGGESTED_RETURNS_QUERY, {
-    variables: { companyId: parseInt(companyId) },
+  const [updateAnswer, { loading: updateLoading }] = useMutation(
+    UPDATE_ONBOARDING_QUESTION_ANSWER,
+    {
+      variables: {
+        accountId: parseInt(accountId),
+        companyId: parseInt(companyId),
+        country: countryCode,
+        region: regionCode,
+      },
+    }
+  );
+
+  // Get all tax forms
+  const {
+    data: taxFormsData,
+    loading: taxFormsLoading,
+    error: taxFormsError,
+  } = useQuery(TAX_FORMS, {
+    variables: { country: countryCode, region: regionCode },
+  });
+  // Get suggested/recommended tax forms, onboarding questions and onboarding answers
+  const {
+    data: suggestedTaxFormsData,
+    loading: suggestedTaxFormsLoading,
+    error: suggestedTaxFormsError,
+    refetch: refetchSuggestedTaxForms,
+    networkStatus: suggestedTaxFormsRefetchStatus,
+  } = useQuery(SUGGESTED_TAX_FORMS, {
+    variables: {
+      companyId: parseInt(companyId),
+      country: countryCode,
+      region: regionCode,
+    },
+    notifyOnNetworkStatusChange: true,
   });
 
-  // TODO: remove hardcodings
-  const suggestedReturns =
-    data?.companies?.value?.[0]?.suggestedReturns?.[0]?.suggestedReturns || [];
+  // Extract suggested returns, onboarding questions and onboarding answers
+  const returns = taxFormsData?.taxForms;
+  const suggestedTaxForms =
+    suggestedTaxFormsData?.companies?.value?.[0]?.suggestedTaxForms?.[0]
+      ?.suggestedReturns || [];
   const onboardingQuestions =
-    data?.companies?.value?.[0]?.suggestedReturns?.[0]?.onboardingQuestions ||
-    [];
+    suggestedTaxFormsData?.companies?.value?.[0]?.suggestedTaxForms?.[0]
+      ?.onboardingQuestions || [];
+  const onboardingAnswers =
+    suggestedTaxFormsData?.companies?.value?.[0]?.suggestedTaxForms?.[0]
+      ?.answeredQuestions || [];
+
+  const formattedTaxFormsData = useMemo(() => {
+    if (!returns) return [];
+
+    return returns.value
+      .map((r) => {
+        // Check if this tax form is in the suggestedTaxForms array
+        const isRecommended = suggestedTaxForms.some(
+          (suggestedReturn) => suggestedReturn.taxFormCode === r.taxFormCode
+        );
+
+        // Return the tax form with the recommended property added
+        return {
+          ...r,
+          recommended: isRecommended,
+        };
+      })
+      .sort((a, b) => {
+        // Sort by recommended status (recommended items first)
+        if (a.recommended && !b.recommended) return -1;
+        if (!a.recommended && b.recommended) return 1;
+        return 0;
+      });
+  }, [taxFormsData, suggestedTaxForms]);
+
+  const handleAnswerSelect = (question, answerValue) => {
+    // Check if this question already has an answer
+    const existingAnswer = onboardingAnswers.find(
+      (answer) => answer.questionId === question.questionId
+    );
+
+    if (existingAnswer) {
+      // Update existing answer
+      updateAnswer({
+        variables: {
+          onboardingQuestionAnswerId: existingAnswer.onboardingQuestionAnswerId,
+          questionId: question.questionId,
+          answerId: answerValue || 0,
+        },
+      })
+        .catch(() => {
+          message.error(
+            'Unable to update answer. Please try again or contact support if the problem persists.'
+          );
+        })
+        .finally(() => {
+          refetchSuggestedTaxForms();
+        });
+    } else {
+      // Create new answer
+      createAnswer({
+        variables: {
+          questionId: question.questionId,
+          answerId: answerValue || 0,
+        },
+      })
+        .catch(() => {
+          message.error(
+            'Unable to submit answer. Please try again or contact support if the problem persists.'
+          );
+        })
+        .finally(() => {
+          refetchSuggestedTaxForms();
+        });
+    }
+  };
 
   const filteredReturns = useMemo(() => {
     const searchLower = searchText.toLowerCase();
-    return suggestedReturns.filter((item) => {
+    return formattedTaxFormsData.filter((item) => {
       const matchesSearch =
         !searchText ||
         item.description?.toLowerCase().includes(searchLower) ||
@@ -64,15 +184,23 @@ const SetUpRegionReturns = () => {
       }
       return matchesSearch;
     });
-  }, [searchText, showRecommended, suggestedReturns]);
+  }, [searchText, showRecommended, formattedTaxFormsData]);
 
-  if (error) {
+  if (taxFormsError) {
     return (
       <Result
         status="500"
         subTitle="We are having a momentary issue, please try again in some time."
       />
     );
+  }
+
+  if (suggestedTaxFormsError) {
+    message.error({
+      content:
+        'Unable to load suggested returns. Please refresh the page or try again later.',
+      duration: 5,
+    });
   }
 
   return (
@@ -143,7 +271,11 @@ const SetUpRegionReturns = () => {
                   <Card>
                     <TaxFormsTable
                       dataSource={filteredReturns}
-                      loading={loading}
+                      loading={
+                        suggestedTaxFormsLoading ||
+                        taxFormsLoading ||
+                        suggestedTaxFormsRefetchStatus === NetworkStatus.refetch
+                      }
                     />
                   </Card>
                 </Col>
@@ -151,7 +283,7 @@ const SetUpRegionReturns = () => {
             </Col>
             <Col className="gutter-row" span={8}>
               <Card
-                title="Improve your reccomendations"
+                title="Improve your recommendations"
                 style={{ height: '70vh' }}
               >
                 <Row gutter={[16, 24]}>
@@ -165,6 +297,18 @@ const SetUpRegionReturns = () => {
                         {...question}
                         onAnswerSelect={(answerValue) =>
                           handleAnswerSelect(question, answerValue)
+                        }
+                        selectedAnswerIds={onboardingAnswers
+                          .filter(
+                            (answer) =>
+                              answer.questionId === question.questionId
+                          )
+                          .map((answer) => answer.answerId)}
+                        disabled={
+                          createLoading ||
+                          updateLoading ||
+                          suggestedTaxFormsRefetchStatus ===
+                            NetworkStatus.refetch
                         }
                       />
                     </Col>

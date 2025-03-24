@@ -1,7 +1,3 @@
-import { createAndLinkAccount } from './CreateAndLinkAccount';
-import { onboardingQuestionAnswer } from './OnboardingQuestionAnswer';
-
-export default {
-  createAndLinkAccount,
-  onboardingQuestionAnswer,
-};
+export { createAndLinkAccount } from './CreateAndLinkAccount.js';
+export { createOnboardingQuestionAnswer } from './CreateOnboardingQuestionAnswer.js';
+export { updateOnboardingQuestionAnswer } from './UpdateOnboardingQuestionAnswer.js';
