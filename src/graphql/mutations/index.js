@@ -1,7 +1,4 @@
-import { createAndLinkAccount } from './CreateAndLinkAccount';
-import { fundingPoa } from './FundingPoa';
-
-export default {
-  createAndLinkAccount,
-  fundingPoa
-};
+export { createAndLinkAccount } from './CreateAndLinkAccount.js';
+export { createOnboardingQuestionAnswer } from './CreateOnboardingQuestionAnswer.js';
+export { updateOnboardingQuestionAnswer } from './UpdateOnboardingQuestionAnswer.js';
+export { fundingPoa } from './FundingPoa';

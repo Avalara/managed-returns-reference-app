@@ -2,9 +2,6 @@ import { Button, Card, Flex, Segmented, Select, Space, Table } from 'antd';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
-
-import queries from '../../graphql/queries';
 
 const TableFilters = ({
   loading,
@@ -40,12 +37,10 @@ const TableFilters = ({
             ]}
             onChange={(value) => {
               setImportTypeSelection(value);
-              setFilters((prev) => {
-                return {
-                  ...prev,
-                  importType: value,
-                };
-              });
+              setFilters((prev) => ({
+                ...prev,
+                importType: value,
+              }));
             }}
           />
         </div>
@@ -60,18 +55,17 @@ const TableFilters = ({
             value={statusSelection}
             options={[
               { value: 'All', label: <span>All</span> },
-              ...availableStatuses.map((status) => {
-                return { value: status, label: <span>{status}</span> };
-              }),
+              ...availableStatuses.map((status) => ({
+                value: status,
+                label: <span>{status}</span>,
+              })),
             ]}
             onChange={(value) => {
               setStatusSelection(value);
-              setFilters((prev) => {
-                return {
-                  ...prev,
-                  status: value,
-                };
-              });
+              setFilters((prev) => ({
+                ...prev,
+                status: value,
+              }));
             }}
           />
         </div>
@@ -108,9 +102,7 @@ const columns = [
     dataIndex: 'batchName',
     key: 'batchName',
     fixed: true,
-    render: (text, record) => {
-      return record.name;
-    },
+    render: (text, record) => record.name,
   },
   {
     title: 'Import type',
@@ -210,7 +202,6 @@ const ImportHistory = () => {
     <>
       <>
         <Card
-          bordered={false}
           style={{
             boxShadow: 'none',
             marginTop: 20,

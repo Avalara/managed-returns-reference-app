@@ -17,6 +17,7 @@ const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(
     !!localStorageClientId && !!localStorageClientSecret
   );
+  const [accountId, setAccountId] = useState(localStorageClientId);
   const [companyId, setCompanyId] = useState(localStorageCompanyId);
 
   const [selectedKeys, setSelectedKeys] = useState([]);
@@ -188,6 +189,7 @@ const Home = () => {
             context={{
               isLoggedIn,
               setIsLoggedIn,
+              accountId,
               companyId,
               setCompanyId,
             }}

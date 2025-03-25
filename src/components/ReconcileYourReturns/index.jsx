@@ -23,12 +23,12 @@ const ReconcileYourReturns = () => {
   const [amountDue, setAmountDue] = useState();
   const [returnCount, setReturnCount] = useState();
 
-  const isCurrentPeriod = useMemo(() => {
-    return (
+  const isCurrentPeriod = useMemo(
+    () =>
       date.year() === dayjs().tz('America/Los_Angeles').year() &&
-      date.month() === dayjs().tz('America/Los_Angeles').month()
-    );
-  }, [date]);
+      date.month() === dayjs().tz('America/Los_Angeles').month(),
+    [date]
+  );
 
   useEffect(() => {
     const now = dayjs().tz('America/Los_Angeles');
@@ -40,18 +40,19 @@ const ReconcileYourReturns = () => {
       notification.info({
         message: "It's time to reconcile",
         description: `You have ${returnCount} returns to review and reconcile for the ${now.format(
-          'MMMM YYYY',
+          'MMMM YYYY'
         )} filing period. Make sure to reconcile before ${deadline.format(
-          'MMMM D',
+          'MMMM D'
         )} at 5:00 p.m. PT.`,
         duration: 0,
       });
     }
   }, [isCurrentPeriod, returnCount]);
 
-  const filingPeriodParams = useMemo(() => {
-    return getFilingPeriodParameters(date);
-  }, [date]);
+  const filingPeriodParams = useMemo(
+    () => getFilingPeriodParameters(date),
+    [date]
+  );
 
   return (
     <>

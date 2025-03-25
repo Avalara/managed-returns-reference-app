@@ -15,7 +15,7 @@ import { useOutletContext } from 'react-router-dom';
 import { useState } from 'react';
 
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
-import query from '../../graphql/queries';
+import { companies as COMPANIES } from '../../graphql/queries';
 
 const { Content } = Layout;
 
@@ -47,7 +47,7 @@ const Authentication = () => {
   const [
     getCompanies,
     { loading: companiesCallIsLoading, error: companiesCallError, data },
-  ] = useLazyQuery(query.companies);
+  ] = useLazyQuery(COMPANIES);
 
   if (companiesCallError) setIsLoggedIn(false);
 
@@ -107,7 +107,6 @@ const Authentication = () => {
       >
         <Layout>
           <Card
-            bordered={false}
             style={{
               boxShadow: 'none',
               marginTop: 20,
@@ -244,12 +243,10 @@ const Authentication = () => {
                 value={selectedCompanyId}
                 options={
                   companies
-                    ? companies.map((c) => {
-                        return {
-                          value: '' + c.id,
-                          label: <span>{'' + c.id}</span>,
-                        };
-                      })
+                    ? companies.map((c) => ({
+                        value: '' + c.id,
+                        label: <span>{'' + c.id}</span>,
+                      }))
                     : [{ value: 'Loading...', label: <span>Loading...</span> }]
                 }
                 onChange={(value) => {

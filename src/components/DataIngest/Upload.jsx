@@ -1,5 +1,3 @@
-const Upload = () => {
-  return <></>;
-};
+const Upload = () => <></>;
 
 export default Upload;

@@ -48,8 +48,13 @@ function ReturnsDataView({
     );
 
   return viewMode === 'table' ? (
-    <Card bordered={false} style={{ boxShadow: 'none' }}>
-      <Table loading={loading} dataSource={tableData} columns={columns} />
+    <Card style={{ boxShadow: 'none' }}>
+      <Table
+        loading={loading}
+        dataSource={tableData}
+        columns={columns}
+        scroll={{ x: 'max-content' }}
+      />
     </Card>
   ) : (
     <ReturnTiles loading={loading} dataSource={tileData} />

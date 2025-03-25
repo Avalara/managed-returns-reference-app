@@ -16,8 +16,9 @@ import SetUpReturns from './components/SetUpReturns';
 import Authentication from './components/Authentication';
 import Provisioning from './components/Provisioning';
 import DataIngest from './components/DataIngest';
-
+import NotFound from './routes/NotFound';
 import ErrorPage from './routes/Error';
+import SetUpStateReturns from './components/SetUpRegionReturns/index.jsx';
 
 const router = createBrowserRouter([
   {
@@ -71,6 +72,10 @@ const router = createBrowserRouter([
             },
           },
           {
+            path: 'set-up-returns/:region',
+            element: <SetUpStateReturns />,
+          },
+          {
             path: 'get-started',
             element: <GetStarted />,
             handle: {
@@ -111,6 +116,10 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: '*',
+        element: <NotFound />,
+      },
     ],
   },
 ]);
@@ -120,5 +129,5 @@ createRoot(document.getElementById('root')).render(
     <StrictMode>
       <RouterProvider router={router} />
     </StrictMode>
-  </ApolloProvider>,
+  </ApolloProvider>
 );

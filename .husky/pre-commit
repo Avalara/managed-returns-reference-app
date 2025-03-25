@@ -1,1 +1,4 @@
-bash .husky/check-branch-name.sh
+#!/bin/sh
+
+npm run lint
+npm run format
