@@ -14,7 +14,7 @@ import {
   Typography,
 } from 'antd';
 
-import query from '../../graphql/queries';
+import { fundingStatus as FUNDING_STATUS } from '../../graphql/queries';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 
 const { Text } = Typography;
@@ -103,7 +103,7 @@ const GetStarted = () => {
   const [poaStatus, setPoaStatus] = useState('loading');
 
   const [getFundingStatus, fundingStatusResponse] = useLazyQuery(
-    query.fundingStatus
+    FUNDING_STATUS
   );
 
   useEffect(() => {

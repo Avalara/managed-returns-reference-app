@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { Card, Layout, Row, Col, theme } from 'antd';
-import { fundingPoa as FUNDING_POA } from '../../graphql/queries';
+import { fundingPoa as FUNDING_POA } from '../../graphql/mutations';
 
 import PoaModal from './PoaModal';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
