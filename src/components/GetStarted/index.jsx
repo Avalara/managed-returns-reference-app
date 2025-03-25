@@ -9,6 +9,7 @@ import {
   Flex,
   Layout,
   Row,
+  Statistic,
   Tag,
   theme,
   Typography,
@@ -16,8 +17,9 @@ import {
 
 import { fundingStatus as FUNDING_STATUS } from '../../graphql/queries';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
+import { PageHeader } from '../shared';
 
-const { Text } = Typography;
+const { Title } = Typography;
 const { Content } = Layout;
 
 const cardTextByActionStatus = {
@@ -66,7 +68,6 @@ const GetStartedCard = ({ title, status, text, onClick, loading = false }) => {
       title={title}
       extra={statusTag}
       style={{
-        marginTop: 20,
         flex: '1 0 320px',
         display: 'flex',
         flexDirection: 'column',
@@ -102,9 +103,8 @@ const GetStarted = () => {
 
   const [poaStatus, setPoaStatus] = useState('loading');
 
-  const [getFundingStatus, fundingStatusResponse] = useLazyQuery(
-    FUNDING_STATUS
-  );
+  const [getFundingStatus, fundingStatusResponse] =
+    useLazyQuery(FUNDING_STATUS);
 
   useEffect(() => {
     if (isLoggedIn && companyId) {
@@ -133,18 +133,12 @@ const GetStarted = () => {
   }, [fundingStatusResponse]);
   return (
     <>
-      <div
-        style={{
-          backgroundColor: 'white',
-          marginLeft: '-24px',
-          padding: '24px',
-        }}
-      >
+      <PageHeader>
         <BreadcrumbMenu />
         <Content>
           <Row align="bottom">
-            <Col span={18} style={{ paddingRight: '24px' }}>
-              <h1>Get started</h1>
+            <Col span={18}>
+              <Title level={1}>Get started</Title>
               <p>
                 Set up all the returns that you want Avalara to file for you and
                 sign the funding power of attorney. When you’re ready, Avalara’s
@@ -153,25 +147,24 @@ const GetStarted = () => {
               </p>
             </Col>
             <Col span={6}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <Text style={{ textAlign: 'right' }} type="secondary">
-                  Progress
-                </Text>
-                <h2 style={{ textAlign: 'right', marginTop: 0 }}>
-                  0 of 3 tasks complete
-                </h2>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-end',
+                }}
+              >
+                <Statistic
+                  title="Progress"
+                  value={0}
+                  suffix="/ 3 tasks complete"
+                />
               </div>
             </Col>
           </Row>
         </Content>
-      </div>
-      <Content
-        style={{
-          margin: 0,
-          minHeight: 500,
-          borderRadius: borderRadiusLG,
-        }}
-      >
+      </PageHeader>
+      <Content>
         <Layout>
           <Flex wrap="wrap" gap="middle" justify="flex-start">
             <GetStartedCard

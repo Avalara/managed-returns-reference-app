@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Card, Table, Tooltip } from 'antd';
+import { Card, Result, Table, Tooltip } from 'antd';
 import { useEffect } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
 
@@ -39,16 +39,14 @@ function ReturnsDataView({
 
   if (error)
     return (
-      <>
-        <span>An error occurred retrieving the data</span>{' '}
-        <Tooltip title={JSON.stringify(error)}>
-          <InfoCircleOutlined />
-        </Tooltip>
-      </>
+      <Result
+        status="500"
+        subTitle="We are having a momentary issue, please try again in some time."
+      />
     );
 
   return viewMode === 'table' ? (
-    <Card style={{ boxShadow: 'none' }}>
+    <Card>
       <Table
         loading={loading}
         dataSource={tableData}

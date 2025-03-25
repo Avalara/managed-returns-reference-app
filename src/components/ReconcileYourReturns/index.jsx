@@ -3,13 +3,15 @@ import { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import utcPlugin from 'dayjs/plugin/utc';
 import timezonePlugin from 'dayjs/plugin/timezone';
-import { notification, theme, Layout } from 'antd';
+import { notification, theme, Layout, Typography } from 'antd';
 
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import Upper from './Upper';
 import Lower from './Lower';
+import { PageHeader } from '../shared';
 
 const { Header, Content } = Layout;
+const { Title } = Typography;
 
 dayjs.extend(utcPlugin);
 dayjs.extend(timezonePlugin);
@@ -56,16 +58,10 @@ const ReconcileYourReturns = () => {
 
   return (
     <>
-      <div
-        style={{
-          backgroundColor: 'white',
-          marginLeft: '-24px',
-          padding: '24px',
-        }}
-      >
+      <PageHeader>
         <BreadcrumbMenu />
         <Content>
-          <h1>Reconcile your returns</h1>
+          <Title level={1}>Reconcile your returns</Title>
           <Upper
             companyId={companyId}
             date={date}
@@ -73,14 +69,8 @@ const ReconcileYourReturns = () => {
             amountDue={amountDue}
           />
         </Content>
-      </div>
-      <Content
-        style={{
-          margin: 0,
-          minHeight: 280,
-          borderRadius: borderRadiusLG,
-        }}
-      >
+      </PageHeader>
+      <Content>
         <Layout>
           <Lower
             companyId={companyId}

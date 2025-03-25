@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
-import { Card, Layout, Row, Col, theme } from 'antd';
 import { fundingPoa as FUNDING_POA } from '../../graphql/mutations';
+import { Card, Col, Layout, Row, theme, Typography } from 'antd';
 
 import PoaModal from './PoaModal';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
+import { PageHeader } from '../shared';
 
 export const POA_SELF = 'self';
 export const POA_EMAIL = 'email';
 
 const { Content } = Layout;
+const { Title } = Typography;
 
 const Funding = () => {
   const {
@@ -73,18 +75,12 @@ const Funding = () => {
 
   return (
     <>
-      <div
-        style={{
-          backgroundColor: 'white',
-          marginLeft: '-24px',
-          padding: '24px',
-        }}
-      >
+      <PageHeader>
         <BreadcrumbMenu />
         <Content>
           <Row align="bottom">
-            <Col span={18} style={{ paddingRight: '24px' }}>
-              <h1>Sign funding power of attorney</h1>
+            <Col span={18}>
+              <Title level={1}>Sign funding power of attorney</Title>
               <p>
                 In order to act on your behalf with tax authorities, Avalara
                 needs to have the funding power of attorney form completed and
@@ -93,22 +89,10 @@ const Funding = () => {
             </Col>
           </Row>
         </Content>
-      </div>
-      <Content
-        style={{
-          margin: 0,
-          minHeight: 280,
-          borderRadius: borderRadiusLG,
-        }}
-      >
+      </PageHeader>
+      <Content>
         <Layout>
-          <Card
-            style={{
-              boxShadow: 'none',
-              marginTop: 20,
-              width: '100%',
-            }}
-          >
+          <Card>
             {fundingRequestSrcDoc &&
               poaAuthorization &&
               poaAuthorization === POA_SELF && (

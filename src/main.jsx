@@ -19,6 +19,8 @@ import DataIngest from './components/DataIngest';
 import NotFound from './routes/NotFound';
 import ErrorPage from './routes/Error';
 import SetUpStateReturns from './components/SetUpRegionReturns/index.jsx';
+import { ConfigProvider } from 'antd';
+import themeConfig from './theme/themeConfig.js';
 
 const router = createBrowserRouter([
   {
@@ -125,9 +127,11 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')).render(
-  <ApolloProvider client={apolloClient}>
-    <StrictMode>
-      <RouterProvider router={router} />
-    </StrictMode>
-  </ApolloProvider>
+  <ConfigProvider theme={themeConfig}>
+    <ApolloProvider client={apolloClient}>
+      <StrictMode>
+        <RouterProvider router={router} />
+      </StrictMode>
+    </ApolloProvider>
+  </ConfigProvider>
 );

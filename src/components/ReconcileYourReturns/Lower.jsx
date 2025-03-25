@@ -139,13 +139,7 @@ const Lower = ({
 
   return (
     <>
-      <Card
-        style={{
-          boxShadow: 'none',
-          marginTop: 20,
-          width: '100%',
-        }}
-      >
+      <Card>
         <TableFilters
           setViewMode={setViewMode}
           setFilters={setFilters}

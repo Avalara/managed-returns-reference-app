@@ -134,7 +134,7 @@ const Home = () => {
           }}
         />
       </Header>
-      <Layout>
+      <Layout style={{ minHeight: '100vh' }}>
         <Sider
           width={200}
           style={{

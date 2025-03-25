@@ -1,5 +1,5 @@
 import { useLazyQuery } from '@apollo/client';
-import { Button, DatePicker, Flex, Space, Statistic } from 'antd';
+import { Button, DatePicker, Flex, Space, Statistic, Typography } from 'antd';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
@@ -8,12 +8,14 @@ import { DownloadOutlined, FilePdfOutlined } from '@ant-design/icons';
 
 import { liabilityReports as LIABILITY_REPORTS } from '../../graphql/queries';
 
+const { Title } = Typography;
+
 const FilingPeriodSelector = ({ date, setDate }) => {
   const navigate = useNavigate();
 
   return (
     <div>
-      <h2>Filing period</h2>
+      <Title level={2}>Filing period</Title>
       <Space>
         <DatePicker
           onChange={(newDate) => {
