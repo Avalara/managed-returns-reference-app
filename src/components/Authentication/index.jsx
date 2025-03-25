@@ -89,9 +89,7 @@ const Authentication = () => {
         <BreadcrumbMenu />
         <Content>
           <Title level={1}>Authentication</Title>
-          <p style={{ marginBottom: 0 }}>
-            Enter your Avalara credentials to connect.
-          </p>
+          <p>Enter your Avalara credentials to connect.</p>
         </Content>
       </div>
 
