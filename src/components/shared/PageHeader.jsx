@@ -6,6 +6,7 @@ const PageHeader = ({ children }) => (
       padding: '24px',
       marginRight: '-24px',
       marginBottom: '24px',
+      marginTop: '-24px',
     }}
   >
     {children}

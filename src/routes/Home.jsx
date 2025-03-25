@@ -110,13 +110,7 @@ const Home = () => {
 
   return (
     <Layout>
-      <Header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
-        <div className="demo-logo" />
+      <Header>
         <Menu
           theme="dark"
           mode="horizontal"
@@ -130,7 +124,7 @@ const Home = () => {
             flex: 1,
             minWidth: 0,
             fontSize: '18px',
-            fontWeight: 'bold',
+            fontWeight: '500',
           }}
         />
       </Header>
@@ -159,32 +153,9 @@ const Home = () => {
         </Sider>
         <Layout
           style={{
-            padding: '0 24px 24px',
+            padding: '24px',
           }}
         >
-          {/* <Header
-            style={{
-              backgroundColor: 'white',
-              marginLeft: '-24px',
-              paddingTop: '24px',
-            }}
-          >
-            <BreadcrumbMenu />
-          </Header>
-
-          <Content
-            style={{
-              padding: 24,
-              margin: 0,
-              minHeight: 280,
-              borderRadius: borderRadiusLG,
-            }}
-          >
-            <Layout
-              style={{
-                padding: '24px 0',
-              }}
-            > */}
           <Outlet
             context={{
               isLoggedIn,
@@ -194,8 +165,6 @@ const Home = () => {
               setCompanyId,
             }}
           />
-          {/* </Layout>
-          </Content> */}
         </Layout>
       </Layout>
     </Layout>
