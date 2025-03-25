@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { Card, Layout, Row, Col, theme } from 'antd';
-import mutation from '../../graphql/mutations';
+import { fundingPoa as FUNDING_POA } from '../../graphql/queries';
 
 import PoaModal from './PoaModal';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
@@ -23,7 +23,7 @@ const Funding = () => {
   const [poaWidget, setPoaWidget] = useState();
   const [fundingRequestSrcDoc, setFundingRequestSrcDoc] = useState();
 
-  const [fundingPoa, fundingPoaResponse] = useMutation(mutation.fundingPoa);
+  const [fundingPoa, fundingPoaResponse] = useMutation(FUNDING_POA);
 
   const submitFundingPoa = async ({ email = '', requestWidget = false }) => {
     try {
