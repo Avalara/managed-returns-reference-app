@@ -23,8 +23,12 @@ const Authentication = () => {
   const {
     token: { borderRadiusLG },
   } = theme.useToken();
-  const { isLoggedIn, setIsLoggedIn, companyId, setCompanyId } =
-    useOutletContext();
+  const {
+    isLoggedIn,
+    setIsLoggedIn,
+    companyId,
+    setCompanyId,
+  } = useOutletContext();
 
   const [selectedCompanyId, setSelectedCompanyId] = useState(companyId);
 
