@@ -16,6 +16,7 @@ import { useState } from 'react';
 
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import { companies as COMPANIES } from '../../graphql/queries';
+import { PageHeader } from '../shared';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -79,37 +80,17 @@ const Authentication = () => {
 
   return (
     <div>
-      <div
-        style={{
-          backgroundColor: 'white',
-          marginLeft: '-24px',
-          padding: '24px',
-        }}
-      >
+      <PageHeader>
         <BreadcrumbMenu />
         <Content>
           <Title level={1}>Authentication</Title>
-          <p style={{ marginBottom: 0 }}>
-            Enter your Avalara credentials to connect.
-          </p>
+          <p>Enter your Avalara credentials to connect.</p>
         </Content>
-      </div>
+      </PageHeader>
 
-      <Content
-        style={{
-          margin: 0,
-          minHeight: 280,
-        }}
-      >
+      <Content>
         <Layout>
-          <Card
-            title="Credentials"
-            style={{
-              boxShadow: 'none',
-              marginTop: 20,
-              width: '100%',
-            }}
-          >
+          <Card title="Credentials">
             <Typography.Title level={5}>Account number</Typography.Title>
             <Space direction="horizontal">
               <Input

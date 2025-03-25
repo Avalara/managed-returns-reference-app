@@ -1,4 +1,4 @@
-import { Layout, Tabs, theme } from 'antd';
+import { Layout, Tabs, theme, Typography } from 'antd';
 
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import TransactionImportHistory from './TransactionImportHistory.jsx';
@@ -29,7 +29,7 @@ const DataIngest = () => {
       <PageHeader>
         <BreadcrumbMenu />
         <Content>
-          <h1>Data Ingest</h1>
+          <Typography.Title level={1}>Data Ingest</Typography.Title>
           <p>Import transaction data, or summarized tax liability.</p>
           <Tabs
             defaultActiveKey="upload"
