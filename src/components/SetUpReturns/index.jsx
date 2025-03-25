@@ -1,11 +1,13 @@
-import { Card, Layout, theme, Button, Space, Alert } from 'antd';
+import { Card, Layout, theme, Button, Space, Alert, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import SetUpReturnsTable from './SetUpReturnsTable.jsx';
 import { useOutletContext } from 'react-router-dom';
+import { PageHeader } from '../shared';
 
 const { Content } = Layout;
+const { Title } = Typography;
 
 const SetUpReturns = () => {
   const {
@@ -15,35 +17,18 @@ const SetUpReturns = () => {
 
   return (
     <>
-      <div
-        style={{
-          marginLeft: '-24px',
-          padding: '24px',
-        }}
-      >
+      <PageHeader>
         <BreadcrumbMenu />
-        <Content>
-          <h1>Set up returns</h1>
-          <p>
-            These are the states where you’re registered to report tax, based on
-            your tax profile.
-          </p>
-        </Content>
-      </div>
-      <Content
-        style={{
-          margin: 0,
-          minHeight: 280,
-          borderRadius: borderRadiusLG,
-        }}
-      >
+
+        <Title level={1}>Set up returns</Title>
+        <p>
+          These are the states where you&#39;re registered to report tax, based
+          on your tax profile.
+        </p>
+      </PageHeader>
+      <Content>
         <Layout>
-          <Card
-            style={{
-              boxShadow: 'none',
-              width: '100%',
-            }}
-          >
+          <Card>
             <Space
               direction="vertical"
               size="middle"
@@ -56,7 +41,9 @@ const SetUpReturns = () => {
                   alignItems: 'center',
                 }}
               >
-                <h2 style={{ margin: 0 }}>States where you report tax</h2>
+                <Title level={2} style={{ margin: 0 }}>
+                  States where you report tax
+                </Title>
                 <Button icon={<PlusOutlined />}>Add states</Button>
               </div>
               <Alert

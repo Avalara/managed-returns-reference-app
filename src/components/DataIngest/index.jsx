@@ -3,6 +3,8 @@ import { Layout, Tabs, theme } from 'antd';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import TransactionImportHistory from './TransactionImportHistory.jsx';
 import UploadTransactionFiles from './UploadTransactionFiles.jsx';
+import { PageHeader } from '../shared';
+import { useState } from 'react';
 
 const { Content } = Layout;
 
@@ -10,47 +12,40 @@ const items = [
   {
     key: 'upload',
     label: 'Upload files',
-    children: <UploadTransactionFiles />,
   },
   {
     key: 'history',
     label: 'Import history',
-    children: <TransactionImportHistory />,
   },
 ];
 
-const onChange = (key) => {
-  console.log(key);
-};
-
 const DataIngest = () => {
-  const {
-    token: { borderRadiusLG },
-  } = theme.useToken();
-
+  const [view, setView] = useState('upload');
+  const onChange = (key) => {
+    setView(key);
+  };
   return (
     <>
-      <div
-        style={{
-          marginLeft: '-24px',
-          padding: '24px',
-        }}
-      >
+      <PageHeader>
         <BreadcrumbMenu />
         <Content>
           <h1>Data Ingest</h1>
           <p>Import transaction data, or summarized tax liability.</p>
-          <Tabs defaultActiveKey="upload" items={items} onChange={onChange} />
+          <Tabs
+            defaultActiveKey="upload"
+            items={items}
+            onChange={onChange}
+            style={{
+              marginBottom: '-40px',
+            }}
+          />
         </Content>
-      </div>
-      <Content
-        style={{
-          margin: 0,
-          minHeight: 280,
-          borderRadius: borderRadiusLG,
-        }}
-      >
-        <Layout></Layout>
+      </PageHeader>
+      <Content>
+        <Layout>
+          {view === 'upload' && <UploadTransactionFiles />}
+          {view === 'history' && <TransactionImportHistory />}
+        </Layout>
       </Content>
     </>
   );

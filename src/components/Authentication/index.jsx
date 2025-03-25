@@ -18,17 +18,14 @@ import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import { companies as COMPANIES } from '../../graphql/queries';
 
 const { Content } = Layout;
+const { Title } = Typography;
 
 const Authentication = () => {
   const {
     token: { borderRadiusLG },
   } = theme.useToken();
-  const {
-    isLoggedIn,
-    setIsLoggedIn,
-    companyId,
-    setCompanyId,
-  } = useOutletContext();
+  const { isLoggedIn, setIsLoggedIn, companyId, setCompanyId } =
+    useOutletContext();
 
   const [selectedCompanyId, setSelectedCompanyId] = useState(companyId);
 
@@ -91,7 +88,7 @@ const Authentication = () => {
       >
         <BreadcrumbMenu />
         <Content>
-          <h1>Authentication</h1>
+          <Title level={1}>Authentication</Title>
           <p style={{ marginBottom: 0 }}>
             Enter your Avalara credentials to connect.
           </p>
@@ -102,18 +99,17 @@ const Authentication = () => {
         style={{
           margin: 0,
           minHeight: 280,
-          borderRadius: borderRadiusLG,
         }}
       >
         <Layout>
           <Card
+            title="Credentials"
             style={{
               boxShadow: 'none',
               marginTop: 20,
               width: '100%',
             }}
           >
-            <h2>Credentials</h2>
             <Typography.Title level={5}>Account number</Typography.Title>
             <Space direction="horizontal">
               <Input
