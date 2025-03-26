@@ -86,7 +86,12 @@ const ReturnDetails = () => {
       <ReturnSummary returnData={tableData} />
       <Card>
         <Button type="text">+ Add an adjustment</Button>
-        <Table loading={loading} dataSource={dataSource} columns={columns} />
+        <Table
+          loading={loading}
+          dataSource={dataSource}
+          columns={columns}
+          size="middle"
+        />
       </Card>
     </div>
   );

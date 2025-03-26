@@ -185,6 +185,7 @@ const SetUpReturnsTable = ({ companyId }) => {
       columns={columns}
       loading={loading}
       pagination={pagination}
+      size="middle"
     />
   );
 };

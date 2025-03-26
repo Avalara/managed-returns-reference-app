@@ -82,6 +82,7 @@ const Authentication = () => {
 
     localStorage.setItem('companyId', values.companyId);
     setCompanyId(values.companyId);
+    message.success('Successfully updated company!');
   };
 
   return (
