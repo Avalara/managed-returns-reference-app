@@ -31,7 +31,6 @@ const ReturnTile = ({ regionData }) => {
           columns={columns}
           pagination={false}
           scroll={{ x: 'max-content' }}
-          size="middle"
         />
       ),
     },

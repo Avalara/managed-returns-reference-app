@@ -58,7 +58,6 @@ const TaxFormsTable = ({ dataSource, loading }) => {
         setCurrentPage(page.current);
       }}
       rowKey="taxFormCode"
-      size="middle"
       expandable={{
         expandedRowRender: (record) => (
           <Space direction="vertical">
