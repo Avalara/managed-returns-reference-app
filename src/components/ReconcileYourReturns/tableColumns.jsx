@@ -42,33 +42,43 @@ export const columns = [
     title: 'Gross sales',
     dataIndex: 'grossSales',
     key: 'grossSales',
+    render: (value) => Intl.NumberFormat('en-US').format(value),
   },
   {
     title: 'Net sales',
     dataIndex: 'netSales',
     key: 'netSales',
+    render: (value) => Intl.NumberFormat('en-US').format(value),
+
     responsive: ['lg'],
   },
   {
     title: 'Exempt sales',
     dataIndex: 'exemptSales',
+    render: (value) => Intl.NumberFormat('en-US').format(value),
+
     key: 'exemptSales',
   },
   {
     title: 'Total tax',
     dataIndex: 'totalTax',
     key: 'totalTax',
+    render: (value) => Intl.NumberFormat('en-US').format(value),
+
     responsive: ['lg'],
   },
   {
     title: 'Adjustments',
     dataIndex: 'adjustments',
     key: 'adjustments',
+    render: (value) => Intl.NumberFormat('en-US').format(value),
+
     responsive: ['lg'],
   },
   {
     title: 'Amount due',
     dataIndex: 'amountDue',
+    render: (value) => Intl.NumberFormat('en-US').format(value),
     key: 'amountDue',
   },
   {
