@@ -10,16 +10,12 @@ const { Content } = Layout;
 const { Title } = Typography;
 
 const SetUpReturns = () => {
-  const {
-    token: { borderRadiusLG },
-  } = theme.useToken();
   const { companyId } = useOutletContext();
 
   return (
     <>
       <PageHeader>
         <BreadcrumbMenu />
-
         <Title level={1}>Set up returns</Title>
         <p>
           These are the states where you&#39;re registered to report tax, based
