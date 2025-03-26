@@ -117,14 +117,16 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
         </Space>
       </Space>
       {amountDue !== null && amountDue !== undefined && (
-        <Statistic
-          title="Amount due"
-          value={amountDue.toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-          })}
-          suffix="USD"
-        />
+        <div style={{ textAlign: 'right' }}>
+          <Statistic
+            title="Amount due"
+            value={amountDue.toLocaleString('en-US', {
+              style: 'currency',
+              currency: 'USD',
+            })}
+            suffix="USD"
+          />
+        </div>
       )}
     </Flex>
   );

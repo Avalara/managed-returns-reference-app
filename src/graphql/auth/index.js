@@ -74,10 +74,10 @@ export const authLink = new ApolloLink(
             // Token is expired, try to refresh it
             try {
               await authService.login();
-              console.log('logged in');
+              console.log('Successfully logged in');
             } catch (error) {
               // Handle refresh error (e.g., redirect to login page)
-              console.log('error logging in', error);
+              console.log('Error logging in', error);
               authService.logout();
               // window.location.href = '/login';
               return;

@@ -276,7 +276,7 @@ const SetUpRegionReturns = () => {
             <Col className="gutter-row" span={8}>
               <Card
                 title="Improve your recommendations"
-                style={{ height: '70vh' }}
+                style={{ height: '100%' }}
               >
                 <Row gutter={[16, 24]}>
                   {onboardingQuestions.map((question) => (

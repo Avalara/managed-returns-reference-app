@@ -31,8 +31,8 @@ const Home = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    const clientId = localStorage.getItem('clientId');
-    const clientSecret = localStorage.getItem('clientSecret');
+    const clientId = localStorageClientId;
+    const clientSecret = localStorageClientSecret;
     if (!clientId || !clientSecret) {
       console.log('clientId', clientId, 'clientSecret', clientSecret);
       setIsLoggedIn(false);
@@ -129,19 +129,11 @@ const Home = () => {
         />
       </Header>
       <Layout style={{ minHeight: '100vh' }}>
-        <Sider
-          width={200}
-          style={{
-            background: colorBgContainer,
-          }}
-          breakpoint="md"
-          collapsedWidth={0}
-        >
+        <Sider breakpoint="md" collapsible theme={'light'}>
           <Menu
             mode="inline"
             style={{
               height: '100%',
-              borderRight: 0,
             }}
             items={menuItems}
             defaultOpenKeys={[defaultOpenMenuItem]}

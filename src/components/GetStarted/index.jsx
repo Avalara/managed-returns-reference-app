@@ -137,7 +137,7 @@ const GetStarted = () => {
         <BreadcrumbMenu />
         <Content>
           <Row align="bottom">
-            <Col span={18}>
+            <Col span={16}>
               <Title level={1}>Get started</Title>
               <p>
                 Set up all the returns that you want Avalara to file for you and
@@ -146,12 +146,13 @@ const GetStarted = () => {
                 first filing period.
               </p>
             </Col>
-            <Col span={6}>
+            <Col span={8}>
               <div
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-end',
+                  textAlign: 'right',
                 }}
               >
                 <Statistic
