@@ -31,8 +31,8 @@ const Home = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    const clientId = localStorage.getItem('clientId');
-    const clientSecret = localStorage.getItem('clientSecret');
+    const clientId = localStorageClientId;
+    const clientSecret = localStorageClientSecret;
     if (!clientId || !clientSecret) {
       console.log('clientId', clientId, 'clientSecret', clientSecret);
       setIsLoggedIn(false);
@@ -110,13 +110,7 @@ const Home = () => {
 
   return (
     <Layout>
-      <Header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
-        <div className="demo-logo" />
+      <Header>
         <Menu
           theme="dark"
           mode="horizontal"
@@ -130,24 +124,16 @@ const Home = () => {
             flex: 1,
             minWidth: 0,
             fontSize: '18px',
-            fontWeight: 'bold',
+            fontWeight: '500',
           }}
         />
       </Header>
-      <Layout>
-        <Sider
-          width={200}
-          style={{
-            background: colorBgContainer,
-          }}
-          breakpoint="md"
-          collapsedWidth={0}
-        >
+      <Layout style={{ minHeight: '100vh' }}>
+        <Sider breakpoint="md" collapsible theme={'light'}>
           <Menu
             mode="inline"
             style={{
               height: '100%',
-              borderRight: 0,
             }}
             items={menuItems}
             defaultOpenKeys={[defaultOpenMenuItem]}
@@ -159,32 +145,9 @@ const Home = () => {
         </Sider>
         <Layout
           style={{
-            padding: '0 24px 24px',
+            padding: '24px',
           }}
         >
-          {/* <Header
-            style={{
-              backgroundColor: 'white',
-              marginLeft: '-24px',
-              paddingTop: '24px',
-            }}
-          >
-            <BreadcrumbMenu />
-          </Header>
-
-          <Content
-            style={{
-              padding: 24,
-              margin: 0,
-              minHeight: 280,
-              borderRadius: borderRadiusLG,
-            }}
-          >
-            <Layout
-              style={{
-                padding: '24px 0',
-              }}
-            > */}
           <Outlet
             context={{
               isLoggedIn,
@@ -194,8 +157,6 @@ const Home = () => {
               setCompanyId,
             }}
           />
-          {/* </Layout>
-          </Content> */}
         </Layout>
       </Layout>
     </Layout>

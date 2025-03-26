@@ -9,7 +9,7 @@ const mockData = [
     description: 'Description 1',
     taxAuthorityId: 111,
     taxFormCode: 'TaxFormCode 1',
-    taxAuthorityName: 'TaxAuthorityName 1',
+    taxAuthority: 'TaxAuthorityName 1',
     taxFormName: 'TaxFormName 1',
     taxTypes: ['Tax Type 1', 'Tax Type 2'],
     recommended: true,
@@ -19,7 +19,7 @@ const mockData = [
     description: 'Description 2',
     taxAuthorityId: 114,
     taxFormCode: 'TaxFormCode 2',
-    taxAuthorityName: 'TaxAuthorityName 2',
+    taxAuthority: 'TaxAuthorityName 2',
     taxFormName: 'TaxFormName 2',
     taxTypes: ['Tax Type 3'],
     recommended: false,
@@ -29,7 +29,7 @@ const mockData = [
     description: 'Description 3',
     taxAuthorityId: 117,
     taxFormCode: 'TaxFormCode 3',
-    taxAuthorityName: 'TaxAuthorityName 3',
+    taxAuthority: 'TaxAuthorityName 3',
     taxFormName: 'TaxFormName 3',
     taxTypes: ['Tax Type 1', 'Tax Type 2'],
     purpose: 'Purpose 3',
@@ -39,7 +39,7 @@ const mockData = [
     description: 'Description 4',
     taxAuthorityId: 118,
     taxFormCode: 'TaxFormCode 4',
-    taxAuthorityName: 'TaxAuthorityName 4',
+    taxAuthority: 'TaxAuthorityName 4',
     taxFormName: 'TaxFormName 4',
     taxTypes: ['Tax Type 1', 'Tax Type 2'],
     recommended: false,
@@ -48,7 +48,7 @@ const mockData = [
     description: 'Description 5',
     taxAuthorityId: 119,
     taxFormCode: 'TaxFormCode 5',
-    taxAuthorityName: 'TaxAuthorityName 5',
+    taxAuthority: 'TaxAuthorityName 5',
     taxFormName: 'TaxFormName 5',
     taxTypes: ['Tax Type 1', 'Tax Type 2'],
     recommended: false,
@@ -57,7 +57,7 @@ const mockData = [
     description: 'Description 6',
     taxAuthorityId: 6330,
     taxFormCode: 'TaxFormCode 6',
-    taxAuthorityName: 'TaxAuthorityName 6',
+    taxAuthority: 'TaxAuthorityName 6',
     taxFormName: 'TaxFormName 6',
     taxTypes: ['Tax Type 1', 'Tax Type 2', 'Tax Type 3'],
     recommended: true,
@@ -91,22 +91,72 @@ describe('TaxFormsTable', () => {
 
     // There should be one "Recommended" tag visible for the first item
     const recommendedTags = screen.getAllByText('Recommended');
-    expect(recommendedTags.length).toBe(1); // Only the first item in the current page is recommended
+    expect(recommendedTags.length).toBe(2); // Only the first item in the current page is recommended
   });
 
   it('should handle pagination correctly', () => {
-    render(<TaxFormsTable dataSource={mockData} loading={false} />);
+    // Create more mock data to test pagination with 10 items per page
+    const extendedMockData = [
+      ...mockData,
+      {
+        description: 'Description 7',
+        taxAuthorityId: 7,
+        taxFormCode: 'TaxFormCode 7',
+        taxAuthority: 'TaxAuthorityName 7',
+        taxFormName: 'TaxFormName 7',
+        taxTypes: ['Tax Type 1'],
+        recommended: false,
+      },
+      {
+        description: 'Description 8',
+        taxAuthorityId: 8,
+        taxFormCode: 'TaxFormCode 8',
+        taxAuthority: 'TaxAuthorityName 8',
+        taxFormName: 'TaxFormName 8',
+        taxTypes: ['Tax Type 2'],
+        recommended: false,
+      },
+      {
+        description: 'Description 9',
+        taxAuthorityId: 9,
+        taxFormCode: 'TaxFormCode 9',
+        taxAuthority: 'TaxAuthorityName 9',
+        taxFormName: 'TaxFormName 9',
+        taxTypes: ['Tax Type 3'],
+        recommended: false,
+      },
+      {
+        description: 'Description 10',
+        taxAuthorityId: 10,
+        taxFormCode: 'TaxFormCode 10',
+        taxAuthority: 'TaxAuthorityName 10',
+        taxFormName: 'TaxFormName 10',
+        taxTypes: ['Tax Type 1'],
+        recommended: false,
+      },
+      {
+        description: 'Description 11',
+        taxAuthorityId: 11,
+        taxFormCode: 'TaxFormCode 11',
+        taxAuthority: 'TaxAuthorityName 11',
+        taxFormName: 'TaxFormName 11',
+        taxTypes: ['Tax Type 2'],
+        recommended: false,
+      },
+    ];
 
-    // First page should show first 5 items
+    render(<TaxFormsTable dataSource={extendedMockData} loading={false} />);
+
+    // First page should show first 10 items
     expect(screen.getByText('Description 1')).toBeInTheDocument();
-    expect(screen.getByText('Description 2')).toBeInTheDocument();
+    expect(screen.getByText('Description 10')).toBeInTheDocument();
 
     // Find and click the next page button using the pagination item
     const nextPageElement = document.querySelector('.ant-pagination-next');
     fireEvent.click(nextPageElement);
 
-    // Second page should show the 6th item
-    expect(screen.getByText('Description 6')).toBeInTheDocument();
+    // Second page should show the 11th item
+    expect(screen.getByText('Description 11')).toBeInTheDocument();
 
     // First page items should not be visible anymore
     expect(screen.queryByText('Description 1')).not.toBeInTheDocument();
@@ -130,9 +180,9 @@ describe('TaxFormsTable', () => {
   it('should render "Set up returns" button for each row', () => {
     render(<TaxFormsTable dataSource={mockData} loading={false} />);
 
-    // There should be 5 "Set up returns" buttons (one per row on the first page)
+    // There should be 6 "Set up returns" buttons (one per row for all mock data items)
     const setupButtons = screen.getAllByText('Set up returns');
-    expect(setupButtons.length).toBe(5);
+    expect(setupButtons.length).toBe(6);
   });
 
   it('should render empty table when no data is provided', () => {
@@ -146,8 +196,8 @@ describe('TaxFormsTable', () => {
   it('should handle page size correctly', () => {
     render(<TaxFormsTable dataSource={mockData} loading={false} />);
 
-    // Should show 5 items per page by default
+    // Should show all 6 items since it's less than the page size of 10
     const rows = document.querySelectorAll('.ant-table-row');
-    expect(rows.length).toBe(5);
+    expect(rows.length).toBe(6);
   });
 });

@@ -15,10 +15,13 @@ import {
   Row,
   Select,
   theme,
+  Typography,
 } from 'antd';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
+import { PageHeader } from '../shared';
 
 const { Content } = Layout;
+const { Title } = Typography;
 
 const DEFAULT_COUNTRY = 'US';
 const DEFAULT_COUNTRY_PLACEHOLDER = 'Select a country';
@@ -269,37 +272,16 @@ const Provisioning = () => {
 
   return (
     <>
-      <div
-        style={{
-          backgroundColor: 'white',
-          marginLeft: '-24px',
-          padding: '24px',
-        }}
-      >
+      <PageHeader>
         <BreadcrumbMenu />
         <Content>
-          <h1>Provisioning</h1>
-          <p style={{ marginBottom: 0 }}>
-            Enter your customer’s information to provision a new account.
-          </p>
+          <Title level={1}>Provisioning</Title>
+          <p>Enter your customer’s information to provision a new account.</p>
         </Content>
-      </div>
-      <Content
-        style={{
-          margin: 0,
-          minHeight: 280,
-          borderRadius: borderRadiusLG,
-        }}
-      >
+      </PageHeader>
+      <Content>
         <Layout>
-          <Card
-            title="Customer details"
-            style={{
-              boxShadow: 'none',
-              marginTop: 20,
-              width: '100%',
-            }}
-          >
+          <Card title="Customer details">
             <Form
               form={form}
               layout="vertical"

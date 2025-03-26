@@ -40,7 +40,7 @@ const ReturnTile = ({ regionData }) => {
       style={{ marginBottom: 20 }}
       title={<h3>{getRegionName(regionData.region) || ''}</h3>}
       extra={
-        <div style={{ margin: '20px' }}>
+        <div style={{ margin: '15px', textAlign: 'right' }}>
           <Statistic
             title="Amount due"
             value={regionData?.regionTaxSummary?.remittanceAmount.toLocaleString(

@@ -1,8 +1,10 @@
 import { PropTypes } from 'prop-types';
-import { Button, Card, Descriptions, Table } from 'antd';
+import { Button, Card, Descriptions, Table, Typography } from 'antd';
 import { useOutletContext, useParams } from 'react-router-dom';
 
 import { useFilingsData } from '../ReconcileYourReturns/hooks';
+
+const { Title } = Typography;
 
 const ReturnSummary = ({ returnData }) => {
   const items = [
@@ -79,7 +81,7 @@ const ReturnDetails = () => {
 
   return (
     <div id="return-details">
-      <h1>Return details and adjustments</h1>
+      <Title level={1}>Return details and adjustments</Title>
 
       <ReturnSummary returnData={tableData} />
       <Card>

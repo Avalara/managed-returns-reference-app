@@ -8,6 +8,7 @@ import {
   theme,
   Result,
   message,
+  Typography,
 } from 'antd';
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, NetworkStatus } from '@apollo/client';
@@ -26,8 +27,10 @@ import OnboardingQuestion from './OnboardingQuestion';
 import { useOutletContext, useParams, useSearchParams } from 'react-router-dom';
 import Search from 'antd/es/input/Search.js';
 import FormItem from 'antd/es/form/FormItem/index.js';
+import { PageHeader } from '../shared';
 
 const { Content } = Layout;
+const { Title } = Typography;
 
 const SetUpRegionReturns = () => {
   const { accountId, companyId } = useOutletContext();
@@ -205,29 +208,18 @@ const SetUpRegionReturns = () => {
 
   return (
     <>
-      <div
-        style={{
-          marginLeft: '-24px',
-          padding: '24px',
-        }}
-      >
+      <PageHeader>
         <BreadcrumbMenu />
         <Content>
-          <h1>Set up {region} returns</h1>
+          <Title level={1}>Set up {region} returns</Title>
           <p>
             Returns are recommended based on the tax you collect and information
             you provide about your business. Use the Improve your
             recommendations panel if you need help finding the right returns.
           </p>
         </Content>
-      </div>
-      <Content
-        style={{
-          margin: 0,
-          minHeight: 280,
-          borderRadius: borderRadiusLG,
-        }}
-      >
+      </PageHeader>
+      <Content>
         <Layout>
           <Row
             gutter={{
@@ -284,7 +276,7 @@ const SetUpRegionReturns = () => {
             <Col className="gutter-row" span={8}>
               <Card
                 title="Improve your recommendations"
-                style={{ height: '70vh' }}
+                style={{ height: '100%' }}
               >
                 <Row gutter={[16, 24]}>
                   {onboardingQuestions.map((question) => (

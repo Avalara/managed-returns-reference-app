@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 
 const TaxFormsTable = ({ dataSource, loading }) => {
-  const pageSize = 5;
+  const pageSize = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   const columns = [
@@ -69,16 +69,14 @@ const TaxFormsTable = ({ dataSource, loading }) => {
                     <b>Tax type </b>
                   </td>
                   <td style={{ paddingLeft: '10px' }}>
-                    {record.taxTypes.join(', ')}
+                    {record.taxTypes ? record.taxTypes.join(', ') : ''}
                   </td>
                 </tr>
                 <tr>
                   <td>
                     <b>Tax authority </b>
                   </td>
-                  <td style={{ paddingLeft: '10px' }}>
-                    {record.taxAuthorityName}
-                  </td>
+                  <td style={{ paddingLeft: '10px' }}>{record.taxAuthority}</td>
                 </tr>
               </tbody>
             </table>
@@ -93,7 +91,7 @@ TaxFormsTable.propTypes = {
   dataSource: PropTypes.arrayOf(
     PropTypes.shape({
       description: PropTypes.string,
-      taxAuthorityName: PropTypes.string,
+      taxAuthority: PropTypes.string,
       taxTypes: PropTypes.arrayOf(PropTypes.string),
       purpose: PropTypes.string,
       taxFormName: PropTypes.string,

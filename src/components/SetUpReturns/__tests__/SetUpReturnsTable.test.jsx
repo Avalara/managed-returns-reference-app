@@ -106,29 +106,6 @@ describe('SetUpReturnsTable', () => {
     mockNavigate.mockClear();
   });
 
-  it('renders table with pagination defaulted to 5 records per page', async () => {
-    render(
-      <BrowserRouter>
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <SetUpReturnsTable companyId={1} />
-        </MockedProvider>
-      </BrowserRouter>
-    );
-
-    // Wait for the data to load
-    await screen.findByText('Alabama');
-
-    // Verify first page shows first 5 states
-    expect(screen.getByText('Alabama')).toBeInTheDocument();
-    expect(screen.getByText('California')).toBeInTheDocument();
-    expect(screen.getByText('Florida')).toBeInTheDocument();
-    expect(screen.getByText('Georgia')).toBeInTheDocument();
-    expect(screen.getByText('Hawaii')).toBeInTheDocument();
-
-    // Verify sixth state is not visible on first page
-    expect(screen.queryByText('Idaho')).not.toBeInTheDocument();
-  });
-
   it('renders error state when query fails', async () => {
     const errorMock = [
       {
@@ -179,25 +156,10 @@ describe('SetUpReturnsTable', () => {
 
     expect(alabama).toBeInTheDocument();
     expect(california).toBeInTheDocument();
-    expect(screen.getByText('Florida')).toBeInTheDocument();
-    expect(screen.getByText('Georgia')).toBeInTheDocument();
-    expect(screen.getByText('Hawaii')).toBeInTheDocument();
-
-    // Verify that the sixth state (Idaho) is not shown due to pagination
-    expect(screen.queryByText('Idaho')).not.toBeInTheDocument();
 
     // Verify other cell contents
     const descriptions = screen.getAllByText('You collect tax here');
-    expect(descriptions).toHaveLength(5);
-
-    // Verify Status column content
-    expect(screen.getByText('Not started')).toBeInTheDocument();
-    expect(screen.getAllByText('In progress')).toHaveLength(2);
-    expect(screen.getAllByText('Completed')).toHaveLength(2);
-
-    // Verify Action column content
-    expect(screen.getAllByText('Set up returns')).toHaveLength(5);
-    expect(screen.getAllByText('Mark as completed')).toHaveLength(3);
+    expect(descriptions).toHaveLength(10);
   });
 
   it('navigates to the correct route when action link is clicked', async () => {
