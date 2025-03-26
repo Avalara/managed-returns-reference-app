@@ -670,6 +670,7 @@ const SetUpReturnsTable = ({ companyId }) => {
       loading={loading}
       pagination={pagination}
       size="middle"
+      rowKey={'id'}
     />
   );
 };
