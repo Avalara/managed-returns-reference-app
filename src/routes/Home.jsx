@@ -31,8 +31,8 @@ const Home = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    const clientId = localStorage.getItem('clientId');
-    const clientSecret = localStorage.getItem('clientSecret');
+    const clientId = localStorageClientId;
+    const clientSecret = localStorageClientSecret;
     if (!clientId || !clientSecret) {
       console.log('clientId', clientId, 'clientSecret', clientSecret);
       setIsLoggedIn(false);
