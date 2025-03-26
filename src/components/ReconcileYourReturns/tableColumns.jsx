@@ -42,20 +42,32 @@ export const columns = [
     title: 'Gross sales',
     dataIndex: 'grossSales',
     key: 'grossSales',
-    render: (value) => Intl.NumberFormat('en-US').format(value),
+    render: (value) =>
+      Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(value),
   },
   {
     title: 'Net sales',
     dataIndex: 'netSales',
     key: 'netSales',
-    render: (value) => Intl.NumberFormat('en-US').format(value),
+    render: (value) =>
+      Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(value),
 
     responsive: ['lg'],
   },
   {
     title: 'Exempt sales',
     dataIndex: 'exemptSales',
-    render: (value) => Intl.NumberFormat('en-US').format(value),
+    render: (value) =>
+      Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(value),
 
     key: 'exemptSales',
   },
@@ -63,7 +75,11 @@ export const columns = [
     title: 'Total tax',
     dataIndex: 'totalTax',
     key: 'totalTax',
-    render: (value) => Intl.NumberFormat('en-US').format(value),
+    render: (value) =>
+      Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(value),
 
     responsive: ['lg'],
   },
@@ -71,14 +87,22 @@ export const columns = [
     title: 'Adjustments',
     dataIndex: 'adjustments',
     key: 'adjustments',
-    render: (value) => Intl.NumberFormat('en-US').format(value),
+    render: (value) =>
+      Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(value),
 
     responsive: ['lg'],
   },
   {
     title: 'Amount due',
     dataIndex: 'amountDue',
-    render: (value) => Intl.NumberFormat('en-US').format(value),
+    render: (value) =>
+      Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(value),
     key: 'amountDue',
   },
   {
