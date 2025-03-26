@@ -131,12 +131,7 @@ const columns = [
 ];
 
 const HistoryTable = ({ loading, dataSource }) => (
-  <Table
-    loading={loading}
-    dataSource={dataSource}
-    columns={columns}
-    size="middle"
-  />
+  <Table loading={loading} dataSource={dataSource} columns={columns} />
 );
 
 HistoryTable.propTypes = {

@@ -52,7 +52,6 @@ function ReturnsDataView({
         dataSource={tableData}
         columns={columns}
         scroll={{ x: 'max-content' }}
-        size="middle"
       />
     </Card>
   ) : (
