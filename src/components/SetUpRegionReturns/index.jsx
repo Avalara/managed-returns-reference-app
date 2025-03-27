@@ -211,12 +211,17 @@ const SetUpRegionReturns = () => {
       <PageHeader>
         <BreadcrumbMenu />
         <Content>
-          <Title level={1}>Set up {region} returns</Title>
-          <p>
-            Returns are recommended based on the tax you collect and information
-            you provide about your business. Use the Improve your
-            recommendations panel if you need help finding the right returns.
-          </p>
+          <Row>
+            <Col lg={16}>
+              <Title level={1}>Set up {region} returns</Title>
+              <p>
+                Returns are recommended based on the tax you collect and
+                information you provide about your business. Use the Improve
+                your recommendations panel if you need help finding the right
+                returns.
+              </p>
+            </Col>
+          </Row>
         </Content>
       </PageHeader>
       <Content>
