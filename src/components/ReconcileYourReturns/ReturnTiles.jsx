@@ -1,4 +1,4 @@
-import { Card, Collapse, Skeleton, Space, Statistic, Table } from 'antd';
+import { Card, Collapse, Skeleton, Statistic, Table } from 'antd';
 import PropTypes from 'prop-types';
 
 import { columns } from './tableColumns';

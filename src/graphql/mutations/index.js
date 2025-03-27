@@ -1,4 +1,5 @@
-export { createAndLinkAccount } from './CreateAndLinkAccount.js';
-export { createOnboardingQuestionAnswer } from './CreateOnboardingQuestionAnswer.js';
-export { updateOnboardingQuestionAnswer } from './UpdateOnboardingQuestionAnswer.js';
+export { createAndLinkAccount } from './CreateAndLinkAccount';
+export { createOnboardingQuestionAnswer } from './CreateOnboardingQuestionAnswer';
+export { updateOnboardingQuestionAnswer } from './UpdateOnboardingQuestionAnswer';
 export { fundingPoa } from './FundingPoa';
+export { createTransaction } from './CreateTransaction';
