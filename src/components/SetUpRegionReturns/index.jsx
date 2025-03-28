@@ -9,6 +9,7 @@ import {
   Result,
   message,
   Typography,
+  Empty,
 } from 'antd';
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, NetworkStatus } from '@apollo/client';
@@ -284,6 +285,15 @@ const SetUpRegionReturns = () => {
                 style={{ height: '100%' }}
               >
                 <Row gutter={[16, 24]}>
+                  {!suggestedTaxFormsLoading &&
+                    suggestedTaxFormsRefetchStatus !== NetworkStatus.refetch &&
+                    (!onboardingQuestions ||
+                      onboardingQuestions?.length === 0) && (
+                      <Empty
+                        style={{ margin: 'auto' }}
+                        description="No onboarding questions available at this time."
+                      ></Empty>
+                    )}
                   {onboardingQuestions.map((question) => (
                     <Col
                       key={question.questionId}
