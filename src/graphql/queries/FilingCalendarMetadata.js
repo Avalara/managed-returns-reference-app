@@ -9,26 +9,44 @@ export const filingCalendarMetadata = gql`
             customQuestions {
               dataType
               filingQuestionId
+              filingQuestionCode
               destination
               helpText
               maxLength
               question
               regex
               required
-              sortOrder
             }
             standardQuestions {
               value {
                 dataType
                 filingQuestionId
+                filingQuestionCode
                 destination
                 helpText
                 maxLength
                 question
                 regex
                 required
-                sortOrder
               }
+            }
+            formFilingFrequencies {
+              filingFrequency
+              filingFrequencyId
+              filingPeriodDates {
+                description
+                transactionalPeriodEnd
+                transactionalPeriodStart
+                filingDueDate
+              }
+            }
+            formFilingMethods {
+              filingMethod
+              filingMethodId
+            }
+            formHeader {
+              outletReportingMethod
+              outletReportingMethodId
             }
           }
         }
