@@ -1,3 +1,20 @@
+/*
+ * Contents of this file was produced with a help of a code generation tool and
+ * subsequently reviewed and edited by a human.
+ *
+ * While some of the code was created by an AI assisted service, manual adjustments
+ * have been made to ensure correctness, readability, functionality and compliance
+ * to Avalara's coding standards and guidelines.
+ * Any future modifications should be approached with caution to avoid
+ * overwriting the manual changes.
+ *
+ *
+ * This source code is owned by Avalara Inc. Unauthorized copying of this file,
+ * via any medium, is strictly prohibited. Proprietary and confidential.
+ *
+ * For more information, refer to the documentation or contact the development team.
+ */
+
 import React, { useState, useEffect } from 'react';
 import {
   Drawer,
@@ -6,10 +23,10 @@ import {
   Select,
   Space,
   Typography,
-  Spin,
   Alert,
   Divider,
   Skeleton,
+  Modal,
 } from 'antd';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
@@ -142,7 +159,7 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
     customQuestions = [],
     standardQuestions = [],
     formFilingFrequencies = [],
-    formHeader: { outletReportingMethod } = {},
+    formHeader: { outletReportingMethod, region } = {},
   } = questionsData?.definitions?.value?.filingCalendarMetaData
     ?.filingCalendarMetadata || {};
 
@@ -175,7 +192,25 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
       open={visible}
       extra={
         <Space>
-          <Button onClick={onClose}>Set up later</Button>
+          <Button
+            onClick={() => {
+              Modal.confirm({
+                title: 'Are you sure you want to set up this return later?',
+                content: `The information for this return won't be saved. To set up this return later, you will need to add it again to your ${region || 'state'} returns.`,
+                okText: 'Yes, set up later',
+                cancelText: 'Cancel',
+                onOk: () => onClose(),
+                footer: (_, { OkBtn, CancelBtn }) => (
+                  <>
+                    <CancelBtn />
+                    <OkBtn />
+                  </>
+                ),
+              });
+            }}
+          >
+            Set up later
+          </Button>
           <Button onClick={handleSubmit} type="primary">
             Save
           </Button>

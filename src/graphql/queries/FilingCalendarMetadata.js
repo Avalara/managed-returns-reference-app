@@ -47,6 +47,7 @@ export const filingCalendarMetadata = gql`
             formHeader {
               outletReportingMethod
               outletReportingMethodId
+              region
             }
           }
         }
