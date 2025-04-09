@@ -34,6 +34,7 @@ import ReturnQuestion from './ReturnQuestion.jsx';
 import { filingCalendarMetadata } from '../../graphql/queries/FilingCalendarMetadata.js';
 import { companyLocations as COMPANY_LOCATIONS } from '../../graphql/queries/Companies.js';
 import { useOutletContext, useParams } from 'react-router-dom';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 
@@ -113,6 +114,7 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
   const { companyId } = useOutletContext();
   const [form] = Form.useForm();
   const selectedFilingFrequency = Form.useWatch('filingFrequency', form);
+  const [modal, contextHolder] = Modal.useModal();
 
   // Handle location selection
   const handleLocationSelect = (locationCode) => {
@@ -194,9 +196,10 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
         <Space>
           <Button
             onClick={() => {
-              Modal.confirm({
+              modal.confirm({
                 title: 'Are you sure you want to set up this return later?',
                 content: `The information for this return won't be saved. To set up this return later, you will need to add it again to your ${region || 'state'} returns.`,
+                icon: <ExclamationCircleOutlined />,
                 okText: 'Yes, set up later',
                 cancelText: 'Cancel',
                 onOk: () => onClose(),
@@ -214,6 +217,7 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
           <Button onClick={handleSubmit} type="primary">
             Save
           </Button>
+          {contextHolder}
         </Space>
       }
     >
