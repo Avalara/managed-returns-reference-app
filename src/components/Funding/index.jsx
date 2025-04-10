@@ -79,7 +79,7 @@ const Funding = () => {
         <BreadcrumbMenu />
         <Content>
           <Row align="bottom">
-            <Col span={18}>
+            <Col lg={16}>
               <Title level={1}>Sign funding power of attorney</Title>
               <p>
                 In order to act on your behalf with tax authorities, Avalara

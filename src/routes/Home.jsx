@@ -34,7 +34,6 @@ const Home = () => {
     const clientId = localStorageClientId;
     const clientSecret = localStorageClientSecret;
     if (!clientId || !clientSecret) {
-      console.log('clientId', clientId, 'clientSecret', clientSecret);
       setIsLoggedIn(false);
     } else {
       setIsLoggedIn(true);

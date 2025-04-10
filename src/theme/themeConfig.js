@@ -11,32 +11,6 @@ const themeConfig = {
     // fontFamily:
     //   "'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
   },
-  components: {
-    Button: {
-      borderRadius: 2,
-    },
-    Card: {
-      borderRadius: 2,
-    },
-    Input: {
-      borderRadius: 2,
-    },
-    Select: {
-      borderRadius: 2,
-    },
-    Typography: {
-      h1: {
-        fontSize: 20,
-        lineHeight: 28 / 20,
-        fontWeight: 500,
-      },
-      h2: {
-        fontSize: 16,
-        lineHeight: 24 / 16,
-        fontWeight: 500,
-      },
-    },
-  },
 };
 
 export default themeConfig;

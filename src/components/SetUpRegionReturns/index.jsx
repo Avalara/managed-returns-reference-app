@@ -9,6 +9,7 @@ import {
   Result,
   message,
   Typography,
+  Empty,
 } from 'antd';
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, NetworkStatus } from '@apollo/client';
@@ -211,12 +212,17 @@ const SetUpRegionReturns = () => {
       <PageHeader>
         <BreadcrumbMenu />
         <Content>
-          <Title level={1}>Set up {region} returns</Title>
-          <p>
-            Returns are recommended based on the tax you collect and information
-            you provide about your business. Use the Improve your
-            recommendations panel if you need help finding the right returns.
-          </p>
+          <Row>
+            <Col lg={16}>
+              <Title level={1}>Set up {region} returns</Title>
+              <p>
+                Returns are recommended based on the tax you collect and
+                information you provide about your business. Use the Improve
+                your recommendations panel if you need help finding the right
+                returns.
+              </p>
+            </Col>
+          </Row>
         </Content>
       </PageHeader>
       <Content>
@@ -279,6 +285,15 @@ const SetUpRegionReturns = () => {
                 style={{ height: '100%' }}
               >
                 <Row gutter={[16, 24]}>
+                  {!suggestedTaxFormsLoading &&
+                    suggestedTaxFormsRefetchStatus !== NetworkStatus.refetch &&
+                    (!onboardingQuestions ||
+                      onboardingQuestions?.length === 0) && (
+                      <Empty
+                        style={{ margin: 'auto' }}
+                        description="No onboarding questions available at this time."
+                      ></Empty>
+                    )}
                   {onboardingQuestions.map((question) => (
                     <Col
                       key={question.questionId}

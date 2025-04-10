@@ -1,10 +1,20 @@
-import { Button, Card, Form, Result, Select, Space, Table } from 'antd';
+import {
+  Button,
+  Card,
+  Form,
+  Result,
+  Select,
+  Space,
+  Table,
+  Badge,
+  Input,
+} from 'antd';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { transactionImportHistory as TRANSACTION_IMPORT_HISTORY } from '../../graphql/queries';
-import Search from 'antd/es/input/Search.js';
+const { Search } = Input;
 
 const TableFilters = ({ loading, setFilters, availableStatuses }) => {
   const [form] = Form.useForm();
@@ -86,6 +96,36 @@ TableFilters.propTypes = {
   availableStatuses: PropTypes.array.isRequired,
 };
 
+const getStatusBadge = (status) => {
+  const statusUpper = status?.toUpperCase();
+
+  // Convert to camel case for display (capitalize first letter of each word)
+  const displayStatus = status
+    ?.toLowerCase()
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
+  switch (statusUpper) {
+    case 'SUBMITTED':
+      return <Badge status="processing" text={displayStatus} />;
+    case 'PROCESSING':
+      return <Badge status="processing" text={displayStatus} />;
+    case 'COMPLETED':
+      return <Badge status="success" text={displayStatus} />;
+    case 'FAILED':
+      return <Badge status="error" text={displayStatus} />;
+    case 'DELETED':
+      return <Badge status="error" text={displayStatus} />;
+    case 'DUPLICATE':
+      return <Badge status="warning" text={displayStatus} />;
+    case 'BLOCKED':
+      return <Badge status="error" text={displayStatus} />;
+    default:
+      return <Badge status="default" text={displayStatus} />;
+  }
+};
+
 const columns = [
   {
     title: 'File name',
@@ -127,6 +167,7 @@ const columns = [
     dataIndex: 'status',
     key: 'status',
     responsive: ['lg'],
+    render: (status) => getStatusBadge(status),
   },
 ];
 
@@ -161,7 +202,6 @@ const TransactionImportHistory = () => {
   });
   const { companyId } = useOutletContext();
   const [availableStatuses, setAvailableStatuses] = useState([]);
-  const navigate = useNavigate();
 
   // Query transaction import history
   const { loading, error, data } = useQuery(TRANSACTION_IMPORT_HISTORY, {

@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
-import { Card, Result, Table, Tooltip } from 'antd';
+import { Card, Result, Table } from 'antd';
 import { useEffect } from 'react';
-import { InfoCircleOutlined } from '@ant-design/icons';
 
 import ReturnTiles from './ReturnTiles';
 import { columns } from './tableColumns';
