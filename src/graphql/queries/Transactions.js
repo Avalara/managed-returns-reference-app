@@ -11,9 +11,8 @@ export const transactionImportHistory = gql`
             errorMessages
             hasErrorFile
             fileName
-            importFileId
-            errorFileId
             importType
+            createdDate
           }
         }
       }

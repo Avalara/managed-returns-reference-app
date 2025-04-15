@@ -11,9 +11,19 @@ import {
 } from 'antd';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import { transactionImportHistory as TRANSACTION_IMPORT_HISTORY } from '../../graphql/queries';
+
+// Extend dayjs with plugins
+dayjs.extend(localizedFormat);
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 const { Search } = Input;
 
 const TableFilters = ({ loading, setFilters, availableStatuses }) => {
@@ -140,27 +150,43 @@ const columns = [
     responsive: ['lg'],
   },
   {
-    title: 'Source file',
-    dataIndex: 'importFileId',
-    key: 'importFileId',
+    title: 'Transaction Batch ID',
+    dataIndex: 'transactionBatchId',
+    key: 'transactionBatchId',
     responsive: ['lg'],
   },
   {
-    title: 'Errors',
-    dataIndex: 'errorFileId',
-    key: 'errorFileId',
+    title: 'Error Messages',
+    dataIndex: 'errorMessages',
+    key: 'errorMessages',
     responsive: ['lg'],
+    render: (errorMessages) => {
+      if (!errorMessages || errorMessages.length === 0) return '-';
+      return (
+        <ul style={{ margin: 0, paddingLeft: 20 }}>
+          {errorMessages.map((msg, index) => (
+            <li key={index}>{msg}</li>
+          ))}
+        </ul>
+      );
+    },
   },
   {
-    title: 'Results',
-    dataIndex: 'results',
-    key: 'results',
+    title: 'Has Error File',
+    dataIndex: 'hasErrorFile',
+    key: 'hasErrorFile',
     responsive: ['lg'],
+    render: (hasErrorFile) => (hasErrorFile ? 'Yes' : 'No'),
   },
   {
     title: 'Date uploaded',
-    dataIndex: 'date',
-    key: 'date',
+    dataIndex: 'createdDate',
+    key: 'createdDate',
+    render: (createdDate) => {
+      if (!createdDate) return '';
+      // Convert UTC createdDate to local timezone
+      return dayjs.utc(createdDate).local().format('MMM D, YYYY h:mm A');
+    },
   },
   {
     title: 'Status',
@@ -234,17 +260,7 @@ const TransactionImportHistory = () => {
   }
 
   // Transform the data for the table
-  const transformedData =
-    data?.transactions?.value?.importHistory?.value?.map((item, index) => ({
-      key: item.transactionBatchId || index.toString(),
-      fileName: item.fileName,
-      importType: item.importType,
-      errorMessages: item.errorMessages,
-      hasErrorFile: item.hasErrorFile,
-      status: item.status,
-      importFileId: item.importFileId,
-      errorFileId: item.errorFileId,
-    })) || [];
+  const transformedData = data?.transactions?.value?.importHistory?.value || [];
 
   // Apply filters to the data
   const filteredData = applyFilters(transformedData, filters);
