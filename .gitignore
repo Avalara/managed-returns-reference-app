@@ -24,8 +24,7 @@ dist-ssr
 *.sw?
 
 .env
-
 CODEOWNERS
-deployment
 nginx
-.gitlab-ci.yml
+deployment
+.amazonq

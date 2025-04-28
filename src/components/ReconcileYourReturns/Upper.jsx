@@ -1,19 +1,21 @@
 import { useLazyQuery } from '@apollo/client';
-import { Button, DatePicker, Flex, Space } from 'antd';
+import { Button, DatePicker, Flex, Space, Statistic, Typography } from 'antd';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DownloadOutlined, FilePdfOutlined } from '@ant-design/icons';
 
-import { liabilityReports } from '../../graphql/queries/LiabilityReports';
+import { liabilityReports as LIABILITY_REPORTS } from '../../graphql/queries';
+
+const { Title } = Typography;
 
 const FilingPeriodSelector = ({ date, setDate }) => {
   const navigate = useNavigate();
 
   return (
     <div>
-      <h2>Filing period</h2>
+      <Title level={2}>Filing period</Title>
       <Space>
         <DatePicker
           onChange={(newDate) => {
@@ -64,7 +66,7 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
       loading,
       // data,
     },
-  ] = useLazyQuery(liabilityReports);
+  ] = useLazyQuery(LIABILITY_REPORTS);
 
   const downloadLiabilityReports = async () => {
     const { data } = await downloadLiabilityReport({
@@ -90,10 +92,9 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
   };
 
   return (
-    <Flex align="flex-start" justify="space-between">
-      <Flex vertical>
+    <Flex align="center" justify="space-between">
+      <Space direction="vertical">
         <FilingPeriodSelector date={date} setDate={setDate} />
-        <br />
         <Space>
           <Button
             type="default"
@@ -114,18 +115,18 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
             Download filing confirmations
           </Button>
         </Space>
-      </Flex>
-      {amountDue && (
-        <Flex vertical align="flex-end" justify="space-between" style={{}}>
-          <p>Amount due</p>
-          <h2>
-            {amountDue.toLocaleString('en-US', {
+      </Space>
+      {amountDue !== null && amountDue !== undefined && (
+        <div style={{ textAlign: 'right' }}>
+          <Statistic
+            title="Amount due"
+            value={amountDue.toLocaleString('en-US', {
               style: 'currency',
               currency: 'USD',
-            })}{' '}
-            USD
-          </h2>
-        </Flex>
+            })}
+            suffix="USD"
+          />
+        </div>
       )}
     </Flex>
   );

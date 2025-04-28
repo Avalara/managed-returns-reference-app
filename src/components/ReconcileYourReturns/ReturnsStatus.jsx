@@ -3,31 +3,35 @@ import { Badge } from 'antd';
 
 function getPrettyStatus(filingStatus) {
   let badgeStatus, statusString;
-  switch (filingStatus) {
-    case 'Dirty':
+  const status = filingStatus ? filingStatus.toUpperCase() : '';
+
+  switch (status) {
+    case 'DIRTY':
       statusString = 'Refreshing numbers';
       badgeStatus = 'processing';
       break;
-    case 'PendingApproval':
+    case 'PENDINGAPPROVAL':
+    case 'READYFORREVIEW':
       statusString = 'Ready for review';
       badgeStatus = 'processing';
       break;
-    case 'ApprovedToFile':
-    case 'PendingFiling':
-    case 'PendingFilingOnBehalf':
-    case 'ReturnAccepted':
-    case 'ReturnAcceptedOnBehalf':
-    case 'PaymentRemitted':
-    case 'PendingReturn':
-    case 'PendingReturnOnBehalf':
-    case 'ReturnRejected':
-    case 'ReturnRejectedOnBehalf':
-    case 'ApprovedToFileOnBehalf':
+    case 'APPROVEDTOFILE':
+    case 'PENDINGFILING':
+    case 'PENDINGFILINGONBEHALF':
+    case 'RETURNACCEPTED':
+    case 'RETURNACCEPTEDONBEHALF':
+    case 'PAYMENTREMITTED':
+    case 'PENDINGRETURN':
+    case 'PENDINGRETURNOBEHALF':
+    case 'RETURNREJECTED':
+    case 'RETURNREJECTEDONBEHALF':
+    case 'APPROVEDTOFILEONBEHALF':
+    case 'PREPARINGTOFILE':
       statusString = 'Preparing to file';
       badgeStatus = 'success';
       break;
-    case 'FiledOnBehalf':
-    case 'Filed':
+    case 'FILEDONBEHALF':
+    case 'FILED':
       statusString = 'Filed';
       badgeStatus = 'success';
       break;

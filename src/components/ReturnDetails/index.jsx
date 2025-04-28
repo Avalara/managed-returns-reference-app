@@ -1,8 +1,10 @@
 import { PropTypes } from 'prop-types';
-import { Button, Card, Descriptions, Table } from 'antd';
+import { Button, Card, Descriptions, Table, Typography } from 'antd';
 import { useOutletContext, useParams } from 'react-router-dom';
 
 import { useFilingsData } from '../ReconcileYourReturns/hooks';
+
+const { Title } = Typography;
 
 const ReturnSummary = ({ returnData }) => {
   const items = [
@@ -79,10 +81,10 @@ const ReturnDetails = () => {
 
   return (
     <div id="return-details">
-      <h1>Return details and adjustments</h1>
+      <Title level={1}>Return details and adjustments</Title>
 
       <ReturnSummary returnData={tableData} />
-      <Card bordered={false}>
+      <Card>
         <Button type="text">+ Add an adjustment</Button>
         <Table loading={loading} dataSource={dataSource} columns={columns} />
       </Card>
@@ -94,11 +96,11 @@ export default ReturnDetails;
 
 const columns = [
   { title: '', dataIndex: 'rowLabel', key: 'rowLabel' },
-  { title: 'Total sales', dataIndex: 'totalSales', key: 'totalSales' },
+  { title: 'Gross sales', dataIndex: 'grossSales', key: 'grossSales' },
   {
     title: 'Taxable sales',
-    dataIndex: 'taxableSales',
-    key: 'taxableSales',
+    dataIndex: 'netSales',
+    key: 'netSales',
   },
   {
     title: 'Payment to jurisdiction',
@@ -131,8 +133,8 @@ function extractTableData(returnData) {
       tableData.push({
         key: i,
         rowLabel: field,
-        totalSales: returnData[field].totalSales,
-        taxableSales: returnData[field].taxableSales,
+        grossSales: returnData[field].grossSales,
+        netSales: returnData[field].netSales,
         paymentToJurisdiction: returnData[field].paymentToJurisdiction,
         paymentToAvalara: returnData[field].paymentToAvalara,
       });
