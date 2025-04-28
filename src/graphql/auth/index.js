@@ -63,45 +63,46 @@ class AuthService {
 
 export const authService = new AuthService();
 
-export const authLink = new ApolloLink((operation, forward) => {
-  return new Observable((observer) => {
-    let handle;
-    Promise.resolve(operation)
-      .then(async (operation) => {
-        if (authService.isTokenExpired()) {
-          console.log('Token is expired, trying to refresh it...');
-          // Token is expired, try to refresh it
-          try {
-            await authService.login();
-            console.log('logged in');
-          } catch (error) {
-            // Handle refresh error (e.g., redirect to login page)
-            console.log('error logging in', error);
-            authService.logout();
-            // window.location.href = '/login';
-            return;
+export const authLink = new ApolloLink(
+  (operation, forward) =>
+    new Observable((observer) => {
+      let handle;
+      Promise.resolve(operation)
+        .then(async (operation) => {
+          if (authService.isTokenExpired()) {
+            console.log('Token is expired, trying to refresh it...');
+            // Token is expired, try to refresh it
+            try {
+              await authService.login();
+              console.log('Successfully logged in');
+            } catch (error) {
+              // Handle refresh error (e.g., redirect to login page)
+              console.log('Error logging in', error);
+              authService.logout();
+              // window.location.href = '/login';
+              return;
+            }
           }
-        }
-        const token = authService.getToken();
-        if (token) {
-          operation.setContext({
-            headers: {
-              authorization: `Bearer ${token}`,
-            },
+          const token = authService.getToken();
+          if (token) {
+            operation.setContext({
+              headers: {
+                authorization: `Bearer ${token}`,
+              },
+            });
+          }
+        })
+        .then(() => {
+          handle = forward(operation).subscribe({
+            next: observer.next.bind(observer),
+            error: observer.error.bind(observer),
+            complete: observer.complete.bind(observer),
           });
-        }
-      })
-      .then(() => {
-        handle = forward(operation).subscribe({
-          next: observer.next.bind(observer),
-          error: observer.error.bind(observer),
-          complete: observer.complete.bind(observer),
-        });
-      })
-      .catch(observer.error.bind(observer));
+        })
+        .catch(observer.error.bind(observer));
 
-    return () => {
-      if (handle) handle.unsubscribe();
-    };
-  });
-});
+      return () => {
+        if (handle) handle.unsubscribe();
+      };
+    })
+);

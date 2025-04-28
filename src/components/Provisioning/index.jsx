@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLazyQuery, useMutation } from '@apollo/client';
-import query from '../../graphql/queries';
-import mutation from '../../graphql/mutations';
+import { countries as COUNTRIES } from '../../graphql/queries';
+import { createAndLinkAccount as CREATE_AND_LINK_ACCOUNT } from '../../graphql/mutations';
 
 import {
   Button,
@@ -15,10 +15,13 @@ import {
   Row,
   Select,
   theme,
+  Typography,
 } from 'antd';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
+import { PageHeader } from '../shared';
 
 const { Content } = Layout;
+const { Title } = Typography;
 
 const DEFAULT_COUNTRY = 'US';
 const DEFAULT_COUNTRY_PLACEHOLDER = 'Select a country';
@@ -34,10 +37,10 @@ const Provisioning = () => {
   const [countryOptions, setCountryOptions] = useState();
   const [regionOptions, setRegionOptions] = useState();
 
-  const getRegionOptionsSorted = (countriesAndRegions, countryCode) =>
+  const getRegionOptionsSorted = (countriesAndRegions = [], countryCode = '') =>
     countriesAndRegions
       .find((country) => country.code === countryCode)
-      .regions.map((region) => ({
+      .regions?.map((region) => ({
         value: region.code,
         label: region.name,
       }))
@@ -50,7 +53,7 @@ const Provisioning = () => {
       error: getCountriesAndRegionsDidError,
       data: countriesAndRegionsData,
     },
-  ] = useLazyQuery(query.countries);
+  ] = useLazyQuery(COUNTRIES);
 
   useEffect(() => {
     const getCountryAndRegionIds = async () => {
@@ -60,8 +63,13 @@ const Provisioning = () => {
   }, [getCountriesAndRegions]);
 
   useEffect(() => {
-    if (countriesAndRegionsData && countriesAndRegionsData.countries) {
-      const countriesAndRegions = countriesAndRegionsData.countries.value;
+    if (
+      countriesAndRegionsData &&
+      countriesAndRegionsData.definitions &&
+      countriesAndRegionsData.definitions.value
+    ) {
+      const countriesAndRegions =
+        countriesAndRegionsData?.definitions?.value?.countries;
       setCountriesAndRegions(countriesAndRegions);
 
       const options = countriesAndRegions
@@ -102,7 +110,7 @@ const Provisioning = () => {
       error: createAndLinkAccountDidError,
       data: createAndLinkAccountData,
     },
-  ] = useMutation(mutation.createAndLinkAccount);
+  ] = useMutation(CREATE_AND_LINK_ACCOUNT);
 
   const onFinish = async () => {
     try {
@@ -269,38 +277,16 @@ const Provisioning = () => {
 
   return (
     <>
-      <div
-        style={{
-          backgroundColor: 'white',
-          marginLeft: '-24px',
-          padding: '24px',
-        }}
-      >
+      <PageHeader>
         <BreadcrumbMenu />
         <Content>
-          <h1>Provisioning</h1>
-          <p style={{ marginBottom: 0 }}>
-            Enter your customer’s information to provision a new account.
-          </p>
+          <Title level={1}>Provisioning</Title>
+          <p>Enter your customer’s information to provision a new account.</p>
         </Content>
-      </div>
-      <Content
-        style={{
-          margin: 0,
-          minHeight: 280,
-          borderRadius: borderRadiusLG,
-        }}
-      >
+      </PageHeader>
+      <Content>
         <Layout>
-          <Card
-            title="Customer details"
-            bordered={false}
-            style={{
-              boxShadow: 'none',
-              marginTop: 20,
-              width: '100%',
-            }}
-          >
+          <Card title="Customer details">
             <Form
               form={form}
               layout="vertical"

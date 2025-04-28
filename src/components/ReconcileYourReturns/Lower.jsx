@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import {
-  Button,
-  Card,
-  Flex,
-  Segmented,
-  Select,
-  Space,
-} from 'antd';
+import { Button, Card, Flex, Segmented, Select, Space } from 'antd';
 import { BarsOutlined, TableOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 
@@ -40,18 +33,17 @@ const TableFilters = ({
             value={stateSelection}
             options={[
               { value: 'All', label: <span>All</span> },
-              ...availableStates.map((state) => {
-                return { value: state, label: <span>{state}</span> };
-              }),
+              ...availableStates.map((state) => ({
+                value: state,
+                label: <span>{state}</span>,
+              })),
             ]}
             onChange={(value) => {
               setStateSelection(value);
-              setFilters((prev) => {
-                return {
-                  ...prev,
-                  state: value,
-                };
-              });
+              setFilters((prev) => ({
+                ...prev,
+                state: value,
+              }));
             }}
           />
         </div>
@@ -66,18 +58,17 @@ const TableFilters = ({
             value={statusSelection}
             options={[
               { value: 'All', label: <span>All</span> },
-              ...availableStatuses.map((status) => {
-                return { value: status, label: <span>{status}</span> };
-              }),
+              ...availableStatuses.map((status) => ({
+                value: status,
+                label: <span>{status}</span>,
+              })),
             ]}
             onChange={(value) => {
               setStatusSelection(value);
-              setFilters((prev) => {
-                return {
-                  ...prev,
-                  status: value,
-                };
-              });
+              setFilters((prev) => ({
+                ...prev,
+                status: value,
+              }));
             }}
           />
         </div>
@@ -148,14 +139,7 @@ const Lower = ({
 
   return (
     <>
-      <Card
-        bordered={false}
-        style={{
-          boxShadow: 'none',
-          marginTop: 20,
-          width: '100%',
-        }}
-      >
+      <Card>
         <TableFilters
           setViewMode={setViewMode}
           setFilters={setFilters}
@@ -164,22 +148,21 @@ const Lower = ({
           loading={loading}
         />
       </Card>
-
-      <br />
-
-      <ReturnsDataView
-        setLoading={setLoading}
-        viewMode={viewMode}
-        year={year}
-        month={month}
-        companyId={companyId}
-        country={country}
-        setAmountDue={setAmountDue}
-        setReturnCount={setReturnCount}
-        filters={filters}
-        setAvailableStates={setAvailableStates}
-        setAvailableStatuses={setAvailableStatuses}
-      />
+      <div style={{ marginTop: '20px' }}>
+        <ReturnsDataView
+          setLoading={setLoading}
+          viewMode={viewMode}
+          year={year}
+          month={month}
+          companyId={companyId}
+          country={country}
+          setAmountDue={setAmountDue}
+          setReturnCount={setReturnCount}
+          filters={filters}
+          setAvailableStates={setAvailableStates}
+          setAvailableStatuses={setAvailableStatuses}
+        />
+      </div>
     </>
   );
 };

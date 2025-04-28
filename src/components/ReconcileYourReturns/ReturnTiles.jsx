@@ -1,26 +1,25 @@
-import { Card, Collapse, Flex, Skeleton, Table, Typography } from 'antd';
+import { Card, Collapse, Skeleton, Statistic, Table } from 'antd';
 import PropTypes from 'prop-types';
 
 import { columns } from './tableColumns';
 import { getRegionName } from '../shared/USRegions';
 
 const ReturnTile = ({ regionData }) => {
-  const returnsDataSource = regionData?.returns.map((taxReturn) => {
-    return {
-      key: taxReturn.id,
-      taxFormCode: taxReturn.formCode,
-      state: getRegionName(regionData.region) || '',
-      registrationId: taxReturn.registrationId,
-      frequency: taxReturn.filingFrequency,
-      totalSales: taxReturn.returnTaxSummary.reportableSalesAmount,
-      taxableSales: taxReturn.returnTaxSummary.taxableAmount,
-      totalTax: taxReturn.returnTaxSummary.taxAmount,
-      adjustments: taxReturn.totalAdjustments,
-      amountDue: taxReturn.returnTaxSummary.remittanceAmount,
-      status: taxReturn.status,
-      link: '',
-    };
-  });
+  const returnsDataSource = regionData?.returns.map((taxReturn) => ({
+    key: taxReturn.id,
+    taxFormCode: taxReturn.formCode,
+    state: getRegionName(regionData.region) || '',
+    registrationId: taxReturn.registrationId,
+    frequency: taxReturn.filingFrequency,
+    grossSales: taxReturn.returnTaxSummary.reportableSalesAmount,
+    netSales: taxReturn.returnTaxSummary.taxableAmount,
+    exemptSales: taxReturn.returnTaxSummary.nonTaxableAmount,
+    totalTax: taxReturn.returnTaxSummary.taxAmount,
+    adjustments: taxReturn.totalAdjustments,
+    amountDue: taxReturn.returnTaxSummary.remittanceAmount,
+    status: taxReturn.status,
+    link: '',
+  }));
 
   const collapseItems = [
     {
@@ -31,44 +30,46 @@ const ReturnTile = ({ regionData }) => {
           dataSource={returnsDataSource}
           columns={columns}
           pagination={false}
+          scroll={{ x: 'max-content' }}
         />
       ),
     },
   ];
   return (
     <Card
-      bordered={false}
-      style={{
-        marginTop: 20,
-        marginBottom: 20,
-      }}
-    >
-      <Flex align="flex-start" justify="space-between">
-        <Typography.Title level={3}>
-          {getRegionName(regionData.region) || ''}
-        </Typography.Title>
-        <div style={{ alignItems: 'flex-end' }}>
-          <p>Amount due</p>
-          <Typography.Title level={3}>
-            {regionData?.regionTaxSummary?.remittanceAmount}
-          </Typography.Title>
+      style={{ marginBottom: 20 }}
+      title={<h3>{getRegionName(regionData.region) || ''}</h3>}
+      extra={
+        <div style={{ margin: '15px', textAlign: 'right' }}>
+          <Statistic
+            title="Amount due"
+            value={regionData?.regionTaxSummary?.remittanceAmount.toLocaleString(
+              'en-US',
+              {
+                style: 'currency',
+                currency: 'USD',
+              }
+            )}
+            suffix="USD"
+          />
         </div>
-      </Flex>
-
+      }
+    >
       <Collapse items={collapseItems} onChange={() => {}} ghost />
     </Card>
   );
 };
 
-const ReturnTiles = ({ loading, dataSource }) => {
-  return loading ? (
-    <Skeleton active />
+const ReturnTiles = ({ loading, dataSource }) =>
+  loading ? (
+    <Card>
+      <Skeleton active />
+    </Card>
   ) : (
-    dataSource.map((region, idx) => {
-      return <ReturnTile key={idx} regionData={region} />;
-    })
+    dataSource.map((region, idx) => (
+      <ReturnTile key={idx} regionData={region} />
+    ))
   );
-};
 
 ReturnTiles.propTypes = {
   loading: PropTypes.bool.isRequired,

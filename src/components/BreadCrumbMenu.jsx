@@ -12,9 +12,9 @@ const BreadcrumbMenu = () => {
   const location = useLocation();
   const snippets = location.pathname.split('/').filter((key) => key);
 
-  const items = snippets.map((snippet, snippetIdx) => {
-    return { title: kebabToStartCase(snippet) };
-  });
+  const items = snippets.map((snippet, snippetIdx) => ({
+    title: kebabToStartCase(snippet),
+  }));
 
   function itemRender(currentRoute, params, items, paths) {
     // const isLast = currentRoute?.path === items[items.length - 1]?.path;
