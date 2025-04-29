@@ -1,3 +1,20 @@
+/*
+ * Contents of this file was produced with a help of a code generation tool and
+ * subsequently reviewed and edited by a human.
+ *
+ * While some of the code was created by an AI assisted service, manual adjustments
+ * have been made to ensure correctness, readability, functionality and compliance
+ * to Avalara's coding standards and guidelines.
+ * Any future modifications should be approached with caution to avoid
+ * overwriting the manual changes.
+ *
+ *
+ * This source code is owned by Avalara Inc. Unauthorized copying of this file,
+ * via any medium, is strictly prohibited. Proprietary and confidential.
+ *
+ * For more information, refer to the documentation or contact the development team.
+ */
+
 import {
   Button,
   Card,
@@ -20,7 +37,10 @@ import {
 import { useState } from 'react';
 const { Dragger } = Upload;
 import { useOutletContext } from 'react-router-dom';
-import { createTransaction as CREATE_TRANSACTIONS } from '../../graphql/mutations';
+import {
+  createTransaction as CREATE_TRANSACTIONS,
+  createTransactionsSummary as CREATE_TRANSACTIONS_SUMMARY,
+} from '../../graphql/mutations';
 import { useMutation } from '@apollo/client';
 
 const { Link } = Typography;
@@ -82,6 +102,51 @@ const exampleTransactionJson = [
   },
 ];
 
+const emptySummarizedLiabilityJson = [
+  {
+    year: 2025,
+    month: 4,
+    country: '',
+    region: '',
+    city: '',
+    postalCode: '',
+    taxType: '',
+    grossAmount: 0,
+    exemptAmount: 0,
+    taxableAmount: 0,
+    taxAmount: 0,
+  },
+];
+
+const exampleSummarizedLiabilityJson = [
+  {
+    year: 2025,
+    month: 3,
+    country: 'US',
+    region: 'WA',
+    city: 'Seattle',
+    postalCode: '98104',
+    taxType: 'Sales',
+    grossAmount: 5000.0,
+    exemptAmount: 500.0,
+    taxableAmount: 4500.0,
+    taxAmount: 461.25,
+  },
+  {
+    year: 2025,
+    month: 3,
+    country: 'US',
+    region: 'CA',
+    city: 'Los Angeles',
+    postalCode: '90001',
+    taxType: 'Sales',
+    grossAmount: 3500.0,
+    exemptAmount: 0.0,
+    taxableAmount: 3500.0,
+    taxAmount: 332.5,
+  },
+];
+
 const UploadTransactionFiles = () => {
   const { companyId } = useOutletContext();
 
@@ -90,9 +155,30 @@ const UploadTransactionFiles = () => {
   const { token } = theme.useToken();
 
   const [createTransactions] = useMutation(CREATE_TRANSACTIONS);
+  const [createTransactionsSummary] = useMutation(CREATE_TRANSACTIONS_SUMMARY);
 
   const getImportTypeText = () =>
     importType === 'transactions' ? 'transaction' : 'summarized tax liability';
+
+  const getEmptyJsonTemplate = () =>
+    importType === 'transactions'
+      ? emptyTransactionJson
+      : emptySummarizedLiabilityJson;
+
+  const getExampleJsonTemplate = () =>
+    importType === 'transactions'
+      ? exampleTransactionJson
+      : exampleSummarizedLiabilityJson;
+
+  const getTemplateFileName = () =>
+    importType === 'transactions'
+      ? 'transaction_template.json'
+      : 'summarized_liability_template.json';
+
+  const getExampleFileName = () =>
+    importType === 'transactions'
+      ? 'example_transactions.json'
+      : 'example_summarized_liability.json';
 
   const handleFileRead = async (file) => {
     try {
@@ -122,13 +208,22 @@ const UploadTransactionFiles = () => {
             },
           ]);
 
-          // Call the createTransactions mutation with the file content
-          await createTransactions({
-            variables: {
-              input: jsonContent,
-              companyId: parseInt(companyId),
-            },
-          });
+          // Call the appropriate mutation based on import type
+          if (importType === 'transactions') {
+            await createTransactions({
+              variables: {
+                input: jsonContent,
+                companyId: parseInt(companyId),
+              },
+            });
+          } else {
+            await createTransactionsSummary({
+              variables: {
+                input: jsonContent,
+                companyId: parseInt(companyId),
+              },
+            });
+          }
 
           // Update file status to done
           setFileList([
@@ -216,14 +311,14 @@ const UploadTransactionFiles = () => {
           ghost
           onClick={() => {
             // Create a Blob with the JSON data
-            const emptyJson = JSON.stringify(emptyTransactionJson, null, 2);
+            const emptyJson = JSON.stringify(getEmptyJsonTemplate(), null, 2);
 
             // Create a blob and download link
             const blob = new Blob([emptyJson], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'transaction_template.json';
+            link.download = getTemplateFileName();
             document.body.appendChild(link);
             link.click();
 
@@ -243,14 +338,18 @@ const UploadTransactionFiles = () => {
           ghost
           onClick={() => {
             // Create a Blob with the example JSON data
-            const exampleJson = JSON.stringify(exampleTransactionJson, null, 2);
+            const exampleJson = JSON.stringify(
+              getExampleJsonTemplate(),
+              null,
+              2
+            );
 
             // Create a blob and download link
             const blob = new Blob([exampleJson], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'example_transactions.json';
+            link.download = getExampleFileName();
             document.body.appendChild(link);
             link.click();
 
