@@ -37,10 +37,10 @@ const Provisioning = () => {
   const [countryOptions, setCountryOptions] = useState();
   const [regionOptions, setRegionOptions] = useState();
 
-  const getRegionOptionsSorted = (countriesAndRegions, countryCode) =>
+  const getRegionOptionsSorted = (countriesAndRegions = [], countryCode = '') =>
     countriesAndRegions
       .find((country) => country.code === countryCode)
-      .regions.map((region) => ({
+      .regions?.map((region) => ({
         value: region.code,
         label: region.name,
       }))
@@ -63,8 +63,13 @@ const Provisioning = () => {
   }, [getCountriesAndRegions]);
 
   useEffect(() => {
-    if (countriesAndRegionsData && countriesAndRegionsData.countries) {
-      const countriesAndRegions = countriesAndRegionsData.countries.value;
+    if (
+      countriesAndRegionsData &&
+      countriesAndRegionsData.definitions &&
+      countriesAndRegionsData.definitions.value
+    ) {
+      const countriesAndRegions =
+        countriesAndRegionsData?.definitions?.value?.countries;
       setCountriesAndRegions(countriesAndRegions);
 
       const options = countriesAndRegions

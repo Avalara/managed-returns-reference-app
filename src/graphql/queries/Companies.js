@@ -9,3 +9,22 @@ export const companies = gql`
     }
   }
 `;
+
+export const companyLocations = gql`
+  query getCompanyLocations($companyId: Int!) {
+    companies(id: $companyId) {
+      value {
+        locations {
+          city
+          country
+          description
+          isDefault
+          line1
+          locationCode
+          postalCode
+          region
+        }
+      }
+    }
+  }
+`;
