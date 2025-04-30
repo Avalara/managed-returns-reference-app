@@ -78,7 +78,7 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
     });
 
     if (data && data.liabilityReports) {
-      const byteArray = new Uint8Array(data.liabilityReports?.reports);
+      const byteArray = new Uint8Array(data.liabilityReports?.value?.reports);
       const blob = new Blob([byteArray], { type: 'application/octet-stream' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
