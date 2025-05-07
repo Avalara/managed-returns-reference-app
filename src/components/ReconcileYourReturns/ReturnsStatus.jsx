@@ -1,7 +1,7 @@
 import { PropTypes } from 'prop-types';
 import { Badge } from 'antd';
 
-function getPrettyStatus(filingStatus) {
+export function getPrettyStatus(filingStatus) {
   let badgeStatus, statusString;
   const status = filingStatus ? filingStatus.toUpperCase() : '';
 

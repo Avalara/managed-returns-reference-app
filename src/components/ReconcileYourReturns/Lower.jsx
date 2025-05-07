@@ -4,6 +4,7 @@ import { BarsOutlined, TableOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 
 import ReturnsDataView from './ReturnsDataView';
+import { getPrettyStatus } from './ReturnsStatus';
 
 const TableFilters = ({
   loading,
@@ -60,7 +61,7 @@ const TableFilters = ({
               { value: 'All', label: <span>All</span> },
               ...availableStatuses.map((status) => ({
                 value: status,
-                label: <span>{status}</span>,
+                label: <span>{getPrettyStatus(status)[0]}</span>,
               })),
             ]}
             onChange={(value) => {
