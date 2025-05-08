@@ -28,3 +28,20 @@ export const companyLocations = gql`
     }
   }
 `;
+
+export const companyFundingStatus = gql`
+  query Companies($companyId: Int!) {
+    companies(id: $companyId) {
+      value {
+        fundingStatus {
+          currency
+          lastSigned
+          recipient
+          sender
+          status
+          documentKey
+        }
+      }
+    }
+  }
+`;
