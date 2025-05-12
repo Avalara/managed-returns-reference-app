@@ -1,23 +1,37 @@
-import { Button, Dropdown } from 'antd';
+/*
+ * Contents of this file was produced with a help of a code generation tool and
+ * subsequently reviewed and edited by a human.
+ *
+ * While some of the code was created by an AI assisted service, manual adjustments
+ * have been made to ensure correctness, readability, functionality and compliance
+ * to Avalara's coding standards and guidelines.
+ * Any future modifications should be approached with caution to avoid
+ * overwriting the manual changes.
+ *
+ *
+ * This source code is owned by Avalara Inc. Unauthorized copying of this file,
+ * via any medium, is strictly prohibited. Proprietary and confidential.
+ *
+ * For more information, refer to the documentation or contact the development team.
+ */
+
+import { Button, Dropdown, message } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { useState } from 'react';
 
-import ReturnsStatus from './ReturnsStatus';
+import { filingConfirmationAttachment as FILING_CONFIRMATION_ATTACHMENT } from '../../graphql/queries';
+import ReturnsStatus, { getPrettyStatus } from './ReturnsStatus';
+import { apolloClient } from '../../graphql';
 
-export const columns = [
+const baseColumns = [
   {
     title: 'Return',
     dataIndex: 'taxFormCode',
     key: 'taxFormCode',
     fixed: true,
     render: (text, record) => record.taxFormCode,
-    // return (
-    //   <Link
-    //     to={`${record.country}/${record.regionCode}/${record.year}/${record.month}`}
-    //   >
-    //     {record.taxFormCode}
-    //   </Link>
-    // );
   },
   {
     title: 'State',
@@ -57,7 +71,6 @@ export const columns = [
         style: 'currency',
         currency: 'USD',
       }).format(value),
-
     responsive: ['lg'],
   },
   {
@@ -68,7 +81,6 @@ export const columns = [
         style: 'currency',
         currency: 'USD',
       }).format(value),
-
     key: 'exemptSales',
   },
   {
@@ -80,7 +92,6 @@ export const columns = [
         style: 'currency',
         currency: 'USD',
       }).format(value),
-
     responsive: ['lg'],
   },
   {
@@ -92,7 +103,6 @@ export const columns = [
         style: 'currency',
         currency: 'USD',
       }).format(value),
-
     responsive: ['lg'],
   },
   {
@@ -112,14 +122,56 @@ export const columns = [
     sorter: (a, b) => (a && a.status ? a.status.localeCompare(b.status) : 1),
     render: (text, record) => <ReturnsStatus filingStatus={record.status} />,
   },
-  {
-    title: '',
-    dataIndex: 'link',
-    key: 'link',
-    render: (text, record) => (
+];
+
+const FilingConfirmationCell = ({ record, companyId }) => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const [loading, setLoading] = useState(false);
+
+  const handleDownloadFilingConfirmation = async () => {
+    try {
+      setLoading(true);
+
+      const { data } = await apolloClient.query({
+        query: FILING_CONFIRMATION_ATTACHMENT,
+        variables: {
+          companyId: parseInt(companyId),
+          filingReturnId: parseFloat(record.id),
+        },
+        fetchPolicy: 'network-only', // Don't use cache for this query
+      });
+
+      if (data && data.filingConfirmationAttachment) {
+        const byteArray = new Uint8Array(data.filingConfirmationAttachment);
+        const blob = new Blob([byteArray], {
+          type: 'application/octet-stream',
+        });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `FilingConfirmation_${record.taxFormCode}_${record.state || ''}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        messageApi.success('Filing confirmation downloaded successfully');
+      } else {
+        messageApi.warning('No filing confirmation available for this return');
+      }
+    } catch (error) {
+      messageApi.error(
+        `Error downloading filing confirmation: ${error.message}`
+      );
+      console.error('Error in filing confirmation download:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      {contextHolder}
       <Dropdown
-        placement="bottom"
-        trigger="click"
         menu={{
           items: [
             {
@@ -129,20 +181,32 @@ export const columns = [
             {
               key: '2',
               label: <span>Download filing confirmation</span>,
-              disabled: record?.status !== 'Filed',
+              disabled: getPrettyStatus(record?.status)?.[0] !== 'Filed',
+              onClick: handleDownloadFilingConfirmation,
             },
           ],
         }}
       >
-        <Button
-          type="text"
-          icon={<EllipsisOutlined />}
-          onClick={(e) => {
-            // console.log('record', record);
-            // console.log('e', e);
-          }}
-        />
+        <Button type="text" icon={<EllipsisOutlined />} loading={loading} />
       </Dropdown>
+    </>
+  );
+};
+
+FilingConfirmationCell.propTypes = {
+  record: PropTypes.object.isRequired,
+  companyId: PropTypes.string.isRequired,
+};
+
+export const columns = (companyId) => [
+  ...baseColumns,
+  {
+    title: '',
+    dataIndex: 'link',
+    key: 'link',
+    fixed: 'right',
+    render: (text, record) => (
+      <FilingConfirmationCell record={record} companyId={companyId} />
     ),
   },
 ];

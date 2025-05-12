@@ -124,6 +124,7 @@ function extractTableData(data, filters) {
           )
           .map((taxReturn) => ({
             key: taxReturn.id,
+            id: taxReturn.id,
             taxFormCode: taxReturn.formCode,
             state: getRegionName(region.region) || '',
             registrationId: taxReturn.registrationId,
