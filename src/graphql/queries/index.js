@@ -13,3 +13,4 @@ export { fundingStatus } from './FundingStatus';
 export { transactionImportHistory } from './Transactions.js';
 export { filingCalendarMetadata } from './FilingCalendarMetadata.js';
 export { filingConfirmationAttachments } from './FilingConfirmationAttachments.js';
+export { filingConfirmationAttachment } from './FilingConfirmationAttachment.js';

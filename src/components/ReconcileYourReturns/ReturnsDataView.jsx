@@ -49,7 +49,7 @@ function ReturnsDataView({
       <Table
         loading={loading}
         dataSource={tableData}
-        columns={columns}
+        columns={columns(companyId)}
         scroll={{ x: 'max-content' }}
         pagination={
           tableData && tableData.length > 50

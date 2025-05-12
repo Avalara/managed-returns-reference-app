@@ -207,8 +207,9 @@ const Upper = ({ companyId, date, setDate, amountDue }) => {
             type="default"
             onClick={downloadFilingConfirmations}
             disabled={filingConfirmationsLoading}
+            loading={filingConfirmationsLoading}
           >
-            <FilePdfOutlined />
+            {!filingConfirmationsLoading && <FilePdfOutlined />}
             Download filing confirmations
           </Button>
         </Space>
