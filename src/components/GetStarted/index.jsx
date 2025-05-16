@@ -82,7 +82,7 @@ const GetStartedCard = ({ title, status, text, onClick, loading = false }) => {
       actions={[
         <Button
           key={`${title}-1`}
-          type="default"
+          type="primary"
           disabled={status !== 'notStarted' || loading}
           onClick={onClick}
         >

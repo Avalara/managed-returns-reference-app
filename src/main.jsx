@@ -17,11 +17,10 @@ import SetUpReturns from './components/SetUpReturns';
 import Authentication from './components/Authentication';
 import Provisioning from './components/Provisioning';
 import DataIngest from './components/DataIngest';
+import Index from './components/CustomBrandingSettings';
 import NotFound from './routes/NotFound';
 import ErrorPage from './routes/Error';
 import SetUpStateReturns from './components/SetUpRegionReturns';
-import { ConfigProvider } from 'antd';
-import themeConfig from './theme/themeConfig.js';
 
 const router = createBrowserRouter([
   {
@@ -124,6 +123,15 @@ const router = createBrowserRouter([
               ),
             },
           },
+          {
+            path: 'branding-settings',
+            element: <Index />,
+            handle: {
+              crumb: () => (
+                <Link to="/developer-tools/branding-settings">Theme</Link>
+              ),
+            },
+          },
         ],
       },
       {
@@ -135,11 +143,9 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')).render(
-  <ConfigProvider theme={themeConfig}>
-    <ApolloProvider client={apolloClient}>
-      <StrictMode>
-        <RouterProvider router={router} />
-      </StrictMode>
-    </ApolloProvider>
-  </ConfigProvider>
+  <ApolloProvider client={apolloClient}>
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>
+  </ApolloProvider>
 );
