@@ -40,7 +40,9 @@ const SetUpReturns = () => {
                 <Title level={2} style={{ margin: 0 }}>
                   States where you report tax
                 </Title>
-                <Button icon={<PlusOutlined />}>Add states</Button>
+                <Button type="primary" icon={<PlusOutlined />}>
+                  Add states
+                </Button>
               </div>
               <Alert
                 description="The data shown in this table is mock data for demonstration purposes and does not reflect actual API responses."
