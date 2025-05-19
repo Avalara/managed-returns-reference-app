@@ -39,7 +39,7 @@ const Index = () => {
     <div>
       <PageHeader>
         <BreadcrumbMenu />
-        <Title level={2}>Theme Settings</Title>
+        <Title level={2}>Branding Settings</Title>
         <p>Customize the application&#39;s appearance and branding.</p>
       </PageHeader>
       <Content>
