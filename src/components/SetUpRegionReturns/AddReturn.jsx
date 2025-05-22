@@ -257,6 +257,27 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
       });
   };
 
+  const handleDrawerClose = () => {
+    if (form.isFieldsTouched() === true) {
+      modal.confirm({
+        title: 'Are you sure you want to set up this return later?',
+        icon: <ExclamationCircleOutlined />,
+        content: (
+          <>
+            The information for this return won’t be saved. To set up this
+            return later, you will need to add it again to your{' '}
+            {taxForm?.region || 'state'} returns.
+          </>
+        ),
+        okText: 'Yes, set up later',
+        cancelText: 'Cancel',
+        onOk: () => onClose(),
+      });
+    } else {
+      onClose();
+    }
+  };
+
   return (
     <Drawer
       title={
@@ -268,11 +289,11 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
         </Space>
       }
       width={600}
-      onClose={onClose}
+      onClose={handleDrawerClose}
       open={visible}
       extra={
         <Space>
-          <Button onClick={onClose}>Set up later</Button>
+          <Button onClick={handleDrawerClose}>Set up later</Button>
           <Button
             onClick={handleSubmit}
             type="primary"
@@ -454,6 +475,7 @@ AddReturn.propTypes = {
     description: PropTypes.string,
     taxFormName: PropTypes.string,
     taxFormCode: PropTypes.string,
+    region: PropTypes.string,
   }),
 };
 
