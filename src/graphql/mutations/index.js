@@ -3,3 +3,5 @@ export { createOnboardingQuestionAnswer } from './CreateOnboardingQuestionAnswer
 export { updateOnboardingQuestionAnswer } from './UpdateOnboardingQuestionAnswer';
 export { fundingPoa } from './FundingPoa';
 export { createTransaction } from './CreateTransaction';
+export { createTransactionsSummary } from './CreateTransactionsSummary';
+export { createFilingCalendarRequests } from './CreateFilingCalendarRequests';

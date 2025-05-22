@@ -8,7 +8,9 @@ export const liabilityReports = gql`
       month: $month
       liabilityType: ORIGINAL
     ) {
-      reports
+      value {
+        reports
+      }
     }
   }
 `;

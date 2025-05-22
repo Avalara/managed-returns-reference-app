@@ -1,77 +1,114 @@
-import { useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { useMutation } from '@apollo/client';
-import { fundingPoa as FUNDING_POA } from '../../graphql/mutations';
-import { Card, Col, Layout, Row, theme, Typography } from 'antd';
+/*
+ * Contents of this file was produced with a help of a code generation tool and
+ * subsequently reviewed and edited by a human.
+ *
+ * While some of the code was created by an AI assisted service, manual adjustments
+ * have been made to ensure correctness, readability, functionality and compliance
+ * to Avalara's coding standards and guidelines.
+ * Any future modifications should be approached with caution to avoid
+ * overwriting the manual changes.
+ *
+ *
+ * This source code is owned by Avalara Inc. Unauthorized copying of this file,
+ * via any medium, is strictly prohibited. Proprietary and confidential.
+ *
+ * For more information, refer to the documentation or contact the development team.
+ */
 
-import PoaModal from './PoaModal';
-import BreadcrumbMenu from '../../components/BreadCrumbMenu';
+import {
+  Layout,
+  Row,
+  Col,
+  Typography,
+  Card,
+  Table,
+  Button,
+  Space,
+  Result,
+  Badge,
+} from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { useQuery } from '@apollo/client';
 import { PageHeader } from '../shared';
-
-export const POA_SELF = 'self';
-export const POA_EMAIL = 'email';
+import BreadcrumbMenu from '../BreadCrumbMenu';
+import { companyFundingStatus as COMPANY_FUNDING_STATUS } from '../../graphql/queries';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 
 const { Content } = Layout;
 const { Title } = Typography;
 
 const Funding = () => {
-  const {
-    token: { borderRadiusLG },
-  } = theme.useToken();
+  const { companyId } = useOutletContext();
+  const navigate = useNavigate();
 
-  const { isLoggedIn, companyId } = useOutletContext();
+  const { loading, error, data } = useQuery(COMPANY_FUNDING_STATUS, {
+    variables: { companyId: parseInt(companyId) },
+  });
 
-  const [poaAuthorization, setPoaAuthorization] = useState();
-  const [poaWidget, setPoaWidget] = useState();
-  const [fundingRequestSrcDoc, setFundingRequestSrcDoc] = useState();
-
-  const [fundingPoa, fundingPoaResponse] = useMutation(FUNDING_POA);
-
-  const submitFundingPoa = async ({ email = '', requestWidget = false }) => {
-    try {
-      return await fundingPoa({
-        variables: {
-          requestWidget: requestWidget,
-          requestEmail: email !== '',
-          fundingEmailRecipient: email,
-          currency: 'USD',
-          agreementType: 'ACHDebit',
-          companyId: parseInt(companyId),
-        },
-      });
-    } catch (err) {
-      console.error('Funding POA error:', err);
-      return null;
-    }
+  const handleCreatePowerOfAttorney = () => {
+    navigate('/returns/create-funding');
   };
 
-  useEffect(() => {
-    const fetchWidget = async () => {
-      const widgetResponse = await submitFundingPoa({ requestWidget: true });
-      const widget = widgetResponse?.data?.fundingPoa?.javaScript;
-      setPoaWidget(widget);
-    };
-    if (companyId && isLoggedIn) {
-      fetchWidget();
-    }
-  }, [fundingPoa, companyId, isLoggedIn]);
+  // Extract unique values for filters
+  const fundingStatusData = data?.companies?.value?.[0]?.fundingStatus
+    ? data.companies.value[0].fundingStatus
+    : [];
 
-  useEffect(() => {
-    if (poaWidget) {
-      const script = `
-        <script type="text/javascript">
-          window.addEventListener('message', function(event) {
-            if (event.origin === 'https://secure.na1.echosign.com' || event.origin === 'https://avalara.na1.echosign.com') {
-              window.parent.postMessage(event.data, '${window.location.origin}');
-            }
-          });
-        </script>
-      `;
+  const senderOptions = [
+    ...new Set(fundingStatusData.map((item) => item.sender)),
+  ]
+    .filter(Boolean)
+    .map((sender) => ({ text: sender, value: sender }));
 
-      const simpleHtmlDoc = `<!DOCTYPE html><html style="height: 100%"><head><meta charset="utf-8">${poaWidget}</head><body style="height: 100%; margin: 0">${script}</body></html>`;
-      setFundingRequestSrcDoc(simpleHtmlDoc);
-    }
-  }, [poaWidget]);
+  const statusOptions = ['Signed', 'Out for Signature'].map((status) => ({
+    text: status,
+    value: status,
+  }));
+
+  const columns = [
+    {
+      title: 'Signed by',
+      dataIndex: 'recipient',
+      key: 'recipient',
+    },
+    {
+      title: 'Currency code',
+      dataIndex: 'currency',
+      key: 'currency',
+      sorter: (a, b) => a.currency.localeCompare(b.currency),
+    },
+    {
+      title: 'Requested by',
+      dataIndex: 'sender',
+      key: 'sender',
+      sorter: (a, b) => a.sender.localeCompare(b.sender),
+      filters: senderOptions,
+      onFilter: (value, record) => record.sender === value,
+    },
+    {
+      title: 'Date signed',
+      dataIndex: 'lastSigned',
+      key: 'lastSigned',
+      render: (text) => (text ? new Date(text).toLocaleDateString() : ''),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      sorter: (a, b) => a.status.localeCompare(b.status),
+      filters: statusOptions,
+      onFilter: (value, record) => record.status === value,
+      render: (status) => {
+        let color = 'default';
+        if (status === 'Signed') {
+          color = 'success';
+        } else if (status === 'Out for signature') {
+          color = 'processing';
+        }
+        return <Badge status={color} text={status} />;
+      },
+    },
+  ];
 
   return (
     <>
@@ -80,12 +117,7 @@ const Funding = () => {
         <Content>
           <Row align="bottom">
             <Col lg={16}>
-              <Title level={1}>Sign funding power of attorney</Title>
-              <p>
-                In order to act on your behalf with tax authorities, Avalara
-                needs to have the funding power of attorney form completed and
-                signed by an authorized representative of your business.
-              </p>
+              <Title level={1}>Funding power of attorney</Title>
             </Col>
           </Row>
         </Content>
@@ -93,26 +125,51 @@ const Funding = () => {
       <Content>
         <Layout>
           <Card>
-            {fundingRequestSrcDoc &&
-              poaAuthorization &&
-              poaAuthorization === POA_SELF && (
-                <iframe
-                  title="Funding Power Of Attorney Form"
-                  id="poaIframe"
-                  srcDoc={fundingRequestSrcDoc}
-                  style={{ height: '700px', width: '100%' }}
+            {error ? (
+              <Result
+                status="500"
+                title="Error"
+                subTitle="We are having a momentary issue. Please try again in some time."
+              />
+            ) : (
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ display: 'flex' }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Title level={2} style={{ margin: 0 }}></Title>
+                  <Button
+                    icon={<PlusOutlined />}
+                    onClick={handleCreatePowerOfAttorney}
+                  >
+                    Create a power of attorney
+                  </Button>
+                </div>
+
+                <Table
+                  dataSource={fundingStatusData}
+                  columns={columns}
+                  rowKey="documentKey"
+                  loading={loading}
                 />
-              )}
+              </Space>
+            )}
           </Card>
-          <PoaModal
-            open={!poaAuthorization}
-            setPoaAuthorization={setPoaAuthorization}
-            sendPOAEmail={submitFundingPoa}
-          />
         </Layout>
       </Content>
     </>
   );
+};
+
+Funding.propTypes = {
+  // Add any props here if needed
 };
 
 export default Funding;

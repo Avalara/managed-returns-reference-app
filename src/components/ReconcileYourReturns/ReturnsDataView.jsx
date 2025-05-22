@@ -49,8 +49,18 @@ function ReturnsDataView({
       <Table
         loading={loading}
         dataSource={tableData}
-        columns={columns}
+        columns={columns(companyId)}
         scroll={{ x: 'max-content' }}
+        pagination={
+          tableData && tableData.length > 50
+            ? {
+                total: tableData.length,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: () => `Total ${tableData.length} items`,
+              }
+            : true
+        }
       />
     </Card>
   ) : (

@@ -27,12 +27,14 @@ import {
   Divider,
   Skeleton,
   Modal,
+  message,
 } from 'antd';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import ReturnQuestion from './ReturnQuestion.jsx';
 import { filingCalendarMetadata } from '../../graphql/queries/FilingCalendarMetadata.js';
 import { companyLocations as COMPANY_LOCATIONS } from '../../graphql/queries/Companies.js';
+import { createFilingCalendarRequests as CREATE_FILING_CALENDAR_REQUESTS } from '../../graphql/mutations/CreateFilingCalendarRequests.js';
 import { useOutletContext, useParams } from 'react-router-dom';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
@@ -115,6 +117,19 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
   const [form] = Form.useForm();
   const selectedFilingFrequency = Form.useWatch('filingFrequency', form);
   const [modal, contextHolder] = Modal.useModal();
+  // const [loading, setLoading] = useState(false);
+
+  // Create Filing Calendar Requests mutation
+  const [createFilingCalendar, { loading: createFilingRequestInProgress }] =
+    useMutation(CREATE_FILING_CALENDAR_REQUESTS, {
+      onCompleted: (data) => {
+        message.success('Return setup successfully saved');
+        onClose();
+      },
+      onError: (error) => {
+        message.error(`Error saving return: ${error.message}`);
+      },
+    });
 
   // Handle location selection
   const handleLocationSelect = (locationCode) => {
@@ -171,8 +186,71 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
     form
       .validateFields()
       .then((values) => {
-        console.log(values);
         // setLoading(true);
+
+        // Prepare an answers array from form values
+        const answers = [];
+
+        // Process standard questions
+        standardQuestions.forEach((question) => {
+          const questionId = question.value.filingQuestionId;
+          const fieldName = question.value.filingQuestionCode;
+          if (values[fieldName]) {
+            answers.push({
+              filingQuestionId: questionId,
+              answer: values[fieldName],
+            });
+          }
+        });
+
+        // Process custom questions
+        customQuestions.forEach((question) => {
+          const questionId = question.filingQuestionId;
+          const fieldName = question.filingQuestionCode;
+          if (values[fieldName]) {
+            answers.push({
+              filingQuestionId: questionId,
+              answer: values[fieldName],
+            });
+          }
+        });
+
+        // Get filing period data
+        const selectedPeriod = formFilingFrequencies
+          .find((freq) => freq.filingFrequency === values.filingFrequency)
+          ?.filingPeriodDates.find(
+            (period) => period.description === values.filingPeriod
+          );
+
+        // Create request payload
+        const requestData = {
+          returnName: taxForm?.taxFormName || '',
+          taxFormCode: taxForm?.taxFormCode || '',
+          filingFrequencyId: values.filingFrequency.toUpperCase(),
+          effDate:
+            selectedPeriod?.transactionalPeriodStart ||
+            new Date().toISOString(),
+          country: 'US',
+          region: region || '',
+          taxAuthorityName: taxForm?.description || '',
+          answers: answers,
+        };
+
+        // Call the mutation
+        createFilingCalendar({
+          variables: {
+            filingRequestInput: {
+              companyId: parseInt(companyId),
+              filingRequest: {
+                data: requestData,
+                companyId: parseInt(companyId),
+                filingRequestStatusId: 'NEW',
+              },
+            },
+          },
+        });
+
+        console.log('Submitting data:', requestData);
       })
       .catch((info) => {
         console.log('Validate Failed:', info);
@@ -194,27 +272,12 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
       open={visible}
       extra={
         <Space>
+          <Button onClick={onClose}>Set up later</Button>
           <Button
-            onClick={() => {
-              modal.confirm({
-                title: 'Are you sure you want to set up this return later?',
-                content: `The information for this return won't be saved. To set up this return later, you will need to add it again to your ${region || 'state'} returns.`,
-                icon: <ExclamationCircleOutlined />,
-                okText: 'Yes, set up later',
-                cancelText: 'Cancel',
-                onOk: () => onClose(),
-                footer: (_, { OkBtn, CancelBtn }) => (
-                  <>
-                    <CancelBtn />
-                    <OkBtn />
-                  </>
-                ),
-              });
-            }}
+            onClick={handleSubmit}
+            type="primary"
+            loading={createFilingRequestInProgress}
           >
-            Set up later
-          </Button>
-          <Button onClick={handleSubmit} type="primary">
             Save
           </Button>
           {contextHolder}
@@ -282,34 +345,67 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
               <Divider orientation="left" orientationMargin="0">
                 Locations
               </Divider>
-              <Alert
-                description="All your locations will be consolidated to be filed in this return."
-                type="info"
-                showIcon
-              />
+              {locationsLoading ? (
+                <Skeleton active paragraph={{ rows: 2 }} />
+              ) : locationsError ? (
+                <Alert
+                  message="Error loading locations"
+                  description={locationsError.message}
+                  type="error"
+                  showIcon
+                />
+              ) : (
+                <div style={{ marginTop: '16px' }}>
+                  <Text strong>
+                    These are all the locations that you are filing in this
+                    return:
+                  </Text>
+                  {locations.length === 0 ? (
+                    <div style={{ marginTop: '8px' }}>
+                      <Text type="secondary">
+                        No locations found for this company.
+                      </Text>
+                    </div>
+                  ) : (
+                    <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+                      {locations.map((location) => (
+                        <li key={location.locationCode}>
+                          <Text>
+                            {location.locationCode} ({location.city || 'N/A'},{' '}
+                            {location.region || 'N/A'})
+                            {location.isDefault && (
+                              <Text type="secondary"> (Default)</Text>
+                            )}
+                          </Text>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
             </>
           )}
-          {/*{outletReportingMethod?.toUpperCase() === 'DUPLICATE' && (*/}
-          {/*  <>*/}
-          {/*    <Divider orientation="left" orientationMargin="0">*/}
-          {/*      Locations*/}
-          {/*    </Divider>*/}
-          {/*    <Form.Item label={'Location'} name="locationCode">*/}
-          {/*      <Select placeholder="Select location code" size={'large'}>*/}
-          {/*        <Select.Option value={''}>All locations</Select.Option>*/}
-          {/*        {locations.map((location) => (*/}
-          {/*          <Select.Option*/}
-          {/*            key={location.locationCode}*/}
-          {/*            value={location.locationCode}*/}
-          {/*          >*/}
-          {/*            {location.description ||*/}
-          {/*              `${location.line1}, ${location.city}`}*/}
-          {/*          </Select.Option>*/}
-          {/*        ))}*/}
-          {/*      </Select>*/}
-          {/*    </Form.Item>*/}
-          {/*  </>*/}
-          {/*)}*/}
+          {outletReportingMethod?.toUpperCase() === 'DUPLICATE' && (
+            <>
+              <Divider orientation="left" orientationMargin="0">
+                Locations
+              </Divider>
+              <Form.Item label={'Location'} name="locationCode">
+                <Select placeholder="Select location code" size={'large'}>
+                  <Select.Option value={''}>All locations</Select.Option>
+                  {locations.map((location) => (
+                    <Select.Option
+                      key={location.locationCode}
+                      value={location.locationCode}
+                    >
+                      {location.locationCode} ({location.city},{' '}
+                      {location.region})
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </>
+          )}
           <Divider orientation="left" orientationMargin="0">
             Company details
           </Divider>

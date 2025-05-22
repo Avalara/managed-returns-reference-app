@@ -11,6 +11,7 @@ import HomeContent from './components/HomeContent';
 import ReconcileYourReturns from './components/ReconcileYourReturns';
 import ReturnDetails from './components/ReturnDetails';
 import Funding from './components/Funding';
+import CreateFunding from './components/CreateFunding';
 import GetStarted from './components/GetStarted';
 import SetUpReturns from './components/SetUpReturns';
 import Authentication from './components/Authentication';
@@ -18,7 +19,7 @@ import Provisioning from './components/Provisioning';
 import DataIngest from './components/DataIngest';
 import NotFound from './routes/NotFound';
 import ErrorPage from './routes/Error';
-import SetUpStateReturns from './components/SetUpRegionReturns/index.jsx';
+import SetUpStateReturns from './components/SetUpRegionReturns';
 import { ConfigProvider } from 'antd';
 import themeConfig from './theme/themeConfig.js';
 
@@ -62,6 +63,13 @@ const router = createBrowserRouter([
             element: <Funding />,
             handle: {
               crumb: () => <Link to="/returns/funding">Funding</Link>,
+            },
+          },
+          {
+            path: 'create-funding',
+            element: <CreateFunding />,
+            handle: {
+              crumb: () => <Link to="/returns/create-funding">Funding</Link>,
             },
           },
           {
