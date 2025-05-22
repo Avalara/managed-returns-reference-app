@@ -22,14 +22,14 @@ avalara.io/logging: {{ ternary "enabled" "disabled" .Values.loggingEnabled }}
 {{/* Required annotations for resources */}}
 {{- define "common.requiredAnnotations" -}}
 avalara.io/team: {{ .Values.teamName | quote }}
-avalara.io/contact: {{ .Values.teamName | quote }}
-avalara.io/department: {{ .Values.teamName | quote }}
+avalara.io/contact: {{ .Values.contact | quote }}
+avalara.io/department: {{ .Values.department | quote }}
 reliability.avalara.io/escalation: "Good Returns Engineering"
 security.avalara.io/user-data: {{ .Values.securityLabels.userdata | quote }}
 security.avalara.io/data-class: {{ .Values.securityLabels.dataclass | quote }}
 deployment.avalara.io/pipeline: "TODO"
-inventory.avalara.io/appid: "APP-00702"
-inventory.avalara.io/cmpid: "TODO"
+inventory.avalara.io/appid: "APP-01713"
+inventory.avalara.io/cmpid: "CMP-06918"
 {{- end }}
 
 {{/* Labels applied to all resources */}}

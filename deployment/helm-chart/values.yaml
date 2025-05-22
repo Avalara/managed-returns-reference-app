@@ -3,7 +3,9 @@
 ## @param environment The environment for the deployment. ex: dev, qa, prd
 environment: dev
 ## @param teamName The deploying team name. This value is included in labels for various kubernetes resources.
-teamName: goodreturns
+teamName: TEAM-00325
+department: denis.gulsen@avalara.com
+contact: devops-trustfile@avalara.com
 ## @param iamRoleARN The ARN of an IAM role created with https://scm.platform.us-west-2.avalara.io/sre-public/tf-core-modules/-/tree/main/aws/iam/irsa-helper and with necessary permissions (e.g. to pull a secret). If null the service will not have AWS permissions.
 iamRoleARN: null
 ## @param loggingEnabled flag to enable/disable log collection for Sumo Logic

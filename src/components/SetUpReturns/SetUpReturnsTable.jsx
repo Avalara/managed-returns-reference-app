@@ -1,4 +1,4 @@
-import { Table, Typography, Badge, Result } from 'antd';
+import { Table, Typography, Badge, Result, Button } from 'antd';
 import { useQuery } from '@apollo/client';
 import { nexuses as NEXUSES } from '../../graphql/queries/Nexuses.js';
 import { useNavigate } from 'react-router-dom';
@@ -651,13 +651,14 @@ const SetUpReturnsTable = ({ companyId }) => {
           ? record.action
           : [record.action];
         return actions.map((action, index) => (
-          <Typography.Link
+          <Button
+            color="primary"
+            variant="link"
             key={index}
             onClick={() => handleClick(state, stateCode, countryCode)}
-            style={{ marginRight: '8px' }}
           >
             {action}
-          </Typography.Link>
+          </Button>
         ));
       },
     },
