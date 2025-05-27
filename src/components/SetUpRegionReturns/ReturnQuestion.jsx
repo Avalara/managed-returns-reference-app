@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Form, Radio, Input } from 'antd';
 import { CustomTooltip } from '../shared/index.js';
+import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
 const ReturnQuestion = ({
   dataType,
@@ -14,6 +15,9 @@ const ReturnQuestion = ({
   helpText,
   regex,
   regexErrorMessage = 'The input format is invalid',
+  hasFeedback = false,
+  validateStatus,
+  statusText,
 }) => {
   // Create label with optional tooltip if helpText is provided
   const labelWithHelp = (
@@ -48,7 +52,14 @@ const ReturnQuestion = ({
 
   if (dataType === 'BOOLEAN') {
     return (
-      <Form.Item label={labelWithHelp} name={destination} rules={createRules()}>
+      <Form.Item
+        label={labelWithHelp}
+        name={filingQuestionId}
+        rules={createRules()}
+        help={statusText}
+        hasFeedback={hasFeedback}
+        validateStatus={validateStatus}
+      >
         <Radio.Group
           value={value}
           onChange={(e) => onChange && onChange(e.target.value)}
@@ -60,12 +71,38 @@ const ReturnQuestion = ({
     );
   } else if (dataType === 'STRING') {
     return (
-      <Form.Item label={labelWithHelp} name={destination} rules={createRules()}>
+      <Form.Item
+        label={labelWithHelp}
+        name={filingQuestionId}
+        rules={createRules()}
+        help={statusText}
+        hasFeedback={hasFeedback}
+        validateStatus={validateStatus}
+      >
         <Input
-          size={'large'}
           value={value}
           onChange={(e) => onChange && onChange(e.target.value)}
           placeholder="Enter your answer"
+        />
+      </Form.Item>
+    );
+  } else if (dataType === 'PASSWORD') {
+    return (
+      <Form.Item
+        label={labelWithHelp}
+        name={filingQuestionId}
+        rules={createRules()}
+        help={statusText}
+        hasFeedback={hasFeedback}
+        validateStatus={validateStatus}
+      >
+        <Input.Password
+          value={value}
+          onChange={(e) => onChange && onChange(e.target.value)}
+          placeholder="Enter your password"
+          iconRender={(visible) =>
+            visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+          }
         />
       </Form.Item>
     );
@@ -86,6 +123,8 @@ ReturnQuestion.propTypes = {
   helpText: PropTypes.string,
   regex: PropTypes.string,
   regexErrorMessage: PropTypes.string,
+  hasFeedback: PropTypes.bool,
+  validateStatus: PropTypes.string,
 };
 
 export default ReturnQuestion;
