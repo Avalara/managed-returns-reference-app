@@ -48,6 +48,7 @@ export const filingCalendarMetadata = gql`
               outletReportingMethod
               outletReportingMethodId
               region
+              dorWebsite
             }
           }
         }

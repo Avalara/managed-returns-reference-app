@@ -10,6 +10,8 @@ export const taxForms = gql`
         taxTypes
         purpose
         taxAuthority
+        country
+        region
       }
     }
   }
