@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useLazyQuery } from '@apollo/client';
 
 import {
@@ -100,6 +100,7 @@ const GetStarted = () => {
     token: { borderRadiusLG },
   } = theme.useToken();
   const { isLoggedIn, companyId } = useOutletContext();
+  const navigate = useNavigate();
 
   const [poaStatus, setPoaStatus] = useState('loading');
 
@@ -174,7 +175,7 @@ const GetStarted = () => {
               text={cardTextByActionStatus.setUpReturns.notStarted}
               onClick={(e) => {
                 e.preventDefault();
-                window.location.href = '/returns/set-up-returns';
+                navigate('/returns/set-up-returns');
               }}
             />
             <GetStartedCard
@@ -182,7 +183,8 @@ const GetStarted = () => {
               status={poaStatus}
               text={cardTextByActionStatus.fundingPoa[poaStatus]}
               onClick={(e) => {
-                window.location.href = '/returns/funding';
+                e.preventDefault();
+                navigate('/returns/funding');
               }}
             />
             <GetStartedCard
