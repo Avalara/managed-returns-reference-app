@@ -328,7 +328,7 @@ const Provisioning = () => {
                   ))}
                 </Col>
               </Row>
-
+              <Divider />
               <Form.Item>
                 <Button
                   type="primary"

@@ -45,6 +45,7 @@ const Sidebar = ({ brandingConfig }) => {
     if (path.includes('/returns/funding')) return ['returns-funding'];
     if (path.includes('/returns/create-funding')) return ['returns-funding'];
     if (path.includes('/returns/set-up-returns')) return ['returns-setup'];
+    if (path.includes('/returns/select-states')) return ['returns-setup'];
     if (path.includes('/returns/get-started')) return ['returns-get-started'];
     if (path.includes('/developer-tools/authentication'))
       return ['dev-authentication'];
