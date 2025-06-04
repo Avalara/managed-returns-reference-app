@@ -10,6 +10,7 @@ import {
 
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { DEFAULT_COUNTRY } from '../shared/Constants.js';
 
 const SetUpReturnsTable = ({ companyId }) => {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ const SetUpReturnsTable = ({ companyId }) => {
     error: definitionRegionsError,
     data: definitionRegionsData,
   } = useQuery(REGIONS, {
-    variables: { country: 'US' },
+    variables: { country: DEFAULT_COUNTRY },
   });
 
   // Create maps for country and region names from definitions query
