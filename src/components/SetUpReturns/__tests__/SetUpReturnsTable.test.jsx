@@ -1,4 +1,9 @@
-import { nexuses as NEXUSES } from '../../../graphql/queries/Nexuses.js';
+import {
+  companyRegionStatus as COMPANY_REGION_STATUS,
+  filingCalendarRequests as FILING_CALENDAR_REQUESTS,
+  filingCalendars as FILING_CALENDARS,
+  regions as REGIONS,
+} from '../../../graphql/queries';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
 import SetUpReturnsTable from '../SetUpReturnsTable.jsx';
@@ -19,82 +24,142 @@ vi.mock(import('react-router-dom'), async (importOriginal) => {
 const mocks = [
   {
     request: {
-      query: NEXUSES,
+      query: COMPANY_REGION_STATUS,
       variables: {
         companyId: 1,
       },
     },
     result: {
       data: {
-        nexuses: {
+        companies: {
           value: [
             {
-              id: '1',
-              country: 'US',
-              state: 'Alabama',
-              stateCode: 'AL',
-              countryCode: 'US',
-              description: 'You collect tax here',
-              returns: '0 returns set up',
-              status: 'Not started',
-              action: ['Set up returns', 'Mark as completed'],
-            },
-            {
-              id: '2',
-              country: 'US',
-              state: 'California',
-              stateCode: 'CA',
-              countryCode: 'US',
-              description: 'You collect tax here',
-              returns: '2 returns set up',
-              status: 'In progress',
-              action: ['Set up returns', 'Mark as completed'],
-            },
-            {
-              id: '3',
-              country: 'US',
-              state: 'Florida',
-              stateCode: 'FL',
-              countryCode: 'US',
-              description: 'You collect tax here',
-              returns: '3 returns set up',
-              status: 'Completed',
-              action: ['Set up returns'],
-            },
-            {
-              id: '4',
-              country: 'US',
-              state: 'Georgia',
-              stateCode: 'GA',
-              countryCode: 'US',
-              description: 'You collect tax here',
-              returns: '10 returns set up',
-              status: 'Completed',
-              action: ['Set up returns'],
-            },
-            {
-              id: '5',
-              country: 'US',
-              state: 'Hawaii',
-              stateCode: 'HI',
-              countryCode: 'US',
-              description: 'You collect tax here',
-              returns: '2 returns set up',
-              status: 'In progress',
-              action: ['Set up returns', 'Mark as completed'],
-            },
-            {
-              id: '6',
-              country: 'US',
-              state: 'Idaho',
-              stateCode: 'ID',
-              countryCode: 'US',
-              description: 'You collect tax here',
-              returns: '0 returns set up',
-              status: 'Not started',
-              action: ['Set up returns', 'Mark as completed'],
+              regionStatus: [
+                {
+                  country: 'US',
+                  region: 'AL',
+                  status: 'NOTSTARTED',
+                },
+                {
+                  country: 'US',
+                  region: 'CA',
+                  status: 'INPROGRESS',
+                },
+              ],
             },
           ],
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: FILING_CALENDAR_REQUESTS,
+      variables: {
+        companyId: 1,
+      },
+    },
+    result: {
+      data: {
+        filingCalendarRequests: {
+          value: {
+            filingRequests: {
+              value: [
+                {
+                  data: {
+                    country: 'US',
+                    region: 'CA',
+                    taxFormCode: 'TEST-001',
+                  },
+                },
+                {
+                  data: {
+                    country: 'US',
+                    region: 'HI',
+                    taxFormCode: 'TEST-002',
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: FILING_CALENDARS,
+      variables: {
+        companyId: 1,
+      },
+    },
+    result: {
+      data: {
+        filingCalendars: {
+          value: {
+            filingCalendars: {
+              value: [
+                {
+                  formCountry: 'US',
+                  formRegion: 'CA',
+                  taxFormCode: 'TEST-001',
+                },
+                {
+                  formCountry: 'US',
+                  formRegion: 'HI',
+                  taxFormCode: 'TEST-002',
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: REGIONS,
+      variables: {
+        country: 'US',
+      },
+    },
+    result: {
+      data: {
+        definitions: {
+          value: {
+            countries: [
+              {
+                code: 'US',
+                name: 'United States',
+                regions: [
+                  {
+                    code: 'AL',
+                    name: 'Alabama',
+                  },
+                  {
+                    code: 'CA',
+                    name: 'California',
+                  },
+                  {
+                    code: 'FL',
+                    name: 'Florida',
+                  },
+                  {
+                    code: 'GA',
+                    name: 'Georgia',
+                  },
+                  {
+                    code: 'HI',
+                    name: 'Hawaii',
+                  },
+                  {
+                    code: 'ID',
+                    name: 'Idaho',
+                  },
+                ],
+              },
+            ],
+          },
         },
       },
     },
@@ -110,9 +175,36 @@ describe('SetUpReturnsTable', () => {
     const errorMock = [
       {
         request: {
-          query: NEXUSES,
+          query: COMPANY_REGION_STATUS,
           variables: {
             companyId: 1,
+          },
+        },
+        error: new Error('An error occurred'),
+      },
+      {
+        request: {
+          query: FILING_CALENDAR_REQUESTS,
+          variables: {
+            companyId: 1,
+          },
+        },
+        error: new Error('An error occurred'),
+      },
+      {
+        request: {
+          query: FILING_CALENDARS,
+          variables: {
+            companyId: 1,
+          },
+        },
+        error: new Error('An error occurred'),
+      },
+      {
+        request: {
+          query: REGIONS,
+          variables: {
+            country: 'US',
           },
         },
         error: new Error('An error occurred'),
@@ -153,13 +245,21 @@ describe('SetUpReturnsTable', () => {
     // Wait for and verify data
     const alabama = await screen.findByText('Alabama');
     const california = await screen.findByText('California');
+    const hawaii = await screen.findByText('Hawaii');
 
     expect(alabama).toBeInTheDocument();
     expect(california).toBeInTheDocument();
+    expect(hawaii).toBeInTheDocument();
 
-    // Verify other cell contents
-    const descriptions = screen.getAllByText('You collect tax here');
-    expect(descriptions).toHaveLength(10);
+    // Verify descriptions - should show "You collect tax here" for regions in regionStatus (AL, CA)
+    const collectTaxDescriptions = screen.getAllByText('You collect tax here');
+    expect(collectTaxDescriptions).toHaveLength(2); // AL and CA
+
+    // Verify "You have not added this region" for regions only in filing data (HI)
+    const notAddedDescriptions = screen.getAllByText(
+      'You have not added this region'
+    );
+    expect(notAddedDescriptions).toHaveLength(1); // HI
   });
 
   it('navigates to the correct route when action link is clicked', async () => {
@@ -180,10 +280,7 @@ describe('SetUpReturnsTable', () => {
 
     // Verify navigation was called with correct parameters
     expect(mockNavigate).toHaveBeenCalledWith(
-      'Alabama?regionCode=AL&countryCode=US',
-      {
-        relative: 'route',
-      }
+      '/returns/set-up-returns/Alabama?regionCode=AL&countryCode=US'
     );
   });
 });
