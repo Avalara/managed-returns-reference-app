@@ -14,10 +14,11 @@ import Funding from './components/Funding';
 import CreateFunding from './components/CreateFunding';
 import GetStarted from './components/GetStarted';
 import SetUpReturns from './components/SetUpReturns';
+import SelectStates from './components/SelectStates';
 import Authentication from './components/Authentication';
 import Provisioning from './components/Provisioning';
 import DataIngest from './components/DataIngest';
-import Index from './components/CustomBrandingSettings';
+import CustomBrandingSettings from './components/CustomBrandingSettings';
 import NotFound from './routes/NotFound';
 import ErrorPage from './routes/Error';
 import SetUpStateReturns from './components/SetUpRegionReturns';
@@ -81,6 +82,15 @@ const router = createBrowserRouter([
             },
           },
           {
+            path: 'select-states',
+            element: <SelectStates />,
+            handle: {
+              crumb: () => (
+                <Link to="/returns/select-states">Select states</Link>
+              ),
+            },
+          },
+          {
             path: 'set-up-returns/:region',
             element: <SetUpStateReturns />,
           },
@@ -125,7 +135,7 @@ const router = createBrowserRouter([
           },
           {
             path: 'branding-settings',
-            element: <Index />,
+            element: <CustomBrandingSettings />,
             handle: {
               crumb: () => (
                 <Link to="/developer-tools/branding-settings">Theme</Link>

@@ -45,3 +45,16 @@ export const companyFundingStatus = gql`
     }
   }
 `;
+export const companyRegionStatus = gql`
+  query Companies($companyId: Int!) {
+    companies(id: $companyId) {
+      value {
+        regionStatus {
+          country
+          region
+          status
+        }
+      }
+    }
+  }
+`;

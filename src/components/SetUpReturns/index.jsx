@@ -1,5 +1,6 @@
 import { Card, Layout, theme, Button, Space, Alert, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import SetUpReturnsTable from './SetUpReturnsTable.jsx';
@@ -11,6 +12,7 @@ const { Title } = Typography;
 
 const SetUpReturns = () => {
   const { companyId } = useOutletContext();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -40,15 +42,14 @@ const SetUpReturns = () => {
                 <Title level={2} style={{ margin: 0 }}>
                   States where you report tax
                 </Title>
-                <Button type="primary" icon={<PlusOutlined />}>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={() => navigate('/returns/select-states')}
+                >
                   Add states
                 </Button>
               </div>
-              <Alert
-                description="The data shown in this table is mock data for demonstration purposes and does not reflect actual API responses."
-                type="info"
-                showIcon
-              />
               <div>
                 <SetUpReturnsTable companyId={companyId} />
               </div>
