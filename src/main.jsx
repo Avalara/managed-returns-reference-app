@@ -18,6 +18,7 @@ import Authentication from './components/Authentication';
 import Provisioning from './components/Provisioning';
 import DataIngest from './components/DataIngest';
 import Index from './components/CustomBrandingSettings';
+import LinkAccount from './components/LinkAccount';
 import NotFound from './routes/NotFound';
 import ErrorPage from './routes/Error';
 import SetUpStateReturns from './components/SetUpRegionReturns';
@@ -120,6 +121,15 @@ const router = createBrowserRouter([
             handle: {
               crumb: () => (
                 <Link to="/developer-tools/data-ingest">Data ingest</Link>
+              ),
+            },
+          },
+          {
+            path: 'link-account',
+            element: <LinkAccount />,
+            handle: {
+              crumb: () => (
+                <Link to="/developer-tools/link-account">Link account</Link>
               ),
             },
           },
