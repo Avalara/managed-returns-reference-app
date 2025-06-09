@@ -2,6 +2,7 @@ export {
   companies,
   companyLocations,
   companyFundingStatus,
+  companyRegionStatus,
 } from './Companies.js';
 export { nexuses } from './Nexuses.js';
 export { countries } from './Countries.js';
@@ -15,3 +16,6 @@ export { filingCalendarMetadata } from './FilingCalendarMetadata.js';
 export { filingConfirmationAttachments } from './FilingConfirmationAttachments.js';
 export { filingConfirmationAttachment } from './FilingConfirmationAttachment.js';
 export { verifyEFileCredentialStatus } from './VerifyEFileCredentialStatus.js';
+export { regions } from './Regions.js';
+export { filingCalendarRequests } from './FilingCalendarRequests.js';
+export { filingCalendars } from './FilingCalendars.js';

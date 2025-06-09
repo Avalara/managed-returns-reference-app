@@ -19,11 +19,11 @@ import {
 } from 'antd';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import { PageHeader } from '../shared';
+import { DEFAULT_COUNTRY } from '../shared/Constants.js';
 
 const { Content } = Layout;
 const { Title } = Typography;
 
-const DEFAULT_COUNTRY = 'US';
 const DEFAULT_COUNTRY_PLACEHOLDER = 'Select a country';
 const DEFAULT_STATE_PLACEHOLDER = 'Select a state';
 
@@ -328,7 +328,7 @@ const Provisioning = () => {
                   ))}
                 </Col>
               </Row>
-
+              <Divider />
               <Form.Item>
                 <Button
                   type="primary"

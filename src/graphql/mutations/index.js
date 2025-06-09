@@ -6,4 +6,5 @@ export { createTransaction } from './CreateTransaction';
 export { createTransactionsSummary } from './CreateTransactionsSummary';
 export { createFilingCalendarRequests } from './CreateFilingCalendarRequests';
 export { verifyEFileCredential } from './VerifyEFileCredential';
+export { updateRegionStatus } from './UpdateRegionStatus';
 export { createFirmClientLinkage } from './CreateFirmClientLinkage';
