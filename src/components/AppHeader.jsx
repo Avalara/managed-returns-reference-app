@@ -23,7 +23,7 @@ import defaultLogo from '../assets/A-Check-RGB.svg';
 const { Header } = Layout;
 const { Title } = Typography;
 
-const AppHeader = ({ brandingConfig }) => {
+const AppHeader = ({ brandingConfig = {} }) => {
   const logoUrl = brandingConfig?.branding?.logoUrl || defaultLogo;
   const partnerName = brandingConfig?.branding?.partnerName || 'Avalara';
 
@@ -53,10 +53,6 @@ AppHeader.propTypes = {
       faviconUrl: PropTypes.string,
     }),
   }),
-};
-
-AppHeader.defaultProps = {
-  brandingConfig: null,
 };
 
 export default AppHeader;
