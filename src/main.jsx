@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './graphql';
 import { createBrowserRouter, Link, RouterProvider } from 'react-router-dom';
+import { App } from 'antd'; // Import App from antd
 
 import './index.css';
 
@@ -165,7 +166,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')).render(
   <ApolloProvider client={apolloClient}>
     <StrictMode>
-      <RouterProvider router={router} />
+      <App>
+        <RouterProvider router={router} />
+      </App>
     </StrictMode>
   </ApolloProvider>
 );

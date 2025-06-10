@@ -1,14 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Typography,
-  Card,
-  Form,
-  Input,
-  Button,
-  Row,
-  Col,
-  notification,
-} from 'antd';
+import { Typography, Card, Form, Input, Button, Row, Col, App } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { useMutation } from '@apollo/client';
 import { useOutletContext } from 'react-router-dom';
@@ -26,6 +17,7 @@ const LinkAccount = () => {
   const [createFirmClientLinkageMutation] = useMutation(
     CREATE_FIRM_CLIENT_LINKAGE
   );
+  const { notification } = App.useApp();
 
   const onFinish = async (values) => {
     try {
