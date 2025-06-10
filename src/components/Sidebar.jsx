@@ -16,7 +16,7 @@
  */
 
 import { useState } from 'react';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Tooltip } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -28,7 +28,7 @@ import {
 
 const { Sider } = Layout;
 
-const Sidebar = ({ brandingConfig }) => {
+const Sidebar = ({ brandingConfig, companyId }) => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
 
@@ -70,29 +70,47 @@ const Sidebar = ({ brandingConfig }) => {
     return [];
   };
 
+  const taxReturnLinks = [
+    {
+      key: 'returns-get-started',
+      labelContent: 'Get started',
+      path: '/returns/get-started',
+    },
+    {
+      key: 'returns-reconcile',
+      labelContent: 'Reconcile',
+      path: '/returns/reconcile',
+    },
+    {
+      key: 'returns-setup',
+      labelContent: 'Set up returns',
+      path: '/returns/set-up-returns',
+    },
+    {
+      key: 'returns-funding',
+      labelContent: 'Funding',
+      path: '/returns/funding',
+    },
+  ];
+
+  const processedTaxReturnItems = taxReturnLinks.map((item) => ({
+    key: item.key,
+    disabled: !companyId,
+    label: !companyId ? (
+      <Tooltip title="A company selection is required to access Tax Returns.">
+        <span>{item.labelContent}</span>
+      </Tooltip>
+    ) : (
+      <Link to={item.path}>{item.labelContent}</Link>
+    ),
+  }));
+
   const menuItems = [
     {
       key: 'returns',
       icon: <TableOutlined />,
       label: 'Tax returns',
-      children: [
-        {
-          key: 'returns-get-started',
-          label: <Link to="/returns/get-started">Get started</Link>,
-        },
-        {
-          key: 'returns-reconcile',
-          label: <Link to="/returns/reconcile">Reconcile</Link>,
-        },
-        {
-          key: 'returns-setup',
-          label: <Link to="/returns/set-up-returns">Set up returns</Link>,
-        },
-        {
-          key: 'returns-funding',
-          label: <Link to="/returns/funding">Funding</Link>,
-        },
-      ],
+      children: processedTaxReturnItems,
     },
     {
       key: 'developer-tools',
@@ -164,6 +182,7 @@ Sidebar.propTypes = {
       partnerName: PropTypes.string,
     }),
   }),
+  companyId: PropTypes.string,
 };
 
 export default Sidebar;

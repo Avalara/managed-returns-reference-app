@@ -66,22 +66,12 @@ const Home = () => {
     }
   }, []);
 
-  // Original redirect logic from the original Home component
-  useEffect(() => {
-    if (
-      (!isLoggedIn || !localStorageCompanyId) &&
-      location.pathname !== '/developer-tools/authentication'
-    ) {
-      window.location.href = '/developer-tools/authentication';
-    }
-  }, [location.pathname, isLoggedIn]);
-
   return (
     <ConfigProvider theme={{ token: brandingConfig?.theme }}>
       <Layout style={{ minHeight: '100vh' }}>
         <AppHeader brandingConfig={brandingConfig} />
         <Layout>
-          <Sidebar brandingConfig={brandingConfig} />
+          <Sidebar brandingConfig={brandingConfig} companyId={companyId} />
           <Layout style={{ padding: '24px' }}>
             <Content>
               <Outlet
