@@ -391,7 +391,6 @@ const UploadTransactionFiles = () => {
           return false; // Prevent default upload behavior
         }}
         onDrop={(e) => {
-          console.log('Dropped files', e.dataTransfer.files);
           // Process dropped files
           Array.from(e.dataTransfer.files).forEach((file) => {
             if (

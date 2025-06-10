@@ -25,7 +25,7 @@ class AuthService {
         },
       });
     } catch (fetchErr) {
-      console.log(fetchErr);
+      console.error('Error logging in:', fetchErr);
       throw fetchErr;
     }
 

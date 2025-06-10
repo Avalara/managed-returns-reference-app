@@ -54,7 +54,6 @@ const FilingPeriodSelector = ({ date, setDate }) => {
                 `/returns/reconcile/${newDate.year()}/${newDate.month()}`
             );
 
-            // console.log('newUrl', newUrl);
             navigate(newUrl, {
               relative: 'path',
             });

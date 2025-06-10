@@ -155,6 +155,7 @@ const SetUpReturnsTable = ({ companyId }) => {
     // Convert regions map to array and map to table rows
     return Object.values(regionsMap).map((record) => ({
       ...record,
+      id: `${record.countryCode}-${record.regionCode}`, // Add unique id for table rowKey
       countryName: countryMap?.[record.countryCode],
       regionName: regionMap?.[record.countryCode]?.[record.regionCode],
     }));
@@ -285,7 +286,7 @@ const SetUpReturnsTable = ({ companyId }) => {
 };
 
 SetUpReturnsTable.propTypes = {
-  companyId: PropTypes.number.isRequired,
+  companyId: PropTypes.string.isRequired,
 };
 
 export default SetUpReturnsTable;

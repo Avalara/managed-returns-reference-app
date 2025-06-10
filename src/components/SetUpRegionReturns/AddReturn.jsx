@@ -214,8 +214,6 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
             },
           },
         });
-
-        console.log('Submitting data:', requestData);
       })
       .catch((error) => {
         console.error('Validation failed:', error);
