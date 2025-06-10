@@ -16,7 +16,7 @@
  */
 
 import { useState } from 'react';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Tooltip } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -27,9 +27,8 @@ import {
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
-const { SubMenu } = Menu;
 
-const Sidebar = ({ brandingConfig }) => {
+const Sidebar = ({ brandingConfig, companyId }) => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
 
@@ -53,6 +52,8 @@ const Sidebar = ({ brandingConfig }) => {
       return ['dev-provisioning'];
     if (path.includes('/developer-tools/data-ingest'))
       return ['dev-data-ingest'];
+    if (path.includes('/developer-tools/link-account'))
+      return ['dev-link-account'];
     if (path.includes('/developer-tools/branding-settings'))
       return ['dev-branding-settings'];
 
@@ -68,6 +69,83 @@ const Sidebar = ({ brandingConfig }) => {
 
     return [];
   };
+
+  const taxReturnLinks = [
+    {
+      key: 'returns-get-started',
+      labelContent: 'Get started',
+      path: '/returns/get-started',
+    },
+    {
+      key: 'returns-reconcile',
+      labelContent: 'Reconcile',
+      path: '/returns/reconcile',
+    },
+    {
+      key: 'returns-setup',
+      labelContent: 'Set up returns',
+      path: '/returns/set-up-returns',
+    },
+    {
+      key: 'returns-funding',
+      labelContent: 'Funding',
+      path: '/returns/funding',
+    },
+  ];
+
+  const processedTaxReturnItems = taxReturnLinks.map((item) => ({
+    key: item.key,
+    disabled: !companyId,
+    label: !companyId ? (
+      <Tooltip title="A company selection is required to access Tax Returns.">
+        <span>{item.labelContent}</span>
+      </Tooltip>
+    ) : (
+      <Link to={item.path}>{item.labelContent}</Link>
+    ),
+  }));
+
+  const menuItems = [
+    {
+      key: 'returns',
+      icon: <TableOutlined />,
+      label: 'Tax returns',
+      children: processedTaxReturnItems,
+    },
+    {
+      key: 'developer-tools',
+      icon: <SettingOutlined />,
+      label: 'Developer tools',
+      children: [
+        {
+          key: 'dev-authentication',
+          label: (
+            <Link to="/developer-tools/authentication">Authentication</Link>
+          ),
+        },
+        {
+          key: 'dev-provisioning',
+          label: <Link to="/developer-tools/provisioning">Provisioning</Link>,
+        },
+        {
+          key: 'dev-data-ingest',
+          label: <Link to="/developer-tools/data-ingest">Data ingest</Link>,
+        },
+        {
+          key: 'dev-link-account',
+          label: <Link to="/developer-tools/link-account">Link account</Link>,
+        },
+        {
+          key: 'dev-branding-settings',
+          label: (
+            <Link to="/developer-tools/branding-settings">
+              Branding settings
+            </Link>
+          ),
+        },
+      ],
+    },
+  ];
 
   return (
     <Sider
@@ -89,43 +167,8 @@ const Sidebar = ({ brandingConfig }) => {
         selectedKeys={getSelectedKeys()}
         defaultOpenKeys={getOpenKeys()}
         style={{ height: '100%' }}
-      >
-        <SubMenu key="returns" title="Tax returns" icon={<TableOutlined />}>
-          <Menu.Item key="returns-get-started">
-            <Link to="/returns/get-started">Get started</Link>
-          </Menu.Item>
-          <Menu.Item key="returns-reconcile">
-            <Link to="/returns/reconcile">Reconcile</Link>
-          </Menu.Item>
-          <Menu.Item key="returns-setup">
-            <Link to="/returns/set-up-returns">Set up returns</Link>
-          </Menu.Item>
-          <Menu.Item key="returns-funding">
-            <Link to="/returns/funding">Funding</Link>
-          </Menu.Item>
-        </SubMenu>
-
-        <SubMenu
-          key="developer-tools"
-          title="Developer tools"
-          icon={<SettingOutlined />}
-        >
-          <Menu.Item key="dev-authentication">
-            <Link to="/developer-tools/authentication">Authentication</Link>
-          </Menu.Item>
-          <Menu.Item key="dev-provisioning">
-            <Link to="/developer-tools/provisioning">Provisioning</Link>
-          </Menu.Item>
-          <Menu.Item key="dev-data-ingest">
-            <Link to="/developer-tools/data-ingest">Data ingest</Link>
-          </Menu.Item>
-          <Menu.Item key="dev-branding-settings">
-            <Link to="/developer-tools/branding-settings">
-              Branding settings
-            </Link>
-          </Menu.Item>
-        </SubMenu>
-      </Menu>
+        items={menuItems}
+      />
     </Sider>
   );
 };
@@ -139,6 +182,7 @@ Sidebar.propTypes = {
       partnerName: PropTypes.string,
     }),
   }),
+  companyId: PropTypes.string,
 };
 
 export default Sidebar;

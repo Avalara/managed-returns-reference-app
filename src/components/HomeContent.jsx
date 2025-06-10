@@ -19,22 +19,19 @@ import { useEffect } from 'react';
 import { useOutletContext, useLocation } from 'react-router-dom';
 
 const HomeContent = () => {
-  const { isLoggedIn, companyId } = useOutletContext() || {
+  const { isLoggedIn } = useOutletContext() || {
     isLoggedIn: false,
-    companyId: null,
   };
   const location = useLocation();
 
   useEffect(() => {
     if (
-      (!isLoggedIn || !companyId) &&
+      !isLoggedIn &&
       location.pathname !== '/developer-tools/authentication'
     ) {
       window.location.href = '/developer-tools/authentication';
-    } else {
-      window.location.href = '/returns/reconcile';
     }
-  }, [companyId, isLoggedIn, location.pathname]);
+  }, [isLoggedIn, location.pathname]);
 
   return <></>;
 };

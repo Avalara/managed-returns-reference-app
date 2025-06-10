@@ -127,7 +127,6 @@ function extractTableData(returnData) {
   if (!returnData) return tableData;
 
   const adjustmentData = returnData?.[0]?.adjustments;
-  // console.log('Adjustment data', adjustmentData);
   fieldsToExtract.forEach((field, i) => {
     if (adjustmentData[field]) {
       tableData.push({

@@ -162,7 +162,7 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
         const answers = [];
 
         standardQuestions.forEach((question) => {
-          const questionId = question.value.filingQuestionId;
+          const questionId = question.filingQuestionId;
           if (values[questionId]) {
             answers.push({
               filingQuestionId: questionId,
@@ -214,8 +214,6 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
             },
           },
         });
-
-        console.log('Submitting data:', requestData);
       })
       .catch((error) => {
         console.error('Validation failed:', error);
@@ -369,8 +367,7 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
                   dorWebsite={dorWebsite}
                   standardQuestions={standardQuestions.filter(
                     (q) =>
-                      q?.value?.filingQuestionId === 26 ||
-                      q?.value?.filingQuestionId === 27
+                      q?.filingQuestionId === 26 || q?.filingQuestionId === 27
                   )}
                 />
               </>
@@ -447,8 +444,8 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
               Company details
             </Divider>
             {standardQuestions.map((question) => (
-              <>
-                {question?.value?.filingQuestionId === 28 && (
+              <React.Fragment key={question?.filingQuestionId}>
+                {question?.filingQuestionId === 28 && (
                   <Form.Item label="Select address" name="address">
                     <Select
                       placeholder="Select a address"
@@ -469,14 +466,14 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
                   </Form.Item>
                 )}
                 {/* Skip rendering ReturnQuestion for efile username (26) and password (27) */}
-                {question?.value?.filingQuestionId !== 26 &&
-                  question?.value?.filingQuestionId !== 27 && (
+                {question?.filingQuestionId !== 26 &&
+                  question?.filingQuestionId !== 27 && (
                     <ReturnQuestion
-                      key={question.value.filingQuestionId}
-                      {...question.value}
+                      key={question.filingQuestionId}
+                      {...question}
                     />
                   )}
-              </>
+              </React.Fragment>
             ))}
           </>
         )}

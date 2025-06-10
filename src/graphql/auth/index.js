@@ -25,7 +25,7 @@ class AuthService {
         },
       });
     } catch (fetchErr) {
-      console.log(fetchErr);
+      console.error('Error logging in:', fetchErr);
       throw fetchErr;
     }
 
@@ -36,6 +36,35 @@ class AuthService {
     const access_token = await response?.data?.access_token;
     this.setToken(access_token);
     return access_token;
+  }
+
+  // Reusable function to generate auth token with custom credentials
+  async generateAuthToken(clientId, clientSecret) {
+    const creds = `${clientId}:${clientSecret}`;
+    const encodedCredentials = btoa(creds);
+
+    try {
+      const response = await axios({
+        method: 'post',
+        url: config.TOKEN_URL,
+        data: {
+          grant_type: 'client_credentials',
+        },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${encodedCredentials}`,
+        },
+      });
+
+      if (response.status !== 200) {
+        throw new Error('Token generation failed');
+      }
+
+      return response.data.access_token;
+    } catch (error) {
+      console.error('Error generating auth token:', error);
+      throw error;
+    }
   }
 
   setToken(access_token) {
@@ -69,27 +98,34 @@ export const authLink = new ApolloLink(
       let handle;
       Promise.resolve(operation)
         .then(async (operation) => {
-          if (authService.isTokenExpired()) {
-            console.log('Token is expired, trying to refresh it...');
-            // Token is expired, try to refresh it
-            try {
-              await authService.login();
-              console.log('Successfully logged in');
-            } catch (error) {
-              // Handle refresh error (e.g., redirect to login page)
-              console.log('Error logging in', error);
-              authService.logout();
-              // window.location.href = '/login';
-              return;
+          // Check if custom authorization header is already set in context
+          const { headers } = operation.getContext();
+          const hasCustomAuth = headers && headers.authorization;
+
+          // Only apply default auth logic if no custom authorization is provided
+          if (!hasCustomAuth) {
+            if (authService.isTokenExpired()) {
+              console.warn('Token is expired, trying to refresh it...');
+              // Token is expired, try to refresh it
+              try {
+                await authService.login();
+                console.log('Successfully logged in');
+              } catch (error) {
+                // Handle refresh error (e.g., redirect to login page)
+                console.error('Error logging in', error);
+                authService.logout();
+                // window.location.href = '/login';
+                return;
+              }
             }
-          }
-          const token = authService.getToken();
-          if (token) {
-            operation.setContext({
-              headers: {
-                authorization: `Bearer ${token}`,
-              },
-            });
+            const token = authService.getToken();
+            if (token) {
+              operation.setContext({
+                headers: {
+                  authorization: `Bearer ${token}`,
+                },
+              });
+            }
           }
         })
         .then(() => {

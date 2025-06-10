@@ -27,8 +27,6 @@ function useFilingsData({
     },
   });
 
-  // console.log('data', data);
-
   useEffect(() => {
     setAmountDue(data?.filings?.value?.[0]?.taxSummary?.remittanceAmount);
   }, [data, setAmountDue]);
@@ -143,8 +141,6 @@ function extractTableData(data, filters) {
           }))
       )
   );
-
-  console.log('taxReturns', taxReturns);
 
   return taxReturns;
 }

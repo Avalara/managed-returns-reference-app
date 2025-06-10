@@ -23,7 +23,8 @@ const { Content } = Layout;
 const { Title } = Typography;
 
 const Authentication = () => {
-  const { isLoggedIn, setIsLoggedIn, setCompanyId } = useOutletContext();
+  const { isLoggedIn, setIsLoggedIn, setAccountId, setCompanyId } =
+    useOutletContext();
 
   const [form] = Form.useForm();
 
@@ -65,6 +66,7 @@ const Authentication = () => {
       message.success('Successfully connected! Please select a company.');
       setEditCredentials(false);
       setEditCompanyId(true);
+      setAccountId(values.clientId);
       fetchCompanies(values.clientId);
     } catch (error) {
       console.error('Connection failed:', error);

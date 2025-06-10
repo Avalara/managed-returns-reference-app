@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './graphql';
 import { createBrowserRouter, Link, RouterProvider } from 'react-router-dom';
+import { App } from 'antd'; // Import App from antd
 
 import './index.css';
 
@@ -18,6 +19,7 @@ import SelectStates from './components/SelectStates';
 import Authentication from './components/Authentication';
 import Provisioning from './components/Provisioning';
 import DataIngest from './components/DataIngest';
+import LinkAccount from './components/LinkAccount';
 import CustomBrandingSettings from './components/CustomBrandingSettings';
 import NotFound from './routes/NotFound';
 import ErrorPage from './routes/Error';
@@ -134,6 +136,15 @@ const router = createBrowserRouter([
             },
           },
           {
+            path: 'link-account',
+            element: <LinkAccount />,
+            handle: {
+              crumb: () => (
+                <Link to="/developer-tools/link-account">Link account</Link>
+              ),
+            },
+          },
+          {
             path: 'branding-settings',
             element: <CustomBrandingSettings />,
             handle: {
@@ -155,7 +166,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')).render(
   <ApolloProvider client={apolloClient}>
     <StrictMode>
-      <RouterProvider router={router} />
+      <App>
+        <RouterProvider router={router} />
+      </App>
     </StrictMode>
   </ApolloProvider>
 );
