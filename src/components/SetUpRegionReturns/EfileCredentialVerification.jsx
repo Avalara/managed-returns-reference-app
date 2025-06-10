@@ -184,20 +184,18 @@ const EfileCredentialVerification = ({
       </Text>
 
       {/* Render username field using ReturnQuestion */}
-      {standardQuestions.find((q) => q?.value?.filingQuestionId === 26) && (
+      {standardQuestions.find((q) => q?.filingQuestionId === 26) && (
         <ReturnQuestion
-          {...standardQuestions.find((q) => q?.value?.filingQuestionId === 26)
-            .value}
+          {...standardQuestions.find((q) => q?.filingQuestionId === 26)}
           hasFeedback={!!status}
           validateStatus={getValidationStatus()}
         />
       )}
 
       {/* Render password field using ReturnQuestion */}
-      {standardQuestions.find((q) => q?.value?.filingQuestionId === 27) && (
+      {standardQuestions.find((q) => q?.filingQuestionId === 27) && (
         <ReturnQuestion
-          {...standardQuestions.find((q) => q?.value?.filingQuestionId === 27)
-            .value}
+          {...standardQuestions.find((q) => q?.filingQuestionId === 27)}
           dataType="PASSWORD"
           hasFeedback={!!status}
           validateStatus={getValidationStatus()}

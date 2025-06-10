@@ -18,17 +18,15 @@ export const filingCalendarMetadata = gql`
               required
             }
             standardQuestions {
-              value {
-                dataType
-                filingQuestionId
-                filingQuestionCode
-                destination
-                helpText
-                maxLength
-                question
-                regex
-                required
-              }
+              dataType
+              filingQuestionId
+              filingQuestionCode
+              destination
+              helpText
+              maxLength
+              question
+              regex
+              required
             }
             formFilingFrequencies {
               filingFrequency
