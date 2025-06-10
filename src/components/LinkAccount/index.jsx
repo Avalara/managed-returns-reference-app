@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Typography,
   Card,
@@ -12,6 +12,7 @@ import {
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { useMutation } from '@apollo/client';
 import { useOutletContext } from 'react-router-dom';
+import { authService } from '../../graphql/auth';
 import { createFirmClientLinkage as CREATE_FIRM_CLIENT_LINKAGE } from '../../graphql/mutations';
 import { PageHeader } from '../shared/index.js';
 import { Content } from 'antd/es/layout/layout.js';
@@ -21,17 +22,29 @@ const { Title, Text } = Typography;
 
 const LinkAccount = () => {
   const { accountId } = useOutletContext();
-  const [createFirmClientLinkageMutation, { loading }] = useMutation(
+  const [linkingAccount, setLinkingAccount] = useState(false);
+  const [createFirmClientLinkageMutation] = useMutation(
     CREATE_FIRM_CLIENT_LINKAGE
   );
 
   const onFinish = async (values) => {
-    console.log('Received values of form: ', values);
     try {
+      setLinkingAccount(true);
+      // Generate custom JWT token using form values
+      const clientAuthToken = await authService.generateAuthToken(
+        values.clientAccountNumber,
+        values.clientToken
+      );
+
       const { data } = await createFirmClientLinkageMutation({
         variables: {
-          firmAccountId: accountId, // Use accountId from outlet context
+          firmAccountId: parseInt(accountId), // Use accountId from outlet context
           firmAccountName: 'AVATEST - Returns_Firm_Account', // TODO: fetch this from API
+        },
+        context: {
+          headers: {
+            authorization: `Bearer ${clientAuthToken}`,
+          },
         },
       });
 
@@ -44,9 +57,11 @@ const LinkAccount = () => {
     } catch (error) {
       console.error('Failed to link account:', error);
       notification.error({
-        message: 'Account couldn’t be relinked.',
-        description: `Try relinking Account ID ${values.accountNumber} again.`,
+        message: 'Account couldn’t be linked.',
+        description: `Try relinking Account ID ${values.clientAccountNumber} again.`,
       });
+    } finally {
+      setLinkingAccount(false);
     }
   };
 
@@ -66,8 +81,8 @@ const LinkAccount = () => {
       <Card title="Account information">
         <Form name="link_account_form" layout="vertical" onFinish={onFinish}>
           <Form.Item
-            label="Account number"
-            name="accountNumber"
+            label="Client account number"
+            name="clientAccountNumber"
             rules={[
               {
                 required: true,
@@ -80,8 +95,8 @@ const LinkAccount = () => {
           </Form.Item>
 
           <Form.Item
-            label="Partner token"
-            name="partnerToken"
+            label="Client token"
+            name="clientToken"
             rules={[
               {
                 required: true,
@@ -99,7 +114,7 @@ const LinkAccount = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading}>
+            <Button type="primary" htmlType="submit" loading={linkingAccount}>
               Link account
             </Button>
           </Form.Item>

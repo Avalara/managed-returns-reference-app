@@ -90,6 +90,7 @@ const Home = () => {
                   setIsLoggedIn,
                   accountId,
                   companyId,
+                  setAccountId,
                   setCompanyId,
                 }}
               />
