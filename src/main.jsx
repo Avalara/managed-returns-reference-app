@@ -24,6 +24,7 @@ import CustomBrandingSettings from './components/CustomBrandingSettings';
 import NotFound from './routes/NotFound';
 import ErrorPage from './routes/Error';
 import SetUpStateReturns from './components/SetUpRegionReturns';
+import ExistingReturns from './components/ExistingReturns';
 
 const router = createBrowserRouter([
   {
@@ -95,6 +96,17 @@ const router = createBrowserRouter([
           {
             path: 'set-up-returns/:region',
             element: <SetUpStateReturns />,
+          },
+          {
+            path: 'existing-returns',
+            element: <ExistingReturns />,
+            handle: {
+              crumb: () => (
+                <Link to="/returns/existing-returns">
+                  Manage and add returns
+                </Link>
+              ),
+            },
           },
           {
             path: 'get-started',
