@@ -641,7 +641,7 @@ const ExistingReturns = () => {
       <PageHeader>
         <BreadcrumbMenu />
         <Content>
-          <Title level={1}>Set up returns</Title>
+          <Title level={1}>Manage and add returns</Title>
           <Upper
             activeTab={activeTab}
             setActiveTab={setActiveTab}
