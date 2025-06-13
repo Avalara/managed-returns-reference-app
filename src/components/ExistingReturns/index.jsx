@@ -12,7 +12,7 @@ import {
   Flex,
 } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
@@ -109,7 +109,7 @@ const data = [
     state: 'Virginia',
     regNumber: 'ST9-12412',
     frequency: 'Monthly',
-    filingMethod: 'LCL-22089',
+    filingMethod: 'Electronic',
     effective: '08/01/2023',
     expiration: '-',
     status: 'Active',
@@ -522,7 +522,10 @@ const ExistingReturns = () => {
   const [regionFilter, setRegionFilter] = useState('all');
   const [frequencyFilter, setFrequencyFilter] = useState('all');
   const [filingMethodFilter, setFilingMethodFilter] = useState('all');
-  const [filteredData, setFilteredData] = useState(data);
+  const [filteredData, setFilteredData] = useState(() =>
+    // Initialize with Active status items since default tab is '1' (Active)
+    data.filter((item) => item.status === 'Active')
+  );
 
   // Extract unique states from data for region filter
   const regionOptions = useMemo(() => {
@@ -531,32 +534,75 @@ const ExistingReturns = () => {
     return [...new Set(states)].sort();
   }, []);
 
-  const handleSearch = () => {
-    if (!searchText.trim()) {
-      setFilteredData(data);
-      return;
+  // Filter data when tab changes
+  useEffect(() => {
+    let filtered = data;
+
+    // Filter by active tab (status)
+    if (activeTab !== '4') {
+      // '4' is "All" tab
+      const statusMap = {
+        1: 'Active',
+        2: 'Pending',
+        3: 'Expired',
+      };
+      const targetStatus = statusMap[activeTab];
+      filtered = filtered.filter((item) => item.status === targetStatus);
     }
 
-    const filtered = data.filter((item) => {
+    setFilteredData(filtered);
+  }, [activeTab]);
+
+  const handleSearch = useCallback(() => {
+    let filtered = data;
+
+    // Filter by active tab (status)
+    if (activeTab !== '4') {
+      // '4' is "All" tab
+      const statusMap = {
+        1: 'Active',
+        2: 'Pending',
+        3: 'Expired',
+      };
+      const targetStatus = statusMap[activeTab];
+      filtered = filtered.filter((item) => item.status === targetStatus);
+    }
+
+    // Filter by search text
+    if (searchText.trim()) {
       const searchLower = searchText.toLowerCase();
-      return (
-        item.return.toLowerCase().includes(searchLower) ||
-        item.description.toLowerCase().includes(searchLower) ||
-        item.state.toLowerCase().includes(searchLower) ||
-        item.regNumber.toLowerCase().includes(searchLower)
+      filtered = filtered.filter(
+        (item) =>
+          item.return.toLowerCase().includes(searchLower) ||
+          item.description.toLowerCase().includes(searchLower) ||
+          item.state.toLowerCase().includes(searchLower) ||
+          item.regNumber.toLowerCase().includes(searchLower)
       );
-    });
+    }
 
     setFilteredData(filtered);
-  };
+  }, [activeTab, searchText]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setSearchText('');
     setRegionFilter('all');
     setFrequencyFilter('all');
     setFilingMethodFilter('all');
-    setFilteredData(data);
-  };
+
+    // Filter by current tab only (no search text)
+    let filtered = data;
+    if (activeTab !== '4') {
+      // '4' is "All" tab
+      const statusMap = {
+        1: 'Active',
+        2: 'Pending',
+        3: 'Expired',
+      };
+      const targetStatus = statusMap[activeTab];
+      filtered = data.filter((item) => item.status === targetStatus);
+    }
+    setFilteredData(filtered);
+  }, [activeTab]);
 
   return (
     <>
