@@ -292,6 +292,8 @@ const FiltersSection = ({
   handleReset,
   handleSearch,
   regionOptions,
+  frequencyOptions,
+  filingMethodOptions,
 }) => (
   <Card>
     <Flex
@@ -356,6 +358,7 @@ const FiltersSection = ({
             value={regionFilter === 'all' ? undefined : regionFilter}
             onChange={(value) => setRegionFilter(value || 'all')}
           >
+            <Option value="all">All</Option>
             {regionOptions.map((state) => (
               <Option key={state.toLowerCase()} value={state.toLowerCase()}>
                 {state}
@@ -380,9 +383,12 @@ const FiltersSection = ({
             value={frequencyFilter === 'all' ? undefined : frequencyFilter}
             onChange={(value) => setFrequencyFilter(value || 'all')}
           >
-            <Option value="monthly">Monthly</Option>
-            <Option value="quarterly">Quarterly</Option>
-            <Option value="annually">Annually</Option>
+            <Option value="all">All</Option>
+            {frequencyOptions.map((freq) => (
+              <Option key={freq.toLowerCase()} value={freq.toLowerCase()}>
+                {freq}
+              </Option>
+            ))}
           </Select>
         </div>
 
@@ -404,8 +410,12 @@ const FiltersSection = ({
             }
             onChange={(value) => setFilingMethodFilter(value || 'all')}
           >
-            <Option value="electronic">Electronic</Option>
-            <Option value="paper">Paper</Option>
+            <Option value="all">All</Option>
+            {filingMethodOptions.map((method) => (
+              <Option key={method.toLowerCase()} value={method.toLowerCase()}>
+                {method}
+              </Option>
+            ))}
           </Select>
         </div>
       </div>
@@ -429,6 +439,8 @@ FiltersSection.propTypes = {
   handleReset: PropTypes.func.isRequired,
   handleSearch: PropTypes.func.isRequired,
   regionOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  frequencyOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  filingMethodOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 const Upper = ({
@@ -445,6 +457,8 @@ const Upper = ({
   handleReset,
   handleSearch,
   regionOptions,
+  frequencyOptions,
+  filingMethodOptions,
 }) => (
   <Space direction="vertical" size="large" style={{ width: '100%' }}>
     <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -460,6 +474,8 @@ const Upper = ({
       handleReset={handleReset}
       handleSearch={handleSearch}
       regionOptions={regionOptions}
+      frequencyOptions={frequencyOptions}
+      filingMethodOptions={filingMethodOptions}
     />
   </Space>
 );
@@ -478,6 +494,8 @@ Upper.propTypes = {
   handleReset: PropTypes.func.isRequired,
   handleSearch: PropTypes.func.isRequired,
   regionOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  frequencyOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  filingMethodOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 const Lower = ({ filteredData }) => (
@@ -527,14 +545,24 @@ const ExistingReturns = () => {
     data.filter((item) => item.status === 'Active')
   );
 
-  // Extract unique states from data for region filter
+  // Extract unique options from data for filters
   const regionOptions = useMemo(() => {
     const states = data.map((item) => item.state);
     // Sort alphabetically
     return [...new Set(states)].sort();
   }, []);
 
-  // Filter data when tab changes
+  const frequencyOptions = useMemo(() => {
+    const frequencies = data.map((item) => item.frequency);
+    return [...new Set(frequencies)].sort();
+  }, []);
+
+  const filingMethodOptions = useMemo(() => {
+    const methods = data.map((item) => item.filingMethod);
+    return [...new Set(methods)].sort();
+  }, []);
+
+  // Filter data when any filter changes
   useEffect(() => {
     let filtered = data;
 
@@ -550,22 +578,26 @@ const ExistingReturns = () => {
       filtered = filtered.filter((item) => item.status === targetStatus);
     }
 
-    setFilteredData(filtered);
-  }, [activeTab]);
+    // Filter by region
+    if (regionFilter !== 'all') {
+      filtered = filtered.filter(
+        (item) => item.state.toLowerCase() === regionFilter.toLowerCase()
+      );
+    }
 
-  const handleSearch = useCallback(() => {
-    let filtered = data;
+    // Filter by frequency
+    if (frequencyFilter !== 'all') {
+      filtered = filtered.filter(
+        (item) => item.frequency.toLowerCase() === frequencyFilter.toLowerCase()
+      );
+    }
 
-    // Filter by active tab (status)
-    if (activeTab !== '4') {
-      // '4' is "All" tab
-      const statusMap = {
-        1: 'Active',
-        2: 'Pending',
-        3: 'Expired',
-      };
-      const targetStatus = statusMap[activeTab];
-      filtered = filtered.filter((item) => item.status === targetStatus);
+    // Filter by filing method
+    if (filingMethodFilter !== 'all') {
+      filtered = filtered.filter(
+        (item) =>
+          item.filingMethod.toLowerCase() === filingMethodFilter.toLowerCase()
+      );
     }
 
     // Filter by search text
@@ -581,28 +613,27 @@ const ExistingReturns = () => {
     }
 
     setFilteredData(filtered);
-  }, [activeTab, searchText]);
+  }, [
+    activeTab,
+    regionFilter,
+    frequencyFilter,
+    filingMethodFilter,
+    searchText,
+  ]);
+
+  const handleSearch = useCallback(() => {
+    // Filtering is now automatic via useEffect
+    // This function is kept for the search icon click
+    // but the actual filtering happens automatically when searchText changes
+  }, []);
 
   const handleReset = useCallback(() => {
     setSearchText('');
     setRegionFilter('all');
     setFrequencyFilter('all');
     setFilingMethodFilter('all');
-
-    // Filter by current tab only (no search text)
-    let filtered = data;
-    if (activeTab !== '4') {
-      // '4' is "All" tab
-      const statusMap = {
-        1: 'Active',
-        2: 'Pending',
-        3: 'Expired',
-      };
-      const targetStatus = statusMap[activeTab];
-      filtered = data.filter((item) => item.status === targetStatus);
-    }
-    setFilteredData(filtered);
-  }, [activeTab]);
+    // The useEffect will automatically filter with the reset values
+  }, []);
 
   return (
     <>
@@ -625,6 +656,8 @@ const ExistingReturns = () => {
             handleReset={handleReset}
             handleSearch={handleSearch}
             regionOptions={regionOptions}
+            frequencyOptions={frequencyOptions}
+            filingMethodOptions={filingMethodOptions}
           />
         </Content>
       </PageHeader>
