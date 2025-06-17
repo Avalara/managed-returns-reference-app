@@ -47,7 +47,7 @@ const mockSuggestedTaxFormsData = {
                 question: 'Test Question 1',
                 allowMultiSelect: false,
                 helpText: '',
-                answers: [
+                initialValues: [
                   {
                     leadingQuestionAnswerId: 1,
                     answer: 'Answer 1',

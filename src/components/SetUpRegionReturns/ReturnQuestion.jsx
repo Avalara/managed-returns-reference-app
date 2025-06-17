@@ -8,6 +8,7 @@ const ReturnQuestion = ({
   dataType,
   question,
   filingQuestionId,
+  filingQuestionCode,
   destination,
   value,
   onChange,
@@ -54,7 +55,7 @@ const ReturnQuestion = ({
     return (
       <Form.Item
         label={labelWithHelp}
-        name={filingQuestionId}
+        name={filingQuestionCode}
         rules={createRules()}
         help={statusText}
         hasFeedback={hasFeedback}
@@ -73,7 +74,7 @@ const ReturnQuestion = ({
     return (
       <Form.Item
         label={labelWithHelp}
-        name={filingQuestionId}
+        name={filingQuestionCode}
         rules={createRules()}
         help={statusText}
         hasFeedback={hasFeedback}
@@ -90,7 +91,7 @@ const ReturnQuestion = ({
     return (
       <Form.Item
         label={labelWithHelp}
-        name={filingQuestionId}
+        name={filingQuestionCode}
         rules={createRules()}
         help={statusText}
         hasFeedback={hasFeedback}

@@ -22,6 +22,12 @@ import { useMutation, useQuery } from '@apollo/client';
 import { verifyEFileCredentialStatus as VERIFY_EFILE_CREDENTIAL_STATUS } from '../../graphql/queries';
 import { verifyEFileCredential as VERIFY_EFILE_CREDENTIAL } from '../../graphql/mutations';
 import ReturnQuestion from './ReturnQuestion.jsx';
+import {
+  E_FILE_PASSWORD_QUESTION_CODE,
+  E_FILE_USERNAME_QUESTION_CODE,
+  isEfilePasswordQuestion,
+  isEfileUsernameQuestion,
+} from './returns-set-up-helper.js';
 
 const { Text } = Typography;
 
@@ -48,6 +54,7 @@ const EfileCredentialVerification = ({
     VERIFY_EFILE_CREDENTIAL_STATUS,
     {
       fetchPolicy: 'no-cache',
+      skip: true,
     }
   );
 
@@ -87,8 +94,8 @@ const EfileCredentialVerification = ({
   const handleTestEFileLogin = async () => {
     try {
       const values = form.getFieldsValue();
-      const userName = values[26];
-      const password = values[27];
+      const userName = values[E_FILE_USERNAME_QUESTION_CODE];
+      const password = values[E_FILE_PASSWORD_QUESTION_CODE];
 
       // Check if username or password is undefined
       if (!userName || !password) {
@@ -184,18 +191,18 @@ const EfileCredentialVerification = ({
       </Text>
 
       {/* Render username field using ReturnQuestion */}
-      {standardQuestions.find((q) => q?.filingQuestionId === 26) && (
+      {standardQuestions.find(isEfileUsernameQuestion) && (
         <ReturnQuestion
-          {...standardQuestions.find((q) => q?.filingQuestionId === 26)}
+          {...standardQuestions.find(isEfileUsernameQuestion)}
           hasFeedback={!!status}
           validateStatus={getValidationStatus()}
         />
       )}
 
       {/* Render password field using ReturnQuestion */}
-      {standardQuestions.find((q) => q?.filingQuestionId === 27) && (
+      {standardQuestions.find(isEfilePasswordQuestion) && (
         <ReturnQuestion
-          {...standardQuestions.find((q) => q?.filingQuestionId === 27)}
+          {...standardQuestions.find(isEfilePasswordQuestion)}
           dataType="PASSWORD"
           hasFeedback={!!status}
           validateStatus={getValidationStatus()}

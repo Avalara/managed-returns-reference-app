@@ -1,0 +1,384 @@
+import { Alert, Divider, Form, Select, Skeleton, Typography } from 'antd';
+import PropTypes from 'prop-types';
+import React, { useImperativeHandle } from 'react';
+import { useQuery } from '@apollo/client';
+import {
+  companyLocations as COMPANY_LOCATIONS,
+  filingCalendarMetadata as FILING_CALENDAR_METADATA,
+} from '../../graphql/queries/index.js';
+import ReturnQuestion from './ReturnQuestion.jsx';
+import EfileCredentialVerification from './EfileCredentialVerification.jsx';
+import {
+  ADDRESS_LINE_1_QUESTION_CODE,
+  ADDRESS_LINE_2_QUESTION_CODE,
+  CITY_QUESTION_CODE,
+  COUNTRY_QUESTION_CODE,
+  isAddressLine1Question,
+  isEfilePasswordQuestion,
+  isEfileUsernameQuestion,
+  REGION_QUESTION_CODE,
+  ZIP_CODE_QUESTION_CODE,
+} from './returns-set-up-helper.js';
+const { Text } = Typography;
+const FormLoading = () => (
+  <div style={{ padding: '50px 0' }}>
+    <Skeleton
+      active
+      title={{ width: '50%' }}
+      paragraph={{
+        rows: 4,
+        width: ['90%', '80%', '70%', '60%'],
+      }}
+    />
+    <Skeleton
+      active
+      title={{ width: '40%' }}
+      paragraph={{
+        rows: 3,
+        width: ['85%', '75%', '65%'],
+      }}
+      style={{ marginTop: 24 }}
+    />
+    <Skeleton
+      active
+      title={{ width: '50%' }}
+      paragraph={{
+        rows: 4,
+        width: ['90%', '80%', '70%', '60%'],
+      }}
+    />
+    <Skeleton
+      active
+      title={{ width: '40%' }}
+      paragraph={{
+        rows: 3,
+        width: ['85%', '75%', '65%'],
+      }}
+      style={{ marginTop: 24 }}
+    />
+  </div>
+);
+
+const FilingFrequency = ({
+  formFilingFrequencies,
+  selectedFilingFrequency,
+}) => {
+  // TODO : remove upperCase after https://avalara.atlassian.net/browse/RAAS-17961
+  const filingFrequencyOptions = formFilingFrequencies.reduce((acc, item) => {
+    acc[item.filingFrequency?.toUpperCase()] = item.filingPeriodDates;
+    return acc;
+  }, {});
+
+  return (
+    <>
+      <Form.Item
+        label="Filing Frequency"
+        name="filingFrequency"
+        rules={[
+          { required: true, message: 'Please select a filing frequency' },
+        ]}
+      >
+        <Select placeholder="Select filing frequency" style={{ width: '100%' }}>
+          {Object.keys(filingFrequencyOptions)?.map((freq) => (
+            <Select.Option key={freq} value={freq}>
+              {freq}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
+
+      <Form.Item
+        label="Filing Period"
+        name="filingPeriod"
+        rules={[{ required: true, message: 'Please select a filing period' }]}
+      >
+        <Select
+          placeholder="Select filing period"
+          disabled={!selectedFilingFrequency}
+          style={{ width: '100%' }}
+        >
+          {filingFrequencyOptions?.[selectedFilingFrequency]?.map(
+            (period, index) => (
+              <Select.Option
+                key={index}
+                value={period.transactionalPeriodStart}
+              >
+                {period.description}
+              </Select.Option>
+            )
+          )}
+        </Select>
+      </Form.Item>
+    </>
+  );
+};
+
+FilingFrequency.propTypes = {
+  formFilingFrequencies: PropTypes.arrayOf(
+    PropTypes.shape({
+      filingFrequencyId: PropTypes.number,
+      filingFrequency: PropTypes.string,
+      filingPeriodDates: PropTypes.arrayOf(
+        PropTypes.shape({
+          transactionalPeriodEnd: PropTypes.string,
+          transactionalPeriodStart: PropTypes.string,
+          filingDueDate: PropTypes.string,
+          description: PropTypes.string,
+        })
+      ),
+    })
+  ),
+};
+
+const ReturnForm = React.forwardRef((props, ref) => {
+  const {
+    loading = false,
+    taxFormCode,
+    region,
+    companyId,
+    initialValues = {},
+    onFinish = () => {},
+  } = props;
+  const [form] = Form.useForm();
+  const selectedFilingFrequency = Form.useWatch('filingFrequency', form);
+
+  // Expose the submit method to parent
+  useImperativeHandle(ref, () => ({
+    getForm: () => form,
+  }));
+
+  // Get questions for form
+  const { loading: questionsLoading, data: questionsData } = useQuery(
+    FILING_CALENDAR_METADATA,
+    {
+      variables: { taxFormCode: taxFormCode },
+    }
+  );
+
+  // Get company locations
+  const {
+    loading: locationsLoading,
+    data: locationsData,
+    error: locationsError,
+  } = useQuery(COMPANY_LOCATIONS, {
+    variables: { companyId: parseInt(companyId) },
+  });
+
+  const {
+    customQuestions = [],
+    standardQuestions = [],
+    formFilingFrequencies = [],
+    formFilingMethods = [],
+    formHeader: { outletReportingMethod, dorWebsite } = {},
+  } = questionsData?.definitions?.value?.filingCalendarMetaData
+    ?.filingCalendarMetadata || {};
+
+  const locations = locationsData?.companies?.value?.[0]?.locations || [];
+
+  const handleLocationSelect = (locationCode) => {
+    const selectedLocation = locations.find(
+      (loc) => loc.locationCode === locationCode
+    );
+    if (selectedLocation) {
+      form.setFieldsValue({
+        [ADDRESS_LINE_1_QUESTION_CODE]: selectedLocation.line1,
+        [ADDRESS_LINE_2_QUESTION_CODE]: selectedLocation.line2,
+        [CITY_QUESTION_CODE]: selectedLocation.city,
+        [REGION_QUESTION_CODE]: selectedLocation.region,
+        [ZIP_CODE_QUESTION_CODE]: selectedLocation.postalCode,
+        [COUNTRY_QUESTION_CODE]: selectedLocation.country,
+      });
+    }
+  };
+
+  const formatFormValues = (values) => {
+    const answers = [];
+
+    standardQuestions.forEach((question) => {
+      const questionId = question.filingQuestionId;
+      const questionCode = question.filingQuestionCode;
+      if (values[questionCode]) {
+        answers.push({
+          filingQuestionId: questionId,
+          answer: values[questionCode],
+        });
+      }
+    });
+
+    customQuestions.forEach((question) => {
+      const questionId = question.filingQuestionId;
+      const questionCode = question.filingQuestionCode;
+      if (values[questionCode]) {
+        answers.push({
+          filingQuestionId: questionId,
+          answer: values[questionCode],
+        });
+      }
+    });
+
+    // Create request payload
+    const requestData = {
+      filingFrequencyId: values.filingFrequency,
+      effDate: values.filingPeriod,
+      answers: answers,
+    };
+
+    return requestData;
+  };
+
+  if (loading || locationsLoading || questionsLoading) {
+    return <FormLoading />;
+  }
+
+  return (
+    <Form
+      form={form}
+      layout="vertical"
+      name="returnSetupForm"
+      wrapperCol={{ span: 16 }}
+      initialValues={{ ...initialValues }}
+      onFinish={(values) => {
+        const formattedFormValues = formatFormValues(values);
+        onFinish(formattedFormValues);
+      }}
+    >
+      <Divider orientation="left" orientationMargin="0">
+        State required information
+      </Divider>
+      {customQuestions.map((question) => (
+        <ReturnQuestion key={question?.filingQuestionCode} {...question} />
+      ))}
+      <FilingFrequency
+        formFilingFrequencies={formFilingFrequencies}
+        selectedFilingFrequency={selectedFilingFrequency}
+      />
+      {formFilingMethods.some(
+        (method) => method.filingMethod === 'Electronic'
+      ) && (
+        <>
+          <Divider orientation="left" orientationMargin="0">
+            E-file Login
+          </Divider>
+          <EfileCredentialVerification
+            form={form}
+            companyId={companyId}
+            taxFormCode={taxFormCode}
+            region={region}
+            dorWebsite={dorWebsite}
+            standardQuestions={standardQuestions}
+          />
+        </>
+      )}
+      {/* Render locations if we have a consolidated return */}
+      {outletReportingMethod?.toUpperCase() === 'CONSOLIDATED' && (
+        <>
+          <Divider orientation="left" orientationMargin="0">
+            Locations
+          </Divider>
+          {locationsLoading ? (
+            <Skeleton active paragraph={{ rows: 2 }} />
+          ) : locationsError ? (
+            <Alert
+              message="Error loading locations"
+              description={locationsError.message}
+              type="error"
+              showIcon
+            />
+          ) : (
+            <div style={{ marginTop: '16px' }}>
+              <Text strong>
+                These are all the locations that you are filing in this return:
+              </Text>
+              {locations.length === 0 ? (
+                <div style={{ marginTop: '8px' }}>
+                  <Text type="secondary">
+                    No locations found for this company.
+                  </Text>
+                </div>
+              ) : (
+                <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+                  {locations.map((location) => (
+                    <li key={location.locationCode}>
+                      <Text>
+                        {location.locationCode} ({location.city || 'N/A'},{' '}
+                        {location.region || 'N/A'})
+                        {location.isDefault && (
+                          <Text type="secondary"> (Default)</Text>
+                        )}
+                      </Text>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </>
+      )}
+      {/* Render locations if we have a duplicate return */}
+      {outletReportingMethod?.toUpperCase() === 'DUPLICATE' && (
+        <>
+          <Divider orientation="left" orientationMargin="0">
+            Locations
+          </Divider>
+          <Form.Item label={'Location'} name="locationCode">
+            <Select placeholder="Select location code">
+              <Select.Option value={''}>All locations</Select.Option>
+              {locations.map((location) => (
+                <Select.Option
+                  key={location.locationCode}
+                  value={location.locationCode}
+                >
+                  {location.locationCode} ({location.city}, {location.region})
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </>
+      )}
+      <Divider orientation="left" orientationMargin="0">
+        Company details
+      </Divider>
+      {standardQuestions.map((question) => (
+        <React.Fragment key={question?.filingQuestionCode}>
+          {isAddressLine1Question(question) && (
+            <Form.Item label="Select address" name="address">
+              <Select
+                placeholder="Select a address"
+                onChange={handleLocationSelect}
+                allowClear={true}
+                style={{ width: '100%' }}
+              >
+                {locations.map((location) => (
+                  <Select.Option
+                    key={location.locationCode}
+                    value={location.locationCode}
+                  >
+                    {location.description ||
+                      `${location.line1}, ${location.city}`}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
+          {/* Skip rendering ReturnQuestion for efile username and password  */}
+          {!isEfileUsernameQuestion(question) &&
+            !isEfilePasswordQuestion(question) && (
+              <ReturnQuestion key={question.filingQuestionCode} {...question} />
+            )}
+        </React.Fragment>
+      ))}
+    </Form>
+  );
+});
+
+ReturnForm.displayName = 'ReturnForm';
+
+ReturnForm.propTypes = {
+  loading: PropTypes.bool,
+  taxFormCode: PropTypes.string,
+  region: PropTypes.string,
+  companyId: PropTypes.string,
+  initialValues: PropTypes.object,
+  onFinish: PropTypes.func,
+};
+export default ReturnForm;

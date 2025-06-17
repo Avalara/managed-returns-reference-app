@@ -6,16 +6,13 @@ import AddReturn from './AddReturn';
 const TaxFormsTable = ({ dataSource, loading }) => {
   const pageSize = 10;
   const [currentPage, setCurrentPage] = useState(1);
-  const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedTaxForm, setSelectedTaxForm] = useState();
 
   const handleSetupReturn = (record) => {
     setSelectedTaxForm(record);
-    setDrawerVisible(true);
   };
 
   const handleCloseDrawer = () => {
-    setDrawerVisible(false);
     setSelectedTaxForm(null);
   };
 
@@ -58,11 +55,6 @@ const TaxFormsTable = ({ dataSource, loading }) => {
     total: dataSource.length,
     showSizeChanger: false,
   };
-
-  const currentPageData = dataSource.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
 
   return (
     <>
@@ -107,7 +99,7 @@ const TaxFormsTable = ({ dataSource, loading }) => {
 
       {selectedTaxForm && (
         <AddReturn
-          visible={drawerVisible}
+          visible={!!selectedTaxForm}
           onClose={handleCloseDrawer}
           taxForm={selectedTaxForm}
         />
