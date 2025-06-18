@@ -18,4 +18,5 @@ export { filingConfirmationAttachment } from './FilingConfirmationAttachment.js'
 export { verifyEFileCredentialStatus } from './VerifyEFileCredentialStatus.js';
 export { regions } from './Regions.js';
 export { filingCalendarRequests } from './FilingCalendarRequests.js';
+export { filingCalendarRequest } from './FilingCalendarRequest.js';
 export { filingCalendars } from './FilingCalendars.js';

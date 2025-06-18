@@ -220,6 +220,7 @@ const ReturnForm = React.forwardRef((props, ref) => {
     const requestData = {
       filingFrequencyId: values.filingFrequency,
       effDate: values.filingPeriod,
+      locationCode: values.locationCode,
       answers: answers,
     };
 
