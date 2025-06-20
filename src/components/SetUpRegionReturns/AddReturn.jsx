@@ -16,68 +16,128 @@
  */
 
 import React, { useRef } from 'react';
-import { Drawer, Form, Button, Space, Typography, Modal, message } from 'antd';
+import {
+  Drawer,
+  Button,
+  Space,
+  Typography,
+  Modal,
+  Result,
+  notification,
+} from 'antd';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { createFilingCalendarRequests as CREATE_FILING_CALENDAR_REQUESTS } from '../../graphql/mutations';
+import { filingCalendarRequestWithModel as FILING_CALENDAR_REQUEST_WITH_MODEL } from '../../graphql/queries';
 import { useOutletContext } from 'react-router-dom';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import ReturnForm from './ReturnForm.jsx';
 
 const { Text } = Typography;
 
-const AddReturn = ({ visible, onClose, taxForm }) => {
+/**
+ * A drawer component for adding a new filing calendar request
+ * Allows users to enter return details and save the request
+ *
+ * Features:
+ * - Validates form and shows confirmation modal on unsaved changes detection
+ * - Cancel return functionality with confirmation modal
+ * - Save return details
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.taxForm - The tax form data object containing taxFormCode, description, etc.
+ * @param {Function} props.onClose - Callback function to close the drawer
+ *
+ * @returns {React.ReactElement} The drawer component.
+ */
+const AddReturn = ({ taxForm, onClose }) => {
+  // Refs and context
   const { companyId } = useOutletContext();
   const childFormRef = useRef();
 
-  const [modal, contextHolder] = Modal.useModal();
+  // UI state management
+  const [modal, modalContextHolder] = Modal.useModal();
 
-  // Create Filing Calendar Requests mutation
-  const [createFilingCalendar, { loading: createFilingRequestInProgress }] =
-    useMutation(CREATE_FILING_CALENDAR_REQUESTS, {
-      onCompleted: (data) => {
-        console.log('return success', data);
-        message.success('Return successfully saved');
-        onClose();
-      },
-      onError: (error) => {
-        message.error(`Error saving return: ${error.message}`);
-      },
-    });
-  const onFinish = (formattedFormValues) => {
-    // Create request payload
-    const requestData = {
-      ...formattedFormValues,
-      returnName: taxForm?.taxFormName || '',
-      taxFormCode: taxForm?.taxFormCode || '',
-      country: taxForm?.country,
-      region: taxForm?.region || '',
-      taxAuthorityName: taxForm?.description || '',
-    };
+  // Create filing calendar request
+  const [
+    createFilingCalendarRequest,
+    { loading: createFilingRequestInProgress },
+  ] = useMutation(CREATE_FILING_CALENDAR_REQUESTS, {
+    onCompleted: () => {
+      notification.success({
+        message: 'Return created successfully',
+        description: (
+          <span>
+            <strong>
+              {taxForm?.taxFormName || 'Return'} ({taxForm?.description})
+            </strong>{' '}
+            has been created successfully
+          </span>
+        ),
+        placement: 'topRight',
+        duration: 10,
+      });
+      onClose();
+    },
+    onError: (error) => {
+      notification.error({
+        message: `Return creation failed`,
+        description: (
+          <span>
+            Failed to create{' '}
+            <strong>
+              {taxForm?.taxFormName || 'return'} ({taxForm?.description})
+            </strong>
+            . Please try again.
+          </span>
+        ),
+        placement: 'topRight',
+        duration: 10,
+      });
+      console.error('Error creating filing request:', error);
+    },
+  });
 
-    createFilingCalendar({
-      variables: {
-        filingRequestInput: {
-          companyId: parseInt(companyId),
-          filingRequest: {
-            data: requestData,
-            companyId: parseInt(companyId),
-            filingRequestStatusId: 'NEW',
-          },
-        },
-      },
-    });
+  // Query variables for fetching filing calendar request model for tax form code and company
+  const queryVariables = {
+    companyId: parseInt(companyId),
+    taxFormCode: taxForm?.taxFormCode,
   };
 
-  const handleSubmit = () => {
-    if (childFormRef.current) {
-      childFormRef.current.getForm().submit(); // Trigger child's form submission
-    }
-  };
+  // Fetch filing calendar request model
+  const {
+    loading: loadingFilingCalendarRequestModel,
+    error: didErrorFilingCalendarRequestModel,
+    data: filingCalendarRequestModelData,
+  } = useQuery(FILING_CALENDAR_REQUEST_WITH_MODEL, {
+    variables: queryVariables,
+    skip: !taxForm?.taxFormCode || !companyId,
+  });
 
+  const requestModel =
+    filingCalendarRequestModelData?.filingCalendarRequests?.value
+      ?.filingCalendarRequestModel;
+  const requestData = requestModel?.data;
+
+  // Extract filing frequencies from the request model
+  const filingFrequencies = requestData?.formFilingFrequencies;
+
+  // Transform answers array into key-value pairs for form initial values
+  const formAnswers = requestData?.answers?.reduce((acc, answer) => {
+    acc[answer.filingQuestionCode] = answer.answer;
+    return acc;
+  }, {});
+
+  /**
+   * Handles closing the drawer
+   * Shows confirmation modal if form is touched
+   */
   const handleDrawerClose = () => {
     if (childFormRef.current) {
-      if (childFormRef.current.getForm().isFieldsTouched() === true) {
+      const form = childFormRef.current.getForm();
+      const isFormTouched = form.isFieldsTouched() === true;
+
+      if (isFormTouched) {
         modal.confirm({
           title: 'Are you sure you want to set up this return later?',
           icon: <ExclamationCircleOutlined />,
@@ -90,27 +150,94 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
           ),
           okText: 'Yes, set up later',
           cancelText: 'Cancel',
-          onOk: () => onClose(),
+          onOk: onClose,
         });
       } else {
         onClose();
       }
+    } else {
+      onClose();
     }
   };
+  /**
+   * Handles form submission by triggering the child's form submission
+   */
+  const handleSubmit = () => {
+    if (childFormRef.current) {
+      childFormRef.current.getForm().submit(); // Trigger child's form submission
+    }
+  };
+  /**
+   * Handles form submission and creates new filing calendar request with answers
+   * @param {Object} formattedFormValues - The formatted form values from ReturnForm
+   */
+  const onFinish = (formattedFormValues) => {
+    // Create request payload
+    const data = {
+      // taxAuthorityName: requestData.taxAuthorityName,
+      // taxAuthorityId: requestData.taxAuthorityId,
+      region: requestData.region,
+      country: requestData.country,
+      // endDate: requestData.endDate,
+      // effDate: requestData.effDate,
+      // locationCode: requestData.locationCode,
+      // registrationId: requestData.registrationId, // TODO: is this needed?
+      // filingFrequencyId: requestData.filingFrequencyId,
+      taxFormCode: requestData.taxFormCode,
+      // returnName: requestData.returnName,
+      companyReturnId: requestData.companyReturnId,
+      ...formattedFormValues,
+    };
+
+    createFilingCalendarRequest({
+      variables: {
+        filingRequestInput: {
+          companyId: parseInt(companyId),
+          filingRequest: {
+            data: data,
+            companyId: requestModel.companyId,
+            filingRequestStatusId: requestModel.filingRequestStatusId,
+          },
+        },
+      },
+    });
+  };
+
+  const drawerTitle = (
+    <Space direction="vertical" size={0} style={{ width: '100%' }}>
+      <div>{`Set up ${taxForm?.description || 'Return'}`}</div>
+      <Text type="secondary" style={{ fontSize: '14px' }}>
+        {taxForm?.taxFormName || ''}
+      </Text>
+    </Space>
+  );
+
+  if (didErrorFilingCalendarRequestModel) {
+    return (
+      <Drawer title={drawerTitle} open={true} onClose={onClose} width={600}>
+        <Result
+          status="error"
+          title="Failed to load return setupinformation"
+          subTitle={
+            didErrorFilingCalendarRequestModel?.message ||
+            'An error occurred while loading the return setup information. Please try again later.'
+          }
+          extra={[
+            <Button key="close" onClick={onClose}>
+              Close
+            </Button>,
+          ]}
+        />
+      </Drawer>
+    );
+  }
 
   return (
     <Drawer
-      title={
-        <Space direction="vertical" size={0} style={{ width: '100%' }}>
-          <div>{`Set up ${taxForm?.description || 'Return'}`}</div>
-          <Text type="secondary" style={{ fontSize: '14px' }}>
-            {taxForm?.taxFormName || ''}
-          </Text>
-        </Space>
-      }
-      width={600}
+      title={drawerTitle}
       onClose={handleDrawerClose}
-      open={visible}
+      open={true}
+      width={600}
       extra={
         <Space>
           <Button onClick={handleDrawerClose}>Set up later</Button>
@@ -121,31 +248,35 @@ const AddReturn = ({ visible, onClose, taxForm }) => {
           >
             Save
           </Button>
-          {contextHolder}
+          {modalContextHolder}
         </Space>
       }
     >
       <ReturnForm
         ref={childFormRef}
-        taxFormCode={taxForm?.taxFormCode}
-        region={taxForm?.region}
+        loading={loadingFilingCalendarRequestModel}
         companyId={companyId}
+        region={taxForm?.region}
+        taxFormCode={taxForm?.taxFormCode}
+        filingFrequencies={filingFrequencies}
         onFinish={onFinish}
+        initialValues={{
+          ...formAnswers,
+          filingFrequencyId: requestData?.filingFrequencyId,
+          effDate: requestData?.effDate,
+          locationCode: requestData?.locationCode,
+        }}
       />
-      {contextHolder}
+      {modalContextHolder}
     </Drawer>
   );
 };
 
 AddReturn.propTypes = {
-  visible: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  accountId: PropTypes.string,
   taxForm: PropTypes.shape({
     description: PropTypes.string,
     taxFormName: PropTypes.string,
-    taxFormCode: PropTypes.string,
-    region: PropTypes.string,
   }),
 };
 
