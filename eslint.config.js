@@ -8,7 +8,68 @@ import prettier from 'eslint-plugin-prettier';
 export default [
   {
     files: ['**/*.{js,jsx}'],
-    ignores: ['dist', 'node_modules'],
+    ignores: [
+      // Dependencies
+      'node_modules/**',
+      
+      // Production builds
+      'build/**',
+      'dist/**',
+      'out/**',
+      
+      // Environment variables
+      '.env*',
+      
+      // IDE and editor files
+      '.vscode/**',
+      '.idea/**',
+      '**/*.swp',
+      '**/*.swo',
+      '**/*~',
+      
+      // OS generated files
+      '.DS_Store',
+      '.DS_Store?',
+      '._*',
+      '.Spotlight-V100',
+      '.Trashes',
+      'ehthumbs.db',
+      'Thumbs.db',
+      
+      // Logs
+      'logs/**',
+      '**/*.log',
+      
+      // Coverage directory
+      'coverage/**',
+      '**/*.lcov',
+      '.nyc_output/**',
+      
+      // Cache directories
+      '.npm/**',
+      '.eslintcache',
+      '.rpt2_cache/**',
+      '.rts2_cache_*/**',
+      '.cache/**',
+      '.parcel-cache/**',
+      
+      // Build outputs
+      '.next/**',
+      '.nuxt/**',
+      '.vuepress/dist/**',
+      'storybook-static/**',
+      
+      // Temporary folders
+      'tmp/**',
+      'temp/**',
+      
+      // Public assets
+      'public/**',
+      'static/**',
+      
+      // Config files that might contain generated content
+      '**/*.config.js'
+    ],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
