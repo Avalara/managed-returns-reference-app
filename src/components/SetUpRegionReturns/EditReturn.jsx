@@ -32,10 +32,9 @@ import { useOutletContext } from 'react-router-dom';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { filingCalendarRequestWithModel as FILING_CALENDAR_REQUEST_WITH_MODEL } from '../../graphql/queries';
 import {
-  cancelFilingCalendarRequest,
-  updateFilingCalendarRequest,
   cancelFilingCalendarRequest as CANCEL_FILING_CALENDAR_REQUEST,
   updateFilingCalendarRequest as UPDATE_FILING_CALENDAR_REQUEST,
+  createFilingCalendarRequests as CREATE_FILING_CALENDAR_REQUESTS,
 } from '../../graphql/mutations';
 import ReturnForm from './ReturnForm.jsx';
 
@@ -391,116 +390,298 @@ EditFilingRequest.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-const EditFilingCalendar = ({ returnData }) => {
+/**
+ * A drawer component for editing a filing calendar request.
+ *
+ * @param {Object} props Component props.
+ * @param {Object} props.returnData The return data object containing id, taxFormName, description etc
+ * @param {Function} props.onClose Callback function to close the drawer.
+ *
+ * @returns {React.ReactElement} The drawer component.
+ */
+const EditFilingCalendar = ({ returnData, onClose }) => {
+  // TODO : alert for expiring filing calendar
+  // TODO : alert for pending filing requests for this calendar
+  // Context and refs
   const { companyId } = useOutletContext();
+  const childFormRef = useRef();
 
-  // Prepare query variables
+  // UI state management
+  const [modal, modalContextHolder] = Modal.useModal();
+
+  // TODO: add mutation to stop filing calendar request
+
+  // Create filing calendar request
+  const [
+    createFilingCalendarRequest,
+    { loading: isCreatingFilingCalendarRequest },
+  ] = useMutation(CREATE_FILING_CALENDAR_REQUESTS, {
+    onCompleted: () => {
+      notification.success({
+        message: 'Return updated successfully',
+        description: (
+          <span>
+            A request with updated values has been created successfully for
+            <strong>
+              {' '}
+              {returnData?.taxFormName || 'Return'} ({returnData?.description})
+            </strong>{' '}
+            .
+          </span>
+        ),
+        placement: 'topRight',
+        duration: 10,
+      });
+      onClose();
+    },
+    onError: (error) => {
+      notification.error({
+        message: `Return update failed`,
+        description: (
+          <span>
+            Failed to create a request to update{' '}
+            <strong>
+              {returnData?.taxFormName || 'return'} ({returnData?.description})
+            </strong>
+            . Please try again.
+          </span>
+        ),
+        placement: 'topRight',
+        duration: 10,
+      });
+      console.error('Error updating filing calendar:', error);
+    },
+  });
+
+  // Query variables for fetching filing calendar request model for filing calendar
   const queryVariables = {
     companyId: parseInt(companyId),
     taxFormCode: returnData?.taxFormCode,
     filingCalendarId: parseInt(returnData.id),
   };
 
-  // Get answers for filing calendar using the enhanced query
+  // Fetch filing calendar data
   const {
-    loading: loadingFilingCalendarData,
-    error: didErrorFilingCalendarData,
-    data: filingCalendarData,
-  } = useQuery(filingCalendarRequestModel, {
+    loading: loadingFilingCalendarRequestModel,
+    error: didErrorFilingCalendarRequestModel,
+    data: filingCalendarRequestModelData,
+  } = useQuery(FILING_CALENDAR_REQUEST_WITH_MODEL, {
     variables: queryVariables,
     skip: !returnData.id || !companyId || !returnData?.taxFormCode,
   });
 
   const requestModel =
-    filingCalendarData?.filingCalendarRequests?.value
+    filingCalendarRequestModelData?.filingCalendarRequests?.value
       ?.filingCalendarRequestModel;
-  const data = requestModel?.data;
-  const answers = data?.answers?.reduce((acc, answer) => {
+  const requestData = requestModel?.data;
+
+  // Extract filing frequencies from the request model
+  const filingFrequencies = requestData?.formFilingFrequencies;
+
+  // Transform answers array into key-value pairs for form initial values
+  const formAnswers = requestData?.answers?.reduce((acc, answer) => {
     acc[answer.filingQuestionCode] = answer.answer;
     return acc;
   }, {});
 
-  if (didErrorFilingCalendarData) {
-    return null;
+  /**
+   * Handles closing the drawer
+   * Shows confirmation modal if form is touched
+   */
+  const handleDrawerClose = () => {
+    if (childFormRef.current) {
+      const form = childFormRef.current.getForm();
+      const isFormTouched = form.isFieldsTouched() === true;
+
+      if (isFormTouched) {
+        modal.confirm({
+          title: 'Are you sure you want to close without saving?',
+          icon: <ExclamationCircleOutlined />,
+          content: (
+            <div>
+              <p>
+                You have unsaved changes for{' '}
+                <strong>
+                  {returnData
+                    ? `${returnData?.taxFormName} (${returnData?.description})`
+                    : 'this return'}
+                </strong>
+                .
+              </p>
+              <p>
+                Are you sure you want to close without saving? Your changes will
+                be lost.
+              </p>
+            </div>
+          ),
+          okText: 'Yes, Close Without Saving',
+          cancelText: 'Cancel',
+          onOk: onClose,
+        });
+      } else {
+        onClose();
+      }
+    } else {
+      onClose();
+    }
+  };
+
+  /**
+   * Handles form submission by triggering the child's form submission
+   */
+  const handleSubmit = () => {
+    if (childFormRef.current) {
+      childFormRef.current.getForm().submit();
+    }
+  };
+
+  /**
+   * Handles form submission and creates change request for filing calendar with updated answers
+   * @param {Object} formattedFormValues - The formatted form values from ReturnForm
+   */
+  const onFinish = (formattedFormValues) => {
+    // Create request payload
+    const data = {
+      // taxAuthorityName: requestData.taxAuthorityName,
+      // taxAuthorityId: requestData.taxAuthorityId,
+      region: requestData.region,
+      country: requestData.country,
+      // endDate: requestData.endDate,
+      // effDate: requestData.effDate,
+      // locationCode: requestData.locationCode,
+      // registrationId: requestData.registrationId, // TODO: is this needed?
+      // filingFrequencyId: requestData.filingFrequencyId,
+      taxFormCode: requestData.taxFormCode,
+      // returnName: requestData.returnName,
+      companyReturnId: requestData.companyReturnId,
+      ...formattedFormValues,
+    };
+
+    createFilingCalendarRequest({
+      variables: {
+        filingRequestInput: {
+          companyId: parseInt(companyId),
+          filingRequest: {
+            data: data,
+            companyId: requestModel.companyId,
+            filingRequestStatusId: requestModel.filingRequestStatusId,
+          },
+        },
+      },
+    });
+  };
+
+  const handleStopFilingReturn = () => {
+    // TODO : handle stop filing return
+  };
+
+  const drawerTitle = (
+    <Space direction="vertical" size={0} style={{ width: '100%' }}>
+      <div>{`${returnData?.taxFormName || 'Return'}`}</div>
+      <Text type="secondary" style={{ fontSize: '14px' }}>
+        {returnData?.description || ''}
+      </Text>
+    </Space>
+  );
+
+  if (didErrorFilingCalendarRequestModel) {
+    return (
+      <Drawer title={drawerTitle} open={true} onClose={onClose} width={600}>
+        <Result
+          status="error"
+          title="Failed to load return information"
+          subTitle={
+            didErrorFilingCalendarRequestModel?.message ||
+            'An error occurred while loading the return information. Please try again later.'
+          }
+          extra={[
+            <Button key="close" onClick={onClose}>
+              Close
+            </Button>,
+          ]}
+        />
+      </Drawer>
+    );
   }
-  console.log('EditFilingCalendar - answers:', answers);
 
   return (
-    <div>
+    <Drawer
+      title={drawerTitle}
+      open={true}
+      onClose={handleDrawerClose}
+      width={600}
+      extra={
+        <Space>
+          <Button onClick={handleStopFilingReturn} danger>
+            Stop filing this return
+          </Button>
+          <Button
+            type="primary"
+            onClick={handleSubmit}
+            loading={isCreatingFilingCalendarRequest}
+          >
+            Save
+          </Button>
+        </Space>
+      }
+    >
       <ReturnForm
-        loading={loadingFilingCalendarData}
+        ref={childFormRef}
+        loading={loadingFilingCalendarRequestModel}
         companyId={companyId}
         region={returnData?.region}
         taxFormCode={returnData?.taxFormCode}
+        filingFrequencies={filingFrequencies}
+        onFinish={onFinish}
         initialValues={{
-          ...answers,
-          filingFrequency: data?.filingFrequencyId,
-          filingPeriod: data?.effDate,
+          ...formAnswers,
+          filingFrequencyId: requestData?.filingFrequencyId,
+          effDate: requestData?.effDate,
+          locationCode: requestData?.locationCode,
         }}
       />
-    </div>
+      {modalContextHolder}
+    </Drawer>
   );
 };
 
 EditFilingCalendar.propTypes = {
-  returnData: PropTypes.object.isRequired,
+  /** The return data object containing filing calendar information */
+  returnData: PropTypes.shape({
+    /** Unique identifier for the return */
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    /** Display name of the tax form */
+    taxFormName: PropTypes.string,
+    /** Tax form code identifier */
+    taxFormCode: PropTypes.string,
+    /** Country code */
+    country: PropTypes.string,
+    /** Region/state code */
+    region: PropTypes.string,
+    /** Description of the tax authority */
+    description: PropTypes.string,
+    /** Current status of the return */
+    status: PropTypes.string,
+  }).isRequired,
+  /** Callback function to close the drawer */
+  onClose: PropTypes.func.isRequired,
 };
 
-const EditReturn = ({ open, onClose, returnData = {} }) => {
-  const handleSubmit = () => {
-    // TODO: Implement save functionality
-    onClose();
-  };
-
+const EditReturn = ({ onClose, returnData = {} }) => {
   // Determine which component to render based on status
-  const renderContent = () => {
-    const status = returnData?.status;
+  const status = returnData?.status;
 
-    if (status === 'Pending') {
-      return <EditFilingRequest returnData={returnData} onClose={onClose} />;
-    } else if (status === 'Active' || status === 'Expired') {
-      return <EditFilingCalendar returnData={returnData} />;
-    } else {
-      // Default fallback
-      return <EditFilingCalendar returnData={returnData} />;
-    }
-  };
-
-  return renderContent();
-
-  // return (
-
-  // <Drawer
-  //   title={
-  //     <Space direction="vertical" size={0} style={{ width: '100%' }}>
-  //       <div>{`${returnData?.taxFormName || 'Return'}`}</div>
-  //       <Text type="secondary" style={{ fontSize: '14px' }}>
-  //         {returnData?.description || ''}
-  //       </Text>
-  //     </Space>
-  //   }
-  //   placement="right"
-  //   onClose={onClose}
-  //   open={open}
-  //   width={600}
-  //   extra={
-  //     <Space>
-  //       <Button onClick={onClose}>Cancel</Button>
-  //       <Button type="primary" onClick={handleSubmit}>
-  //         Save
-  //       </Button>
-  //     </Space>
-  //   }
-  // >
-  //   {renderContent()}
-  // {
-  /*</Drawer>*/
-  // }
-  // );
+  if (status === 'Pending') {
+    return <EditFilingRequest returnData={returnData} onClose={onClose} />;
+  } else if (status === 'Active' || status === 'Expired') {
+    return <EditFilingCalendar returnData={returnData} onClose={onClose} />;
+  } else {
+    // Default fallback
+    return <EditFilingCalendar returnData={returnData} onClose={onClose} />;
+  }
 };
 
 EditReturn.propTypes = {
-  open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   returnData: PropTypes.object,
 };

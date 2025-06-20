@@ -1,3 +1,20 @@
+/*
+ * Contents of this file was produced with a help of a code generation tool and
+ * subsequently reviewed and edited by a human.
+ *
+ * While some of the code was created by an AI assisted service, manual adjustments
+ * have been made to ensure correctness, readability, functionality and compliance
+ * to Avalara's coding standards and guidelines.
+ * Any future modifications should be approached with caution to avoid
+ * overwriting the manual changes.
+ *
+ *
+ * This source code is owned by Avalara Inc. Unauthorized copying of this file,
+ * via any medium, is strictly prohibited. Proprietary and confidential.
+ *
+ * For more information, refer to the documentation or contact the development team.
+ */
+
 import { Alert, Divider, Form, Select, Skeleton, Typography } from 'antd';
 import PropTypes from 'prop-types';
 import React, { useImperativeHandle } from 'react';
@@ -19,6 +36,7 @@ import {
   REGION_QUESTION_CODE,
   ZIP_CODE_QUESTION_CODE,
 } from './returns-set-up-helper.js';
+
 const { Text } = Typography;
 const FormLoading = () => (
   <div style={{ padding: '50px 0' }}>
@@ -73,7 +91,7 @@ const FilingFrequency = ({
     <>
       <Form.Item
         label="Filing Frequency"
-        name="filingFrequency"
+        name="filingFrequencyId"
         rules={[
           { required: true, message: 'Please select a filing frequency' },
         ]}
@@ -89,7 +107,7 @@ const FilingFrequency = ({
 
       <Form.Item
         label="Filing Period"
-        name="filingPeriod"
+        name="effDate"
         rules={[{ required: true, message: 'Please select a filing period' }]}
       >
         <Select
@@ -128,21 +146,23 @@ FilingFrequency.propTypes = {
       ),
     })
   ),
+  selectedFilingFrequency: PropTypes.string,
 };
 
 const ReturnForm = React.forwardRef((props, ref) => {
   const {
     loading = false,
     taxFormCode,
-    region,
+    region, // TODO: remove and extract this from the filing request model
     companyId,
     initialValues = {},
     onFinish = () => {},
   } = props;
-  const [form] = Form.useForm();
-  const selectedFilingFrequency = Form.useWatch('filingFrequency', form);
 
-  // Expose the submit method to parent
+  const [form] = Form.useForm();
+  const selectedFilingFrequency = Form.useWatch('filingFrequencyId', form);
+
+  // Expose form to parent
   useImperativeHandle(ref, () => ({
     getForm: () => form,
   }));
@@ -217,14 +237,12 @@ const ReturnForm = React.forwardRef((props, ref) => {
     });
 
     // Create request payload
-    const requestData = {
-      filingFrequencyId: values.filingFrequency,
-      effDate: values.filingPeriod,
+    return {
+      filingFrequencyId: values.filingFrequencyId,
+      effDate: values.effDate,
       locationCode: values.locationCode,
       answers: answers,
     };
-
-    return requestData;
   };
 
   if (loading || locationsLoading || questionsLoading) {
