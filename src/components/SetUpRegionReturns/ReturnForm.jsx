@@ -207,6 +207,32 @@ const ReturnForm = React.forwardRef((props, ref) => {
       label: `${location.line1}, ${location.city}, ${location.region}, (${location.locationCode})`,
     })) || [];
 
+  // Find the initial address value based on initialValues
+  const getInitialAddressValue = () => {
+    if (!initialValues || !locationList.length) return undefined;
+
+    return locationList.find(
+      (loc) =>
+        loc[ADDRESS_LINE_1_QUESTION_CODE] ===
+          initialValues[ADDRESS_LINE_1_QUESTION_CODE] &&
+        (loc[ADDRESS_LINE_2_QUESTION_CODE] ||
+        initialValues[ADDRESS_LINE_2_QUESTION_CODE]
+          ? loc[ADDRESS_LINE_2_QUESTION_CODE] ===
+            initialValues[ADDRESS_LINE_2_QUESTION_CODE]
+          : true) &&
+        loc[CITY_QUESTION_CODE] === initialValues[CITY_QUESTION_CODE] &&
+        loc[REGION_QUESTION_CODE] === initialValues[REGION_QUESTION_CODE] &&
+        loc[ZIP_CODE_QUESTION_CODE] === initialValues[ZIP_CODE_QUESTION_CODE] &&
+        loc[COUNTRY_QUESTION_CODE] === initialValues[COUNTRY_QUESTION_CODE]
+    )?.value;
+  };
+
+  // Combine initialValues with the address field
+  const formInitialValues = {
+    ...initialValues,
+    address: getInitialAddressValue(),
+  };
+
   const handleAddressSelect = (value) => {
     const selectedLocation = locationList.find((loc) => loc.value === value);
     if (selectedLocation) {
@@ -276,7 +302,8 @@ const ReturnForm = React.forwardRef((props, ref) => {
       layout="vertical"
       name="returnSetupForm"
       wrapperCol={{ span: 16 }}
-      initialValues={{ ...initialValues }}
+      initialValues={formInitialValues}
+      scrollToFirstError={{ behavior: 'smooth', block: 'center' }}
       onFinish={(values) => {
         const formattedFormValues = formatFormValues(values);
         onFinish(formattedFormValues);
@@ -382,26 +409,6 @@ const ReturnForm = React.forwardRef((props, ref) => {
                 showSearch
                 allowClear
                 mode="combobox"
-                defaultValue={
-                  locationList.find(
-                    (loc) =>
-                      loc[ADDRESS_LINE_1_QUESTION_CODE] ===
-                        initialValues[ADDRESS_LINE_1_QUESTION_CODE] &&
-                      (loc[ADDRESS_LINE_2_QUESTION_CODE] ||
-                      initialValues[ADDRESS_LINE_2_QUESTION_CODE]
-                        ? loc[ADDRESS_LINE_2_QUESTION_CODE] ===
-                          initialValues[ADDRESS_LINE_2_QUESTION_CODE]
-                        : true) &&
-                      loc[CITY_QUESTION_CODE] ===
-                        initialValues[CITY_QUESTION_CODE] &&
-                      loc[REGION_QUESTION_CODE] ===
-                        initialValues[REGION_QUESTION_CODE] &&
-                      loc[ZIP_CODE_QUESTION_CODE] ===
-                        initialValues[ZIP_CODE_QUESTION_CODE] &&
-                      loc[COUNTRY_QUESTION_CODE] ===
-                        initialValues[COUNTRY_QUESTION_CODE]
-                  )?.value
-                }
                 placeholder="Select or type a new address"
                 onSelect={handleAddressSelect}
                 onChange={handleAddressSelect}
