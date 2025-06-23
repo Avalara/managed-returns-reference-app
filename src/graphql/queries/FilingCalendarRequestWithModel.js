@@ -52,6 +52,8 @@ export const filingCalendarRequestWithModel = gql`
               effDate
               endDate
               companyReturnId
+              taxAuthorityName
+              returnName
             }
           }
         }

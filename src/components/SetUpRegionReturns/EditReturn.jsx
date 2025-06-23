@@ -240,7 +240,8 @@ const EditFilingRequest = ({ returnData, onClose }) => {
       country: requestData?.country,
       taxFormCode: requestData?.taxFormCode || '',
       companyReturnId: requestData?.companyReturnId,
-      // taxAuthorityName: returnData?.description || '',
+      taxAuthorityName: requestData?.taxAuthorityName || '',
+      returnName: requestData?.returnName || '',
       ...formattedFormValues,
     };
 
@@ -248,7 +249,6 @@ const EditFilingRequest = ({ returnData, onClose }) => {
       variables: {
         companyId: parseInt(companyId),
         id: parseFloat(returnData.id),
-        filingRequestStatusId: 'CHANGEREQUEST',
         data: data,
       },
     });

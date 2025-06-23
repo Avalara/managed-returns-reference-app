@@ -24,7 +24,12 @@ export const updateFilingCalendarRequest = gql`
     $data: UpdateFilingRequestDataModelInput!
   ) {
     updateFilingCalendarRequest(
-      input: { companyId: $companyId, id: $id, data: $data }
+      input: {
+        companyId: $companyId
+        id: $id
+        data: $data
+        filingRequestStatusId: CHANGEREQUEST
+      }
     ) {
       companyId
       filingRequestStatusId
