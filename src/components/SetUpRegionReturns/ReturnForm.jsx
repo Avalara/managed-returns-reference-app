@@ -193,20 +193,41 @@ const ReturnForm = React.forwardRef((props, ref) => {
   } = questionsData?.definitions?.value?.filingCalendarMetaData
     ?.filingCalendarMetadata || {};
 
-  const locations = locationsData?.companies?.value?.[0]?.locations || [];
+  const locationList =
+    locationsData?.companies?.value?.[0]?.locations.map((location) => ({
+      [ADDRESS_LINE_1_QUESTION_CODE]: location.line1,
+      [ADDRESS_LINE_2_QUESTION_CODE]: location.line2,
+      [CITY_QUESTION_CODE]: location.city,
+      [REGION_QUESTION_CODE]: location.region,
+      [ZIP_CODE_QUESTION_CODE]: location.postalCode,
+      [COUNTRY_QUESTION_CODE]: location.country,
+      isDefault: location.isDefault,
+      locationCode: location.locationCode,
+      value: location.locationCode,
+      label: `${location.line1}, ${location.city}, ${location.region}, (${location.locationCode})`,
+    })) || [];
 
-  const handleLocationSelect = (locationCode) => {
-    const selectedLocation = locations.find(
-      (loc) => loc.locationCode === locationCode
-    );
+  const handleAddressSelect = (value) => {
+    const selectedLocation = locationList.find((loc) => loc.value === value);
     if (selectedLocation) {
       form.setFieldsValue({
-        [ADDRESS_LINE_1_QUESTION_CODE]: selectedLocation.line1,
-        [ADDRESS_LINE_2_QUESTION_CODE]: selectedLocation.line2,
-        [CITY_QUESTION_CODE]: selectedLocation.city,
-        [REGION_QUESTION_CODE]: selectedLocation.region,
-        [ZIP_CODE_QUESTION_CODE]: selectedLocation.postalCode,
-        [COUNTRY_QUESTION_CODE]: selectedLocation.country,
+        [ADDRESS_LINE_1_QUESTION_CODE]:
+          selectedLocation[ADDRESS_LINE_1_QUESTION_CODE],
+        [ADDRESS_LINE_2_QUESTION_CODE]:
+          selectedLocation[ADDRESS_LINE_2_QUESTION_CODE],
+        [CITY_QUESTION_CODE]: selectedLocation[CITY_QUESTION_CODE],
+        [REGION_QUESTION_CODE]: selectedLocation[REGION_QUESTION_CODE],
+        [ZIP_CODE_QUESTION_CODE]: selectedLocation[ZIP_CODE_QUESTION_CODE],
+        [COUNTRY_QUESTION_CODE]: selectedLocation[COUNTRY_QUESTION_CODE],
+      });
+    } else {
+      form.setFieldsValue({
+        [ADDRESS_LINE_1_QUESTION_CODE]: '',
+        [ADDRESS_LINE_2_QUESTION_CODE]: '',
+        [CITY_QUESTION_CODE]: '',
+        [REGION_QUESTION_CODE]: '',
+        [ZIP_CODE_QUESTION_CODE]: '',
+        [COUNTRY_QUESTION_CODE]: '',
       });
     }
   };
@@ -308,7 +329,7 @@ const ReturnForm = React.forwardRef((props, ref) => {
               <Text strong>
                 These are all the locations that you are filing in this return:
               </Text>
-              {locations.length === 0 ? (
+              {locationList.length === 0 ? (
                 <div style={{ marginTop: '8px' }}>
                   <Text type="secondary">
                     No locations found for this company.
@@ -316,11 +337,10 @@ const ReturnForm = React.forwardRef((props, ref) => {
                 </div>
               ) : (
                 <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
-                  {locations.map((location) => (
+                  {locationList.map((location) => (
                     <li key={location.locationCode}>
                       <Text>
-                        {location.locationCode} ({location.city || 'N/A'},{' '}
-                        {location.region || 'N/A'})
+                        {location.label}
                         {location.isDefault && (
                           <Text type="secondary"> (Default)</Text>
                         )}
@@ -342,12 +362,9 @@ const ReturnForm = React.forwardRef((props, ref) => {
           <Form.Item label={'Location'} name="locationCode">
             <Select placeholder="Select location code">
               <Select.Option value={''}>All locations</Select.Option>
-              {locations.map((location) => (
-                <Select.Option
-                  key={location.locationCode}
-                  value={location.locationCode}
-                >
-                  {location.locationCode} ({location.city}, {location.region})
+              {locationList.map((location) => (
+                <Select.Option key={location.value} value={location.value}>
+                  {location.label}
                 </Select.Option>
               ))}
             </Select>
@@ -362,18 +379,37 @@ const ReturnForm = React.forwardRef((props, ref) => {
           {isAddressLine1Question(question) && (
             <Form.Item label="Select address" name="address">
               <Select
-                placeholder="Select a address"
-                onChange={handleLocationSelect}
-                allowClear={true}
+                showSearch
+                allowClear
+                mode="combobox"
+                defaultValue={
+                  locationList.find(
+                    (loc) =>
+                      loc[ADDRESS_LINE_1_QUESTION_CODE] ===
+                        initialValues[ADDRESS_LINE_1_QUESTION_CODE] &&
+                      (loc[ADDRESS_LINE_2_QUESTION_CODE] ||
+                      initialValues[ADDRESS_LINE_2_QUESTION_CODE]
+                        ? loc[ADDRESS_LINE_2_QUESTION_CODE] ===
+                          initialValues[ADDRESS_LINE_2_QUESTION_CODE]
+                        : true) &&
+                      loc[CITY_QUESTION_CODE] ===
+                        initialValues[CITY_QUESTION_CODE] &&
+                      loc[REGION_QUESTION_CODE] ===
+                        initialValues[REGION_QUESTION_CODE] &&
+                      loc[ZIP_CODE_QUESTION_CODE] ===
+                        initialValues[ZIP_CODE_QUESTION_CODE] &&
+                      loc[COUNTRY_QUESTION_CODE] ===
+                        initialValues[COUNTRY_QUESTION_CODE]
+                  )?.value
+                }
+                placeholder="Select or type a new address"
+                onSelect={handleAddressSelect}
+                onChange={handleAddressSelect}
                 style={{ width: '100%' }}
               >
-                {locations.map((location) => (
-                  <Select.Option
-                    key={location.locationCode}
-                    value={location.locationCode}
-                  >
-                    {location.description ||
-                      `${location.line1}, ${location.city}`}
+                {locationList.map((location) => (
+                  <Select.Option key={location.value} value={location.value}>
+                    {`${location.label}`}
                   </Select.Option>
                 ))}
               </Select>
