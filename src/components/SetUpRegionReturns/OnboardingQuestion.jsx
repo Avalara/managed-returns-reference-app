@@ -17,6 +17,11 @@ const OnboardingQuestion = ({
     onAnswerSelect(e.target.value);
   };
 
+  // Guard against undefined answers
+  if (!answers || !Array.isArray(answers)) {
+    return null;
+  }
+
   return (
     <Space direction="vertical">
       <div>
