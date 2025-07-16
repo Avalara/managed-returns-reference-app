@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 
 import {
   Button,
@@ -13,10 +13,12 @@ import {
   Tag,
   theme,
   Typography,
+  notification,
 } from 'antd';
 
 import { fundingStatus as FUNDING_STATUS } from '../../graphql/queries';
 import { companyFilingStatus as COMPANY_FILING_STATUS } from '../../graphql/queries/Companies';
+import { reviewFilingRequests } from '../../graphql/mutations';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import { PageHeader } from '../shared';
 
@@ -84,7 +86,8 @@ const GetStartedCard = ({ title, status, text, onClick, loading = false }) => {
         <Button
           key={`${title}-1`}
           type="primary"
-          disabled={status !== 'notStarted' || loading}
+          disabled={status !== 'notStarted'}
+          loading={loading && status === 'notStarted'}
           onClick={onClick}
         >
           Start
@@ -109,6 +112,47 @@ const GetStarted = () => {
   const [getFilingStatus, filingStatusResponse] = useLazyQuery(
     COMPANY_FILING_STATUS
   );
+
+  const [submitReviewMutation, { loading: submitReviewLoading }] = useMutation(
+    reviewFilingRequests,
+    {
+      onCompleted: (data) => {
+        notification.success({
+          message: 'Review submission successful',
+          description: (
+            <span>
+              Your information has been <strong>successfully submitted</strong>{' '}
+              for review by Avalara&apos;s compliance team.
+            </span>
+          ),
+          placement: 'topRight',
+          duration: 10,
+        });
+        // Refetch the filing status to update the UI
+        getFilingStatus({ variables: { companyId: parseInt(companyId) } });
+      },
+      onError: (error) => {
+        notification.error({
+          message: 'Review submission failed',
+          description: (
+            <span>
+              Failed to submit your information for review.{' '}
+              <strong>Please try again.</strong>
+            </span>
+          ),
+          placement: 'topRight',
+          duration: 10,
+        });
+        console.error('Error submitting for review:', error);
+      },
+    }
+  );
+
+  const handleSubmitForReview = () => {
+    submitReviewMutation({
+      variables: { companyId: parseInt(companyId) },
+    });
+  };
 
   useEffect(() => {
     if (isLoggedIn && companyId) {
@@ -214,7 +258,8 @@ const GetStarted = () => {
               text={
                 cardTextByActionStatus.submitForReview[submitReviewStatus] || ''
               }
-              onClick={(e) => {}}
+              onClick={handleSubmitForReview}
+              loading={submitReviewLoading}
             />
           </Flex>
         </Layout>

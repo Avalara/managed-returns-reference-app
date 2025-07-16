@@ -10,3 +10,4 @@ export { updateFilingCalendarRequest } from './UpdateFilingCalendarRequest';
 export { verifyEFileCredential } from './VerifyEFileCredential';
 export { updateRegionStatus } from './UpdateRegionStatus';
 export { createFirmClientLinkage } from './CreateFirmClientLinkage';
+export { reviewFilingRequests } from './ReviewFilingRequests';
