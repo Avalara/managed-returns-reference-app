@@ -16,6 +16,7 @@ import {
 } from 'antd';
 
 import { fundingStatus as FUNDING_STATUS } from '../../graphql/queries';
+import { companyFilingStatus as COMPANY_FILING_STATUS } from '../../graphql/queries/Companies';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import { PageHeader } from '../shared';
 
@@ -96,20 +97,23 @@ const GetStartedCard = ({ title, status, text, onClick, loading = false }) => {
 };
 
 const GetStarted = () => {
-  const {
-    token: { borderRadiusLG },
-  } = theme.useToken();
   const { isLoggedIn, companyId } = useOutletContext();
   const navigate = useNavigate();
 
   const [poaStatus, setPoaStatus] = useState('loading');
+  const [submitReviewStatus, setSubmitReviewStatus] = useState('loading');
 
   const [getFundingStatus, fundingStatusResponse] =
     useLazyQuery(FUNDING_STATUS);
 
+  const [getFilingStatus, filingStatusResponse] = useLazyQuery(
+    COMPANY_FILING_STATUS
+  );
+
   useEffect(() => {
     if (isLoggedIn && companyId) {
       getFundingStatus({ variables: { companyId: parseInt(companyId) } });
+      getFilingStatus({ variables: { companyId: parseInt(companyId) } });
     }
   }, [isLoggedIn, companyId]);
 
@@ -132,6 +136,23 @@ const GetStarted = () => {
       }
     }
   }, [fundingStatusResponse]);
+
+  useEffect(() => {
+    const { loading, error, data } = filingStatusResponse;
+    if (!error && !loading && data) {
+      const filingStatus = data?.companies?.value?.[0]?.filingStatus;
+
+      if (
+        filingStatus === 'FIRSTFILING' ||
+        filingStatus === 'ACTIVE' ||
+        filingStatus === 'FILINGREQUESTED'
+      ) {
+        setSubmitReviewStatus('complete');
+      } else {
+        setSubmitReviewStatus('notStarted');
+      }
+    }
+  }, [filingStatusResponse]);
   return (
     <>
       <PageHeader>
@@ -189,8 +210,10 @@ const GetStarted = () => {
             />
             <GetStartedCard
               title="Submit your info for review"
-              status="notStarted"
-              text={cardTextByActionStatus.submitForReview.notStarted}
+              status={submitReviewStatus}
+              text={
+                cardTextByActionStatus.submitForReview[submitReviewStatus] || ''
+              }
               onClick={(e) => {}}
             />
           </Flex>

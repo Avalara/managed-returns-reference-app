@@ -58,3 +58,13 @@ export const companyRegionStatus = gql`
     }
   }
 `;
+
+export const companyFilingStatus = gql`
+  query Companies($companyId: Int!) {
+    companies(id: $companyId) {
+      value {
+        filingStatus
+      }
+    }
+  }
+`;
