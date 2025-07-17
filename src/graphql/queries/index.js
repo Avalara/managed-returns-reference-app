@@ -10,7 +10,7 @@ export { filings } from './Filings.js';
 export { liabilityReports } from './LiabilityReports.js';
 export { taxForms } from './TaxForms.js';
 export { suggestedTaxForms } from './SuggestedTaxForms.js';
-export { fundingStatus } from './FundingStatus';
+export { fundingStatus } from './FundingStatus.js';
 export { transactionImportHistory } from './Transactions.js';
 export { filingCalendarMetadata } from './FilingCalendarMetadata.js';
 export { filingConfirmationAttachments } from './FilingConfirmationAttachments.js';
@@ -18,4 +18,5 @@ export { filingConfirmationAttachment } from './FilingConfirmationAttachment.js'
 export { verifyEFileCredentialStatus } from './VerifyEFileCredentialStatus.js';
 export { regions } from './Regions.js';
 export { filingCalendarRequests } from './FilingCalendarRequests.js';
+export { filingCalendarRequestWithModel } from './FilingCalendarRequestWithModel.js';
 export { filingCalendars } from './FilingCalendars.js';

@@ -1,3 +1,19 @@
+/*
+ * Contents of this file was produced with a help of a code generation tool and
+ * subsequently reviewed and edited by a human.
+ *
+ * While some of the code was created by an AI assisted service, manual adjustments
+ * have been made to ensure correctness, readability, functionality and compliance
+ * to Avalara's coding standards and guidelines.
+ * Any future modifications should be approached with caution to avoid
+ * overwriting the manual changes.
+ *
+ *
+ * This source code is owned by Avalara Inc. Unauthorized copying of this file,
+ * via any medium, is strictly prohibited. Proprietary and confidential.
+ *
+ * For more information, refer to the documentation or contact the development team.
+ */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -149,7 +165,9 @@ describe('SetUpRegionReturns page', () => {
       expect(screen.getByText('Test Form 1')).toBeInTheDocument();
     });
 
-    const searchInput = screen.getByLabelText(/Search by return name/i);
+    const searchInput = screen.getByLabelText(
+      /Search by return name, form number, or tax type/i
+    );
     fireEvent.change(searchInput, { target: { value: 'Test Form 1' } });
 
     expect(screen.getByText('Test Form 1')).toBeInTheDocument();
@@ -162,7 +180,9 @@ describe('SetUpRegionReturns page', () => {
       expect(screen.getByText('Test Form 1')).toBeInTheDocument();
     });
 
-    const recommendedSwitch = document.querySelector('.ant-switch');
+    const recommendedSwitch = screen.getByText(
+      'Show recommended returns'
+    ).previousElementSibling;
     fireEvent.click(recommendedSwitch);
 
     expect(screen.getByText('Test Form 1')).toBeInTheDocument();

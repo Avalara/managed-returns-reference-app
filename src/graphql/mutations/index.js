@@ -5,6 +5,8 @@ export { fundingPoa } from './FundingPoa';
 export { createTransaction } from './CreateTransaction';
 export { createTransactionsSummary } from './CreateTransactionsSummary';
 export { createFilingCalendarRequests } from './CreateFilingCalendarRequests';
+export { cancelFilingCalendarRequest } from './CancelFilingCalendarRequest';
+export { updateFilingCalendarRequest } from './UpdateFilingCalendarRequest';
 export { verifyEFileCredential } from './VerifyEFileCredential';
 export { updateRegionStatus } from './UpdateRegionStatus';
 export { createFirmClientLinkage } from './CreateFirmClientLinkage';
