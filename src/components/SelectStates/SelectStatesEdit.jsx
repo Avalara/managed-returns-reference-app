@@ -62,7 +62,13 @@ const SelectStatesEdit = ({ companyId }) => {
   // Process regions data when it arrives
   useEffect(() => {
     if (regionsData?.definitions?.value?.countries) {
-      setRegions(regionsData.definitions.value.countries[0]?.regions || []);
+      const regionsArray =
+        regionsData.definitions.value.countries[0]?.regions || [];
+      // Sort regions alphabetically by name (create copy first to avoid mutating read-only array)
+      const sortedRegions = [...regionsArray].sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
+      setRegions(sortedRegions);
     }
   }, [regionsData]);
 

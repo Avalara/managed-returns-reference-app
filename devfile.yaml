@@ -1,0 +1,48 @@
+schemaVersion: 2.2.0
+metadata:
+  name: managed-returns-reference-app
+  version: 1.0.0
+  displayName: Managed Returns Reference App
+  description: React application built with Vite
+  tags:
+    - nodejs
+    - vite
+    - react
+components:
+  - name: runtime
+    container:
+      image: registry.access.redhat.com/ubi8/nodejs-18:latest
+      memoryLimit: 1Gi
+      mountSources: true
+commands:
+  - id: install
+    exec:
+      component: runtime
+      commandLine: npm install
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: build
+        isDefault: true
+  - id: build
+    exec:
+      component: runtime
+      commandLine: npm run build
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: build
+  - id: dev
+    exec:
+      component: runtime
+      commandLine: npm run dev
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: run
+        isDefault: true
+  - id: test
+    exec:
+      component: runtime
+      commandLine: npm run test
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: test
+        isDefault: true

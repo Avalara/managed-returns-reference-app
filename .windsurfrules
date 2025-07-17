@@ -1,0 +1,19 @@
+# General code style and formatting
+- Use Prettier for code formatting.
+- Use ESLint for linting.
+- Use Vitest for testing.
+- Use prop types for type checking of react components.
+
+# Project Structure & Architecture
+- Follow Next.js patterns and use the App Router.
+- Correctly determine when to use server vs. client components in Next.js.
+- src/components for UI components.
+- src/utils for utility functions.
+- src/graphql for GraphQL queries and mutations.
+- src/routes for routes.
+
+# Styling & UI
+- Use Ant design system for styling and components.
+
+# Data fetching
+- Use Apollo Client for data fetching.
