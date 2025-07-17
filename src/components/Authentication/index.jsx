@@ -188,7 +188,7 @@ const Authentication = () => {
                     companiesList
                       ? companiesList.map((c) => ({
                           value: '' + c.id,
-                          label: '' + c.id,
+                          label: `${c.name} - ${c.id}`,
                         }))
                       : []
                   }

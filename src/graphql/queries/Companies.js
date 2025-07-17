@@ -5,6 +5,7 @@ export const companies = gql`
     companies(accountId: $accountId) {
       value {
         id
+        name
       }
     }
   }
