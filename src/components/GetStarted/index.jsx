@@ -207,9 +207,9 @@ const GetStarted = () => {
               <Title level={1}>Get started</Title>
               <p>
                 Set up all the returns that you want Avalara to file for you and
-                sign the funding power of attorney. When you’re ready, Avalara’s
-                compliance team will review all your information before your
-                first filing period.
+                sign the funding power of attorney. When you&apos;re ready,
+                Avalara&apos;s compliance team will review all your information
+                before your first filing period.
               </p>
             </Col>
             <Col span={24} lg={8}>
