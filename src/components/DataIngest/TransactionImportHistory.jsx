@@ -141,7 +141,7 @@ const columns = [
     title: 'File name',
     dataIndex: 'fileName',
     key: 'fileName',
-    fixed: true,
+    fixed: 'left',
   },
   {
     title: 'Import type',
@@ -159,7 +159,7 @@ const columns = [
     title: 'Error Messages',
     dataIndex: 'errorMessages',
     key: 'errorMessages',
-    responsive: ['lg'],
+    responsive: ['xl'],
     render: (errorMessages) => {
       if (!errorMessages || errorMessages.length === 0) return '-';
       return (
@@ -175,7 +175,7 @@ const columns = [
     title: 'Has Error File',
     dataIndex: 'hasErrorFile',
     key: 'hasErrorFile',
-    responsive: ['lg'],
+    responsive: ['xl'],
     render: (hasErrorFile) => (hasErrorFile ? 'Yes' : 'No'),
   },
   {
@@ -192,13 +192,28 @@ const columns = [
     title: 'Status',
     dataIndex: 'status',
     key: 'status',
-    responsive: ['lg'],
+    fixed: 'right',
     render: (status) => getStatusBadge(status),
   },
 ];
 
 const HistoryTable = ({ loading, dataSource }) => (
-  <Table loading={loading} dataSource={dataSource} columns={columns} />
+  <Table
+    loading={loading}
+    dataSource={dataSource}
+    columns={columns}
+    scroll={{ x: 'max-content' }}
+    pagination={
+      dataSource && dataSource.length > 50
+        ? {
+            total: dataSource.length,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: () => `Total ${dataSource.length} items`,
+          }
+        : true
+    }
+  />
 );
 
 HistoryTable.propTypes = {
