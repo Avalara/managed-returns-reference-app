@@ -5,6 +5,7 @@ export const companies = gql`
     companies(accountId: $accountId) {
       value {
         id
+        name
       }
     }
   }
@@ -54,6 +55,16 @@ export const companyRegionStatus = gql`
           region
           status
         }
+      }
+    }
+  }
+`;
+
+export const companyFilingStatus = gql`
+  query Companies($companyId: Int!) {
+    companies(id: $companyId) {
+      value {
+        filingStatus
       }
     }
   }
