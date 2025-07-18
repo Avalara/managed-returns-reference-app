@@ -21,22 +21,26 @@ const TaxFormsTable = ({ dataSource, loading }) => {
       title: 'Return',
       dataIndex: 'description',
       key: 'description',
+      fixed: true,
     },
     {
       title: 'Form number',
       dataIndex: 'taxFormName',
       key: 'taxFormName',
+      responsive: ['lg'],
     },
     {
       title: '',
       dataIndex: 'recommended',
       key: 'recommended',
+      responsive: ['lg'],
       render: (recommended) =>
         recommended ? <Tag color="green">Recommended</Tag> : null,
     },
     {
       title: '',
       key: 'action',
+      fixed: 'right',
       render: (_, record) => (
         <Button
           color="primary"
@@ -68,6 +72,7 @@ const TaxFormsTable = ({ dataSource, loading }) => {
           setCurrentPage(page.current);
         }}
         rowKey="taxFormCode"
+        scroll={{ x: 'max-content' }}
         expandable={{
           expandedRowRender: (record) => (
             <Space direction="vertical">
