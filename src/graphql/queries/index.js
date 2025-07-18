@@ -3,6 +3,8 @@ export {
   companyLocations,
   companyFundingStatus,
   companyRegionStatus,
+  companyFilingStatus,
+  companySuggestedReturns,
 } from './Companies.js';
 export { nexuses } from './Nexuses.js';
 export { countries } from './Countries.js';

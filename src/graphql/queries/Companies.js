@@ -69,3 +69,18 @@ export const companyFilingStatus = gql`
     }
   }
 `;
+
+export const companySuggestedReturns = gql`
+  query SuggestedReturns($companyId: Int!, $country: String!) {
+    companies(id: $companyId, input: { country: $country }) {
+      value {
+        suggestedTaxForms {
+          suggestedReturns {
+            taxFormCode
+          }
+          region
+        }
+      }
+    }
+  }
+`;

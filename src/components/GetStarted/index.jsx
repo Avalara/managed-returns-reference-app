@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useLazyQuery, useMutation } from '@apollo/client';
 
@@ -16,11 +16,16 @@ import {
   notification,
 } from 'antd';
 
-import { fundingStatus as FUNDING_STATUS } from '../../graphql/queries';
-import { companyFilingStatus as COMPANY_FILING_STATUS } from '../../graphql/queries/Companies';
+import {
+  fundingStatus as FUNDING_STATUS,
+  filingCalendarRequests as FILING_CALENDAR_REQUESTS,
+  companyFilingStatus as COMPANY_FILING_STATUS,
+  companySuggestedReturns as SUGGESTED_RETURNS,
+} from '../../graphql/queries';
 import { reviewFilingRequests } from '../../graphql/mutations';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import { PageHeader } from '../shared';
+import { DEFAULT_COUNTRY } from '../shared/Constants.js';
 
 const { Title } = Typography;
 const { Content } = Layout;
@@ -54,7 +59,7 @@ const GetStartedCard = ({ title, status, text, onClick, loading = false }) => {
       case 'loading':
         return '';
       case 'complete':
-        return <Tag color="green">Complete</Tag>;
+        return <Tag color="green">Completed</Tag>;
       case 'pending':
         return <Tag color="orange">Pending</Tag>;
       case 'inProgress':
@@ -86,8 +91,8 @@ const GetStartedCard = ({ title, status, text, onClick, loading = false }) => {
         <Button
           key={`${title}-1`}
           type="primary"
-          disabled={status !== 'notStarted'}
-          loading={loading && status === 'notStarted'}
+          disabled={!['notStarted', 'pending'].includes(status)}
+          loading={loading && ['notStarted', 'pending'].includes(status)}
           onClick={onClick}
         >
           Start
@@ -103,20 +108,45 @@ const GetStarted = () => {
   const { isLoggedIn, companyId } = useOutletContext();
   const navigate = useNavigate();
 
-  const [poaStatus, setPoaStatus] = useState('loading');
-  const [submitReviewStatus, setSubmitReviewStatus] = useState('loading');
-
-  const [getFundingStatus, fundingStatusResponse] =
-    useLazyQuery(FUNDING_STATUS);
-
-  const [getFilingStatus, filingStatusResponse] = useLazyQuery(
-    COMPANY_FILING_STATUS
-  );
-
-  const [submitReviewMutation, { loading: submitReviewLoading }] = useMutation(
-    reviewFilingRequests,
+  const [
+    getFundingStatus,
     {
-      onCompleted: (data) => {
+      loading: isLoadingFundingPOAStatus,
+      error: didErrorFundingPOAStatus,
+      data: dataFundingPOAStatus,
+    },
+  ] = useLazyQuery(FUNDING_STATUS);
+
+  const [
+    getSuggestedReturns,
+    {
+      loading: isLoadingSuggestedReturns,
+      error: didErrorSuggestedReturns,
+      data: dataSuggestedReturns,
+    },
+  ] = useLazyQuery(SUGGESTED_RETURNS);
+
+  const [
+    getFilingCalendarRequests,
+    {
+      loading: isLoadingFilingCalendarRequests,
+      error: didErrorFilingCalendarRequests,
+      data: dataFilingCalendarRequests,
+    },
+  ] = useLazyQuery(FILING_CALENDAR_REQUESTS);
+
+  const [
+    getFilingStatus,
+    {
+      loading: isLoadingFilingStatus,
+      error: didErrorFilingStatus,
+      data: dataFilingStatus,
+    },
+  ] = useLazyQuery(COMPANY_FILING_STATUS);
+
+  const [submitReviewMutation, { loading: isSubmittingSubmitReview }] =
+    useMutation(reviewFilingRequests, {
+      onCompleted: () => {
         notification.success({
           message: 'Review submission successful',
           description: (
@@ -145,8 +175,7 @@ const GetStarted = () => {
         });
         console.error('Error submitting for review:', error);
       },
-    }
-  );
+    });
 
   const handleSubmitForReview = () => {
     submitReviewMutation({
@@ -154,49 +183,197 @@ const GetStarted = () => {
     });
   };
 
+  // Memoized status calculations
+  const fundingPOAStatus = useMemo(() => {
+    if (
+      !dataFundingPOAStatus ||
+      isLoadingFundingPOAStatus ||
+      didErrorFundingPOAStatus
+    ) {
+      return 'loading';
+    }
+
+    const fundingStatusSet = new Set();
+    dataFundingPOAStatus?.companies?.value?.[0]?.fundingStatus?.forEach(
+      (item) => {
+        if (item?.status) {
+          fundingStatusSet.add(item.status);
+        }
+      }
+    );
+
+    if (fundingStatusSet.has('Signed')) {
+      return 'complete';
+    } else if (fundingStatusSet.has('Out for Signature')) {
+      return 'pending';
+    } else {
+      return 'notStarted';
+    }
+  }, [
+    dataFundingPOAStatus,
+    isLoadingFundingPOAStatus,
+    didErrorFundingPOAStatus,
+  ]);
+
+  const submitReviewStatus = useMemo(() => {
+    if (!dataFilingStatus || isLoadingFilingStatus || didErrorFilingStatus) {
+      return 'loading';
+    }
+
+    const filingStatus = dataFilingStatus?.companies?.value?.[0]?.filingStatus;
+
+    if (filingStatus === 'NOTYETFILING') {
+      return 'notStarted';
+    } else {
+      return 'complete';
+    }
+  }, [dataFilingStatus, isLoadingFilingStatus, didErrorFilingStatus]);
+
+  const { setUpReturnsStatus, setUpReturnsCounts } = useMemo(() => {
+    if (
+      isLoadingSuggestedReturns ||
+      isLoadingFilingCalendarRequests ||
+      didErrorSuggestedReturns ||
+      didErrorFilingCalendarRequests ||
+      !dataSuggestedReturns ||
+      !dataFilingCalendarRequests
+    ) {
+      return {
+        setUpReturnsStatus: 'loading',
+        setUpReturnsCounts: { completedRegions: 0, totalRegions: 0 },
+      };
+    }
+
+    // Get suggested returns tax form codes with regions
+    const suggestedTaxForms =
+      dataSuggestedReturns?.companies?.value?.[0]?.suggestedTaxForms || [];
+
+    // Extract all tax form codes for overall status calculation
+    const allSuggestedTaxFormCodes = [];
+    suggestedTaxForms.forEach((taxFormGroup) => {
+      const returns = taxFormGroup.suggestedReturns || [];
+      returns.forEach((suggestedReturn) => {
+        allSuggestedTaxFormCodes.push(suggestedReturn.taxFormCode);
+      });
+    });
+
+    const suggestedTaxFormCodes = allSuggestedTaxFormCodes;
+
+    // Get filing calendar requests and calendars tax form codes
+    const filingRequests =
+      dataFilingCalendarRequests?.filingCalendarRequests?.value?.filingRequests
+        ?.value || [];
+
+    // filter for approved and change requests
+    const existingTaxFormCodes = filingRequests
+      .filter(
+        (request) =>
+          request.filingRequestStatusId === 'REQUESTAPPROVED' ||
+          request.filingRequestStatusId === 'CHANGEREQUEST'
+      )
+      .map((request) => request.data?.taxFormCode);
+
+    // Calculate status based on business logic
+    let calculatedStatus;
+    if (
+      suggestedTaxFormCodes.length === 0 &&
+      existingTaxFormCodes.length === 0
+    ) {
+      calculatedStatus = 'notStarted';
+    } else if (suggestedTaxFormCodes.length === 0) {
+      calculatedStatus = 'complete';
+    } else {
+      // Check if all suggested forms are covered by existing filings
+      const allSuggestedCovered = suggestedTaxFormCodes.every((suggestedCode) =>
+        existingTaxFormCodes.includes(suggestedCode)
+      );
+
+      if (allSuggestedCovered) {
+        calculatedStatus = 'complete';
+      } else {
+        calculatedStatus = 'pending';
+      }
+    }
+
+    // Group suggested tax forms by region using API region field
+    const suggestedByRegion = {};
+
+    suggestedTaxForms.forEach((taxFormGroup) => {
+      const region = taxFormGroup.region || 'UNKNOWN';
+      const returns = taxFormGroup.suggestedReturns || [];
+
+      if (!suggestedByRegion[region]) {
+        suggestedByRegion[region] = [];
+      }
+
+      returns.forEach((suggestedReturn) => {
+        suggestedByRegion[region].push(suggestedReturn.taxFormCode);
+      });
+    });
+
+    const totalRegions = Object.keys(suggestedByRegion).length;
+
+    // Check which regions are complete (all their suggested forms exist in existing codes)
+    let completedRegions = 0;
+    Object.entries(suggestedByRegion).forEach(([_, regionTaxForms]) => {
+      const allFormsExist = regionTaxForms.every((taxForm) =>
+        existingTaxFormCodes.includes(taxForm)
+      );
+      if (allFormsExist) {
+        completedRegions++;
+      }
+    });
+
+    return {
+      setUpReturnsStatus: calculatedStatus,
+      setUpReturnsCounts: { completedRegions, totalRegions },
+    };
+  }, [
+    isLoadingSuggestedReturns,
+    didErrorSuggestedReturns,
+    dataSuggestedReturns,
+    isLoadingFilingCalendarRequests,
+    didErrorFilingCalendarRequests,
+    dataFilingCalendarRequests,
+  ]);
+
   useEffect(() => {
     if (isLoggedIn && companyId) {
       getFundingStatus({ variables: { companyId: parseInt(companyId) } });
       getFilingStatus({ variables: { companyId: parseInt(companyId) } });
-    }
-  }, [isLoggedIn, companyId]);
-
-  useEffect(() => {
-    const { loading, error, data } = fundingStatusResponse;
-    if (!error && !loading && data) {
-      const fundingStatusSet = new Set();
-      data?.companies?.value?.[0]?.fundingStatus?.forEach((item) => {
-        if (item?.status) {
-          fundingStatusSet.add(item.status);
-        }
+      getSuggestedReturns({
+        variables: {
+          companyId: parseInt(companyId),
+          country: DEFAULT_COUNTRY,
+        },
       });
-
-      if (fundingStatusSet.has('Signed')) {
-        setPoaStatus('complete');
-      } else if (fundingStatusSet.has('Out for Signature')) {
-        setPoaStatus('pending');
-      } else {
-        setPoaStatus('notStarted');
-      }
+      getFilingCalendarRequests({
+        variables: { companyId: parseInt(companyId) },
+      });
     }
-  }, [fundingStatusResponse]);
+  }, [
+    isLoggedIn,
+    companyId,
+    getFundingStatus,
+    getFilingStatus,
+    getSuggestedReturns,
+    getFilingCalendarRequests,
+  ]);
 
-  useEffect(() => {
-    const { loading, error, data } = filingStatusResponse;
-    if (!error && !loading && data) {
-      const filingStatus = data?.companies?.value?.[0]?.filingStatus;
-
-      if (
-        filingStatus === 'FIRSTFILING' ||
-        filingStatus === 'ACTIVE' ||
-        filingStatus === 'FILINGREQUESTED'
-      ) {
-        setSubmitReviewStatus('complete');
-      } else {
-        setSubmitReviewStatus('notStarted');
-      }
+  // Generate dynamic text for Set Up Returns card
+  const getSetUpReturnsText = (status) => {
+    switch (status) {
+      case 'notStarted':
+        return "You haven't set up any returns.";
+      case 'pending':
+        return `You've set up returns in ${setUpReturnsCounts.completedRegions} of ${setUpReturnsCounts.totalRegions} regions where you report tax.`;
+      case 'complete':
+        return 'You finished setting up returns.';
+      default:
+        return '';
     }
-  }, [filingStatusResponse]);
+  };
+
   return (
     <>
       <PageHeader>
@@ -223,7 +400,13 @@ const GetStarted = () => {
               >
                 <Statistic
                   title="Progress"
-                  value={0}
+                  value={
+                    [
+                      setUpReturnsStatus,
+                      fundingPOAStatus,
+                      submitReviewStatus,
+                    ].filter((status) => status === 'complete').length
+                  }
                   suffix="/ 3 tasks complete"
                 />
               </div>
@@ -236,8 +419,8 @@ const GetStarted = () => {
           <Flex wrap="wrap" gap="middle" justify="flex-start">
             <GetStartedCard
               title="Set up returns"
-              status="notStarted"
-              text={cardTextByActionStatus.setUpReturns.notStarted}
+              status={setUpReturnsStatus}
+              text={getSetUpReturnsText(setUpReturnsStatus)}
               onClick={(e) => {
                 e.preventDefault();
                 navigate('/returns/set-up-returns');
@@ -245,8 +428,8 @@ const GetStarted = () => {
             />
             <GetStartedCard
               title="Sign funding power of attorney"
-              status={poaStatus}
-              text={cardTextByActionStatus.fundingPoa[poaStatus]}
+              status={fundingPOAStatus}
+              text={cardTextByActionStatus.fundingPoa[fundingPOAStatus]}
               onClick={(e) => {
                 e.preventDefault();
                 navigate('/returns/funding');
@@ -259,7 +442,7 @@ const GetStarted = () => {
                 cardTextByActionStatus.submitForReview[submitReviewStatus] || ''
               }
               onClick={handleSubmitForReview}
-              loading={submitReviewLoading}
+              loading={isSubmittingSubmitReview}
             />
           </Flex>
         </Layout>
