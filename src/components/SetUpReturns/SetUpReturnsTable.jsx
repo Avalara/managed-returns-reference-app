@@ -200,11 +200,13 @@ const SetUpReturnsTable = ({ companyId }) => {
       title: 'State',
       dataIndex: 'regionName',
       key: 'regionName',
+      fixed: true,
     },
     {
       title: 'Description',
       dataIndex: 'description',
       key: 'description',
+      responsive: ['lg'],
       render: (description, region) =>
         region.regionAdded
           ? 'You collect tax here'
@@ -214,6 +216,7 @@ const SetUpReturnsTable = ({ companyId }) => {
       title: 'Returns',
       dataIndex: 'returnsCount',
       key: 'returnsCount',
+      responsive: ['lg'],
     },
     {
       title: 'Status',
@@ -253,6 +256,7 @@ const SetUpReturnsTable = ({ companyId }) => {
       title: 'Action',
       dataIndex: 'action',
       key: 'action',
+      fixed: 'right',
       render: (_, record) => {
         const { regionCode, regionName, countryCode } = record;
         return (
@@ -279,6 +283,7 @@ const SetUpReturnsTable = ({ companyId }) => {
       columns={columns}
       pagination={pagination}
       rowKey="id"
+      scroll={{ x: 'max-content' }}
       locale={{
         emptyText: (
           <Empty description="No states found. Add states to get started."></Empty>
