@@ -32,7 +32,10 @@ const SetUpReturnsTable = ({ companyId }) => {
     error: filingCalendarRequestsError,
     data: filingCalendarRequestsData,
   } = useQuery(FILING_CALENDAR_REQUESTS, {
-    variables: { companyId: parseInt(companyId) },
+    variables: {
+      companyId: parseInt(companyId),
+      filter: "filingRequestStatusId eq 'CHANGEREQUEST'",
+    },
     skip: !companyId,
     fetchPolicy: 'network-only', // Don't use cache, fetch from network every time
   });
