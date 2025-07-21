@@ -309,7 +309,13 @@ const columns = [
     dataIndex: 'status',
     key: 'status',
     fixed: 'right',
-    render: (status) => getStatusBadge(status),
+    render: (status, record) => {
+      // Show "Completed with errors" if status is completed and there are errors
+      if (status?.toUpperCase() === 'COMPLETED' && record.hasErrorFile) {
+        return <Badge status="error" text="Completed with errors" />;
+      }
+      return getStatusBadge(status);
+    },
   },
 ];
 
