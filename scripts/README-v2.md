@@ -62,18 +62,21 @@ git checkout github
 # 2. Create a clean branch from current state
 git checkout -b github-clean
 
-# 3. Run the sync to prepare clean content
+# 3. Do a dry run
+./scripts/sync-to-github-v2.sh --dry-run
+
+# 4. Run the sync to prepare clean content
 ./scripts/sync-to-github-v3.sh
 
-# 4. Force push to GitHub to replace existing history
+# 5. Force push to GitHub to replace existing history
 git push github-remote github-clean:main --force
 
-# 5. Update your local github branch to match
+# 6. Update your local github branch to match
 git checkout github
 git reset --hard github-clean
 git branch -D github-clean
 
-# 6. Set up tracking for future pushes
+# 7. Set up tracking for future pushes
 git push --set-upstream github-remote github:main
 ```
 
