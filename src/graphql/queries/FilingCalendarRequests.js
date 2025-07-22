@@ -6,6 +6,7 @@ export const filingCalendarRequests = gql`
       value {
         filingRequests {
           value {
+            filingRequestStatusId
             data {
               taxFormCode
               region

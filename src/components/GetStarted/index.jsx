@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useLazyQuery, useMutation } from '@apollo/client';
+import PropTypes from 'prop-types';
 
 import {
+  Alert,
   Button,
   Card,
   Col,
@@ -11,7 +13,6 @@ import {
   Row,
   Statistic,
   Tag,
-  theme,
   Typography,
   notification,
 } from 'antd';
@@ -25,88 +26,264 @@ import {
 import { reviewFilingRequests } from '../../graphql/mutations';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import { PageHeader } from '../shared';
-import { DEFAULT_COUNTRY } from '../shared/Constants.js';
+import {
+  DEFAULT_COUNTRY,
+  FILING_REQUEST_STATUS,
+  FUNDING_POA_STATUS,
+  FILING_STATUS,
+} from '../shared/Constants.js';
+
+// Status constants
+const TASK_STATUS = {
+  NOT_STARTED: 'notStarted',
+  IN_PROGRESS: 'inProgress',
+  COMPLETE: 'complete',
+  PENDING: 'pending',
+  LOADING: 'loading',
+  ERROR: 'error',
+};
 
 const { Title } = Typography;
 const { Content } = Layout;
 
-const cardTextByActionStatus = {
+const cardStatus = {
   setUpReturns: {
-    notStarted: 'You haven’t set up any returns.',
-    pending: 'You’ve set up returns in 5 of 10 states where you report tax.',
-    complete: 'You finished setting up returns.',
+    notStarted: <Tag color="default">Not started</Tag>,
+    inProgress: <Tag color="orange">In progress</Tag>,
+    complete: <Tag color="green">Completed</Tag>,
   },
   fundingPoa: {
-    notStarted:
-      'This is required so that Avalara can make tax payments to tax authorities on your behalf.',
-    pending:
-      'An email has been sent to an authorized signee to complete the form.',
-    complete: 'A signed document has been submitted.',
+    notStarted: <Tag color="default">Not started</Tag>,
+    pending: <Tag color="orange">Pending</Tag>,
+    complete: <Tag color="green">Completed</Tag>,
   },
   submitForReview: {
-    notStarted:
-      'When you’re done with the other steps, submit your info to Avalara’s compliance team to review before your first filing.',
-    pending:
-      'When you’re done with the other steps, submit your info to Avalara’s compliance team to review before your first filing.',
-    complete:
-      'Your info will be reviewed before your first filing period. If there are any issues, the compliance team will reach out to you.',
+    notStarted: <Tag color="default">Not started</Tag>,
+    complete: <Tag color="green">Completed</Tag>,
   },
 };
 
-const GetStartedCard = ({ title, status, text, onClick, loading = false }) => {
-  const statusTag = (() => {
-    switch (status) {
-      case 'loading':
-        return '';
-      case 'complete':
-        return <Tag color="green">Completed</Tag>;
-      case 'pending':
-        return <Tag color="orange">Pending</Tag>;
-      case 'inProgress':
-        return <Tag color="orange">In progress</Tag>;
-      case 'notStarted':
-      default:
-        return <Tag color="default">Not started</Tag>;
-    }
-  })();
+const SetUpReturnsDescription = (
+  status,
+  { completedRegions, totalRegions },
+  refetch
+) => {
+  switch (status) {
+    case 'notStarted':
+      return "You haven't set up any returns.";
+    case 'inProgress':
+      return `You've set up returns in ${completedRegions} of ${totalRegions} regions where you report tax.`;
+    case 'complete':
+      return 'You finished setting up returns.';
+    case 'error':
+      return (
+        <Alert
+          message="Error loading returns status"
+          type="error"
+          showIcon
+          action={
+            <Button size="small" danger onClick={refetch}>
+              Retry
+            </Button>
+          }
+        />
+      );
+    default:
+      return '';
+  }
+};
 
-  return (
-    <Card
-      loading={status === 'loading'}
-      title={title}
-      extra={statusTag}
-      style={{
-        flex: '1 0 320px',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-      styles={{
-        body: {
-          flex: '1 1 auto', // This makes the body take remaining space
-          display: 'flex',
-          flexDirection: 'column',
-        },
-      }}
-      actions={[
+const FundingPoaDescription = (status, refetch) => {
+  switch (status) {
+    case 'notStarted':
+      return 'This is required so that Avalara can make tax payments to tax authorities on your behalf.';
+    case 'pending':
+      return 'An email has been sent to an authorized signee to complete the form.';
+    case 'complete':
+      return 'A signed document has been submitted.';
+    case 'error':
+      return (
+        <Alert
+          message="Error loading funding power of attorney status"
+          type="error"
+          showIcon
+          action={
+            <Button size="small" danger onClick={refetch}>
+              Retry
+            </Button>
+          }
+        />
+      );
+  }
+};
+
+const SubmitForReviewDescription = (status, refetch) => {
+  switch (status) {
+    case 'notStarted':
+      return "When you're done with the other steps, submit your info to Avalara's compliance team to review before your first filing.";
+    case 'complete':
+      return 'Your info will be reviewed before your first filing period. If there are any issues, the compliance team will reach out to you.';
+    case 'error':
+      return (
+        <Alert
+          message="Error loading submit for review status"
+          type="error"
+          showIcon
+          action={
+            <Button size="small" danger onClick={refetch}>
+              Retry
+            </Button>
+          }
+        />
+      );
+  }
+};
+
+const SetUpReturnsActions = (status) => {
+  const navigate = useNavigate();
+  switch (status) {
+    case 'notStarted':
+      return [
         <Button
-          key={`${title}-1`}
+          key="start"
           type="primary"
-          disabled={!['notStarted', 'pending'].includes(status)}
-          loading={loading && ['notStarted', 'pending'].includes(status)}
-          onClick={onClick}
+          onClick={() => navigate('/returns/set-up-returns')}
         >
           Start
         </Button>,
-      ]}
-    >
-      <p>{text}</p>
-    </Card>
-  );
+      ];
+    case 'inProgress':
+      return [
+        <Button
+          key="continue"
+          type="primary"
+          onClick={() => navigate('/returns/existing-returns')}
+        >
+          Continue
+        </Button>,
+      ];
+    case 'complete':
+      return [
+        <Button
+          key="more-details"
+          type="primary"
+          onClick={() => navigate('/returns/existing-returns')}
+        >
+          More details
+        </Button>,
+      ];
+    default:
+      return null;
+  }
+};
+
+const FundingPoaActions = (status) => {
+  const navigate = useNavigate();
+  switch (status) {
+    case 'notStarted':
+      return [
+        <Button
+          key="start"
+          type="primary"
+          onClick={() => navigate('/returns/create-funding')}
+        >
+          Start
+        </Button>,
+      ];
+    case 'pending':
+      return [
+        <Button
+          key="more-details"
+          type="primary"
+          onClick={() => navigate('/returns/funding')}
+        >
+          More details
+        </Button>,
+      ];
+    case 'complete':
+      return [
+        <Button
+          key="more-details"
+          type="primary"
+          onClick={() => navigate('/returns/funding')}
+        >
+          More details
+        </Button>,
+      ];
+    default:
+      return null;
+  }
+};
+
+const SubmitForReviewActions = (
+  status,
+  isDisabled = false,
+  isLoading = false,
+  handleSubmitForReview
+) => {
+  switch (status) {
+    case 'notStarted':
+      return [
+        <Button
+          key="start"
+          type="primary"
+          onClick={handleSubmitForReview}
+          {...(isDisabled ? { disabled: true } : {})}
+          loading={isLoading}
+        >
+          Start
+        </Button>,
+      ];
+    case 'complete':
+      return [
+        <Button key="start" type="primary" disabled={true}>
+          Start
+        </Button>,
+      ];
+    default:
+      return null;
+  }
+};
+
+const GetStartedCard = ({
+  title,
+  description,
+  statusTag,
+  actionButtons,
+  loading = false,
+}) => (
+  <Card
+    loading={loading}
+    title={title}
+    extra={statusTag}
+    style={{
+      flex: '1 0 320px',
+      display: 'flex',
+      flexDirection: 'column',
+    }}
+    styles={{
+      body: {
+        flex: '1 1 auto', // This makes the body take remaining space
+        display: 'flex',
+        flexDirection: 'column',
+      },
+    }}
+    actions={actionButtons}
+  >
+    <p>{description}</p>
+  </Card>
+);
+
+GetStartedCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  statusTag: PropTypes.node,
+  actionButtons: PropTypes.array,
+  loading: PropTypes.bool,
 };
 
 const GetStarted = () => {
   const { isLoggedIn, companyId } = useOutletContext();
-  const navigate = useNavigate();
 
   const [
     getFundingStatus,
@@ -114,6 +291,7 @@ const GetStarted = () => {
       loading: isLoadingFundingPOAStatus,
       error: didErrorFundingPOAStatus,
       data: dataFundingPOAStatus,
+      refetch: refetchFundingStatus,
     },
   ] = useLazyQuery(FUNDING_STATUS);
 
@@ -123,6 +301,7 @@ const GetStarted = () => {
       loading: isLoadingSuggestedReturns,
       error: didErrorSuggestedReturns,
       data: dataSuggestedReturns,
+      refetch: refetchSuggestedReturns,
     },
   ] = useLazyQuery(SUGGESTED_RETURNS);
 
@@ -132,6 +311,7 @@ const GetStarted = () => {
       loading: isLoadingFilingCalendarRequests,
       error: didErrorFilingCalendarRequests,
       data: dataFilingCalendarRequests,
+      refetch: refetchFilingCalendarRequests,
     },
   ] = useLazyQuery(FILING_CALENDAR_REQUESTS);
 
@@ -141,6 +321,7 @@ const GetStarted = () => {
       loading: isLoadingFilingStatus,
       error: didErrorFilingStatus,
       data: dataFilingStatus,
+      refetch: refetchFilingStatus,
     },
   ] = useLazyQuery(COMPANY_FILING_STATUS);
 
@@ -159,7 +340,7 @@ const GetStarted = () => {
           duration: 10,
         });
         // Refetch the filing status to update the UI
-        getFilingStatus({ variables: { companyId: parseInt(companyId) } });
+        refetchFilingStatus();
       },
       onError: (error) => {
         notification.error({
@@ -185,12 +366,11 @@ const GetStarted = () => {
 
   // Memoized status calculations
   const fundingPOAStatus = useMemo(() => {
-    if (
-      !dataFundingPOAStatus ||
-      isLoadingFundingPOAStatus ||
-      didErrorFundingPOAStatus
-    ) {
-      return 'loading';
+    if (isLoadingFundingPOAStatus) {
+      return TASK_STATUS.LOADING;
+    }
+    if (didErrorFundingPOAStatus) {
+      return TASK_STATUS.ERROR;
     }
 
     const fundingStatusSet = new Set();
@@ -202,12 +382,12 @@ const GetStarted = () => {
       }
     );
 
-    if (fundingStatusSet.has('Signed')) {
-      return 'complete';
-    } else if (fundingStatusSet.has('Out for Signature')) {
-      return 'pending';
+    if (fundingStatusSet.has(FUNDING_POA_STATUS.SIGNED)) {
+      return TASK_STATUS.COMPLETE;
+    } else if (fundingStatusSet.has(FUNDING_POA_STATUS.OUT_FOR_SIGNATURE)) {
+      return TASK_STATUS.PENDING;
     } else {
-      return 'notStarted';
+      return TASK_STATUS.NOT_STARTED;
     }
   }, [
     dataFundingPOAStatus,
@@ -216,30 +396,39 @@ const GetStarted = () => {
   ]);
 
   const submitReviewStatus = useMemo(() => {
-    if (!dataFilingStatus || isLoadingFilingStatus || didErrorFilingStatus) {
-      return 'loading';
+    if (isLoadingFilingStatus) {
+      return TASK_STATUS.LOADING;
+    }
+    if (didErrorFilingStatus) {
+      return TASK_STATUS.ERROR;
     }
 
     const filingStatus = dataFilingStatus?.companies?.value?.[0]?.filingStatus;
 
-    if (filingStatus === 'NOTYETFILING') {
-      return 'notStarted';
+    if (
+      filingStatus === FILING_STATUS.FIRST_FILING ||
+      filingStatus === FILING_STATUS.ACTIVE ||
+      filingStatus === FILING_STATUS.FILING_REQUESTED
+    ) {
+      return TASK_STATUS.COMPLETE;
     } else {
-      return 'complete';
+      return TASK_STATUS.NOT_STARTED;
     }
   }, [dataFilingStatus, isLoadingFilingStatus, didErrorFilingStatus]);
 
   const { setUpReturnsStatus, setUpReturnsCounts } = useMemo(() => {
-    if (
-      isLoadingSuggestedReturns ||
-      isLoadingFilingCalendarRequests ||
-      didErrorSuggestedReturns ||
-      didErrorFilingCalendarRequests ||
-      !dataSuggestedReturns ||
-      !dataFilingCalendarRequests
-    ) {
+    // loading status
+    if (isLoadingSuggestedReturns || isLoadingFilingCalendarRequests) {
       return {
-        setUpReturnsStatus: 'loading',
+        setUpReturnsStatus: TASK_STATUS.LOADING,
+        setUpReturnsCounts: { completedRegions: 0, totalRegions: 0 },
+      };
+    }
+
+    // error status
+    if (didErrorSuggestedReturns || didErrorFilingCalendarRequests) {
+      return {
+        setUpReturnsStatus: TASK_STATUS.ERROR,
         setUpReturnsCounts: { completedRegions: 0, totalRegions: 0 },
       };
     }
@@ -268,8 +457,8 @@ const GetStarted = () => {
     const existingTaxFormCodes = filingRequests
       .filter(
         (request) =>
-          request.filingRequestStatusId === 'REQUESTAPPROVED' ||
-          request.filingRequestStatusId === 'CHANGEREQUEST'
+          request.filingRequestStatusId === FILING_REQUEST_STATUS.APPROVED ||
+          request.filingRequestStatusId === FILING_REQUEST_STATUS.CHANGE_REQUEST
       )
       .map((request) => request.data?.taxFormCode);
 
@@ -279,9 +468,9 @@ const GetStarted = () => {
       suggestedTaxFormCodes.length === 0 &&
       existingTaxFormCodes.length === 0
     ) {
-      calculatedStatus = 'notStarted';
+      calculatedStatus = TASK_STATUS.NOT_STARTED;
     } else if (suggestedTaxFormCodes.length === 0) {
-      calculatedStatus = 'complete';
+      calculatedStatus = TASK_STATUS.COMPLETE;
     } else {
       // Check if all suggested forms are covered by existing filings
       const allSuggestedCovered = suggestedTaxFormCodes.every((suggestedCode) =>
@@ -289,9 +478,9 @@ const GetStarted = () => {
       );
 
       if (allSuggestedCovered) {
-        calculatedStatus = 'complete';
+        calculatedStatus = TASK_STATUS.COMPLETE;
       } else {
-        calculatedStatus = 'pending';
+        calculatedStatus = TASK_STATUS.IN_PROGRESS;
       }
     }
 
@@ -315,7 +504,7 @@ const GetStarted = () => {
 
     // Check which regions are complete (all their suggested forms exist in existing codes)
     let completedRegions = 0;
-    Object.entries(suggestedByRegion).forEach(([_, regionTaxForms]) => {
+    Object.entries(suggestedByRegion).forEach(([_region, regionTaxForms]) => {
       const allFormsExist = regionTaxForms.every((taxForm) =>
         existingTaxFormCodes.includes(taxForm)
       );
@@ -360,20 +549,6 @@ const GetStarted = () => {
     getFilingCalendarRequests,
   ]);
 
-  // Generate dynamic text for Set Up Returns card
-  const getSetUpReturnsText = (status) => {
-    switch (status) {
-      case 'notStarted':
-        return "You haven't set up any returns.";
-      case 'pending':
-        return `You've set up returns in ${setUpReturnsCounts.completedRegions} of ${setUpReturnsCounts.totalRegions} regions where you report tax.`;
-      case 'complete':
-        return 'You finished setting up returns.';
-      default:
-        return '';
-    }
-  };
-
   return (
     <>
       <PageHeader>
@@ -405,7 +580,7 @@ const GetStarted = () => {
                       setUpReturnsStatus,
                       fundingPOAStatus,
                       submitReviewStatus,
-                    ].filter((status) => status === 'complete').length
+                    ].filter((status) => status === TASK_STATUS.COMPLETE).length
                   }
                   suffix="/ 3 tasks complete"
                 />
@@ -419,30 +594,46 @@ const GetStarted = () => {
           <Flex wrap="wrap" gap="middle" justify="flex-start">
             <GetStartedCard
               title="Set up returns"
-              status={setUpReturnsStatus}
-              text={getSetUpReturnsText(setUpReturnsStatus)}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/returns/set-up-returns');
-              }}
+              description={SetUpReturnsDescription(
+                setUpReturnsStatus,
+                setUpReturnsCounts,
+                refetchSuggestedReturns
+              )}
+              statusTag={cardStatus.setUpReturns[setUpReturnsStatus]}
+              actionButtons={SetUpReturnsActions(setUpReturnsStatus)}
+              loading={setUpReturnsStatus === TASK_STATUS.LOADING}
             />
             <GetStartedCard
               title="Sign funding power of attorney"
-              status={fundingPOAStatus}
-              text={cardTextByActionStatus.fundingPoa[fundingPOAStatus]}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/returns/funding');
-              }}
+              description={FundingPoaDescription(
+                fundingPOAStatus,
+                refetchFundingStatus
+              )}
+              statusTag={cardStatus.fundingPoa[fundingPOAStatus]}
+              actionButtons={FundingPoaActions(fundingPOAStatus)}
+              loading={fundingPOAStatus === TASK_STATUS.LOADING}
             />
             <GetStartedCard
               title="Submit your info for review"
-              status={submitReviewStatus}
-              text={
-                cardTextByActionStatus.submitForReview[submitReviewStatus] || ''
-              }
-              onClick={handleSubmitForReview}
-              loading={isSubmittingSubmitReview}
+              description={SubmitForReviewDescription(
+                submitReviewStatus,
+                refetchFilingStatus
+              )}
+              statusTag={cardStatus.submitForReview[submitReviewStatus]}
+              actionButtons={SubmitForReviewActions(
+                submitReviewStatus,
+                setUpReturnsStatus === TASK_STATUS.NOT_STARTED ||
+                  fundingPOAStatus === TASK_STATUS.NOT_STARTED ||
+                  setUpReturnsStatus === TASK_STATUS.LOADING ||
+                  fundingPOAStatus === TASK_STATUS.LOADING ||
+                  setUpReturnsStatus === TASK_STATUS.ERROR ||
+                  fundingPOAStatus === TASK_STATUS.ERROR ||
+                  submitReviewStatus === TASK_STATUS.LOADING ||
+                  submitReviewStatus === TASK_STATUS.ERROR,
+                isSubmittingSubmitReview,
+                handleSubmitForReview
+              )}
+              loading={submitReviewStatus === TASK_STATUS.LOADING}
             />
           </Flex>
         </Layout>
