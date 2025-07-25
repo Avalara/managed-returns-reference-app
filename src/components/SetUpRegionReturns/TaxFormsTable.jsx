@@ -21,19 +21,17 @@ const TaxFormsTable = ({ dataSource, loading }) => {
       title: 'Return',
       dataIndex: 'description',
       key: 'description',
-      fixed: true,
+      width: 300,
     },
     {
       title: 'Form number',
       dataIndex: 'taxFormName',
       key: 'taxFormName',
-      responsive: ['lg'],
     },
     {
       title: '',
       dataIndex: 'recommended',
       key: 'recommended',
-      responsive: ['lg'],
       render: (recommended) =>
         recommended ? <Tag color="green">Recommended</Tag> : null,
     },
