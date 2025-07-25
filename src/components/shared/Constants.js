@@ -15,3 +15,12 @@ export const FILING_STATUS = {
   ACTIVE: 'ACTIVE',
   FILING_REQUESTED: 'FILINGREQUESTED',
 };
+
+export const GET_STARTED_TASK_STATUS = {
+  NOT_STARTED: 'notStarted',
+  IN_PROGRESS: 'inProgress',
+  COMPLETE: 'complete',
+  PENDING: 'pending',
+  LOADING: 'loading',
+  ERROR: 'error',
+};
