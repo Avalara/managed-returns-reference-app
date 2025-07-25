@@ -101,7 +101,7 @@ export const useSetUpReturnsStatus = (
         ? GET_STARTED_TASK_STATUS.COMPLETE
         : completed === totalRegionsCount
           ? GET_STARTED_TASK_STATUS.COMPLETE
-          : inProgress > 0
+          : returnsSetUpInRegionsCount > 0
             ? GET_STARTED_TASK_STATUS.IN_PROGRESS
             : GET_STARTED_TASK_STATUS.NOT_STARTED;
 
