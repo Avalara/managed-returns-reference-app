@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   companyRegionStatus as COMPANY_REGION_STATUS,
   filingCalendarRequests as FILING_CALENDAR_REQUESTS,
-  filingCalendars as FILING_CALENDARS,
   regions as REGIONS,
+  companySuggestedReturns as COMPANY_SUGGESTED_RETURNS,
 } from '../../graphql/queries';
 
 import { useMemo } from 'react';
@@ -26,7 +26,7 @@ const SetUpReturnsTable = ({ companyId }) => {
     fetchPolicy: 'network-only', // Don't use cache, fetch from network every time
   });
 
-  // Fetch filing calendar requests data
+  // Fetch filing calendar requests data (both pending and approved)
   const {
     loading: filingCalendarRequestsLoading,
     error: filingCalendarRequestsError,
@@ -34,19 +34,9 @@ const SetUpReturnsTable = ({ companyId }) => {
   } = useQuery(FILING_CALENDAR_REQUESTS, {
     variables: {
       companyId: parseInt(companyId),
-      filter: "filingRequestStatusId eq 'CHANGEREQUEST'",
+      filter:
+        "filingRequestStatusId eq 'CHANGEREQUEST' or filingRequestStatusId eq 'REQUESTAPPROVED'",
     },
-    skip: !companyId,
-    fetchPolicy: 'network-only', // Don't use cache, fetch from network every time
-  });
-
-  // Fetch filing calendars data
-  const {
-    loading: filingCalendarsLoading,
-    error: filingCalendarsError,
-    data: filingCalendarsData,
-  } = useQuery(FILING_CALENDARS, {
-    variables: { companyId: parseInt(companyId) },
     skip: !companyId,
     fetchPolicy: 'network-only', // Don't use cache, fetch from network every time
   });
@@ -58,6 +48,20 @@ const SetUpReturnsTable = ({ companyId }) => {
     data: definitionRegionsData,
   } = useQuery(REGIONS, {
     variables: { country: DEFAULT_COUNTRY },
+  });
+
+  // Fetch suggested returns data
+  const {
+    loading: suggestedReturnsLoading,
+    error: suggestedReturnsError,
+    data: suggestedReturnsData,
+  } = useQuery(COMPANY_SUGGESTED_RETURNS, {
+    variables: {
+      companyId: parseInt(companyId),
+      country: DEFAULT_COUNTRY,
+    },
+    skip: !companyId,
+    fetchPolicy: 'network-only', // Don't use cache, fetch from network every time
   });
 
   // Create maps for country and region names from definitions query
@@ -96,6 +100,15 @@ const SetUpReturnsTable = ({ companyId }) => {
     const currentRegions =
       regionData?.companies?.value?.[0]?.regionStatus || [];
 
+    // Get suggested returns data
+    const suggestedReturns =
+      suggestedReturnsData?.companies?.value?.[0]?.suggestedTaxForms || [];
+
+    // Get filing calendar requests data
+    const filingCalendarRequests =
+      filingCalendarRequestsData?.filingCalendarRequests?.value?.filingRequests
+        ?.value || [];
+
     // Create a map of region codes to region objects
     const regionsMap = {};
 
@@ -105,52 +118,110 @@ const SetUpReturnsTable = ({ companyId }) => {
       regionsMap[regionCode] = {
         regionCode,
         countryCode: region.country,
-        status: region.status,
+        status: 'NOTSTARTED',
         regionAdded: true,
-        returnsCount: 0,
+        suggestedReturnsSetUpCount: 0,
+        totalReturnsSetUpCount: 0,
+        suggestedReturnsCount: 0,
       };
     });
 
-    // Process filing calendar requests data
-    if (filingCalendarRequestsData) {
-      // Process filing calendar requests
-      const filingCalendarRequests =
-        filingCalendarRequestsData?.filingCalendarRequests?.value
-          ?.filingRequests?.value || [];
+    // Create a map of suggested tax form codes per region for faster lookup
+    const regionSuggestedTaxForms = {};
+
+    // Process suggested returns data to count suggested returns per region
+    suggestedReturns.forEach((suggestedTaxForm) => {
+      const regionCode = suggestedTaxForm.region;
+      const suggestedReturnsCount =
+        suggestedTaxForm.suggestedReturns?.length || 0;
+
+      // Create set of suggested tax form codes for this region
+      regionSuggestedTaxForms[regionCode] = new Set(
+        suggestedTaxForm.suggestedReturns?.map((sr) => sr.taxFormCode) || []
+      );
+
+      if (!regionsMap[regionCode]) {
+        return (regionsMap[regionCode] = {
+          regionCode,
+          countryCode: DEFAULT_COUNTRY,
+          status: 'NOTSTARTED',
+          regionAdded: false,
+          suggestedReturnsSetUpCount: 0,
+          totalReturnsSetUpCount: 0,
+          suggestedReturnsCount: suggestedReturnsCount,
+        });
+      }
+
+      regionsMap[regionCode].suggestedReturnsCount = suggestedReturnsCount;
+    });
+
+    // Process filing calendar requests data (both pending and approved)
+    if (filingCalendarRequests) {
+      // Track unique tax form codes per region
+      const regionSuggestedTaxFormCodesSetUp = {};
+      const regionAllTaxFormCodesSetUp = {};
+
       filingCalendarRequests.forEach((filingCalendarRequest) => {
-        // Use region if available, otherwise extract from taxFormCode
+        // Use region from the request data
         const regionCode = filingCalendarRequest.data.region;
         const countryCode = filingCalendarRequest.data.country;
+        const taxFormCode = filingCalendarRequest.data.taxFormCode;
 
-        const returnsCount = (regionsMap[regionCode]?.returnsCount || 0) + 1;
+        // Initialize region if it doesn't exist
+        if (!regionsMap[regionCode]) {
+          regionsMap[regionCode] = {
+            regionCode,
+            countryCode,
+            status: 'INPROGRESS',
+            regionAdded: false,
+            suggestedReturnsSetUpCount: 0,
+            totalReturnsSetUpCount: 0,
+            suggestedReturnsCount: 0,
+          };
+        }
+
+        // Track all unique tax form codes set up for this region (Set ensures uniqueness)
+        if (!regionAllTaxFormCodesSetUp[regionCode]) {
+          regionAllTaxFormCodesSetUp[regionCode] = new Set();
+        }
+        regionAllTaxFormCodesSetUp[regionCode].add(taxFormCode);
+
+        // Only count suggested tax forms set up separately
+        const suggestedTaxFormsForRegion = regionSuggestedTaxForms[regionCode];
+        if (
+          suggestedTaxFormsForRegion &&
+          suggestedTaxFormsForRegion.has(taxFormCode)
+        ) {
+          // Track unique suggested tax form codes set up for this region
+          if (!regionSuggestedTaxFormCodesSetUp[regionCode]) {
+            regionSuggestedTaxFormCodesSetUp[regionCode] = new Set();
+          }
+          regionSuggestedTaxFormCodesSetUp[regionCode].add(taxFormCode);
+        }
+
+        // Determine status based on suggested returns completion
+        let status = 'INPROGRESS';
+        const suggestedForCompletion = regionSuggestedTaxForms[regionCode];
+        const allTaxFormsForRegion = regionAllTaxFormCodesSetUp[regionCode];
+
+        if (suggestedForCompletion && allTaxFormsForRegion) {
+          // Check if all suggested tax forms are present in all tax forms
+          const allSuggestedCompleted = [...suggestedForCompletion].every(
+            (suggestedCode) => allTaxFormsForRegion.has(suggestedCode)
+          );
+          if (allSuggestedCompleted && suggestedForCompletion.size > 0) {
+            status = 'COMPLETED';
+          }
+        }
+
+        // Update region with current status and maintain other properties
         regionsMap[regionCode] = {
-          regionCode,
-          countryCode,
-          status: 'INPROGRESS',
-          regionAdded: regionsMap[regionCode]?.regionAdded || false,
-          returnsCount,
-        };
-      });
-    }
-
-    // Process filing calendars data
-    if (filingCalendarsData) {
-      // Process filing calendars
-      const filingCalendarsItems =
-        filingCalendarsData?.filingCalendars?.value?.filingCalendars?.value ||
-        [];
-      filingCalendarsItems.forEach((calendar) => {
-        // For filingCalendars, we can only extract region from taxFormCode
-        const regionCode = calendar.formRegion;
-        const countryCode = calendar.formCountry;
-
-        const returnsCount = (regionsMap[regionCode]?.returnsCount || 0) + 1;
-        regionsMap[regionCode] = {
-          regionCode,
-          countryCode,
-          status: 'INPROGRESS',
-          regionAdded: regionsMap[regionCode]?.regionAdded || false,
-          returnsCount,
+          ...regionsMap[regionCode],
+          status,
+          suggestedReturnsSetUpCount:
+            regionSuggestedTaxFormCodesSetUp[regionCode]?.size || 0,
+          totalReturnsSetUpCount:
+            regionAllTaxFormCodesSetUp[regionCode]?.size || 0,
         };
       });
     }
@@ -165,7 +236,7 @@ const SetUpReturnsTable = ({ companyId }) => {
   }, [
     regionData,
     filingCalendarRequestsData,
-    filingCalendarsData,
+    suggestedReturnsData,
     regionMap,
     countryMap,
   ]);
@@ -173,8 +244,8 @@ const SetUpReturnsTable = ({ companyId }) => {
   if (
     regionError ||
     filingCalendarRequestsError ||
-    filingCalendarsError ||
-    definitionRegionsError
+    definitionRegionsError ||
+    suggestedReturnsError
   ) {
     return (
       <Result
@@ -187,8 +258,8 @@ const SetUpReturnsTable = ({ companyId }) => {
   const isLoading =
     regionLoading ||
     filingCalendarRequestsLoading ||
-    filingCalendarsLoading ||
-    definitionRegionsLoading;
+    definitionRegionsLoading ||
+    suggestedReturnsLoading;
 
   const pagination = {
     pageSize: 10,
@@ -206,17 +277,18 @@ const SetUpReturnsTable = ({ companyId }) => {
       title: 'Description',
       dataIndex: 'description',
       key: 'description',
-      responsive: ['lg'],
       render: (description, region) =>
         region.regionAdded
           ? 'You collect tax here'
           : 'You have not added this region',
     },
+
     {
       title: 'Returns',
-      dataIndex: 'returnsCount',
-      key: 'returnsCount',
-      responsive: ['lg'],
+      dataIndex: 'totalReturnsSetUpCount',
+      key: 'totalReturnsSetUpCount',
+      render: (totalReturnsSetUpCount) =>
+        `${totalReturnsSetUpCount} returns set up`,
     },
     {
       title: 'Status',
@@ -263,6 +335,7 @@ const SetUpReturnsTable = ({ companyId }) => {
           <Button
             color="primary"
             variant="link"
+            style={{ paddingLeft: 0 }}
             onClick={() =>
               navigate(
                 `/returns/set-up-returns/${regionName}?regionCode=${regionCode}&countryCode=${countryCode}`
