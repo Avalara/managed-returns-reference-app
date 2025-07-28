@@ -1,202 +1,134 @@
-import React, { useState, useEffect } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
-import { useLazyQuery, useMutation } from '@apollo/client';
+import React, { useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
+import { useLazyQuery } from '@apollo/client';
+
+import { Col, Flex, Layout, Row, Statistic, Typography } from 'antd';
 
 import {
-  Button,
-  Card,
-  Col,
-  Flex,
-  Layout,
-  Row,
-  Statistic,
-  Tag,
-  theme,
-  Typography,
-  notification,
-} from 'antd';
-
-import { fundingStatus as FUNDING_STATUS } from '../../graphql/queries';
-import { companyFilingStatus as COMPANY_FILING_STATUS } from '../../graphql/queries/Companies';
-import { reviewFilingRequests } from '../../graphql/mutations';
+  fundingStatus as FUNDING_STATUS,
+  filingCalendarRequests as FILING_CALENDAR_REQUESTS,
+  companyFilingStatus as COMPANY_FILING_STATUS,
+  companySuggestedReturns as SUGGESTED_RETURNS,
+} from '../../graphql/queries';
 import BreadcrumbMenu from '../../components/BreadCrumbMenu';
 import { PageHeader } from '../shared';
+import {
+  DEFAULT_COUNTRY,
+  GET_STARTED_TASK_STATUS,
+} from '../shared/Constants.js';
+
+import {
+  useFundingPoaStatus,
+  useSubmitReviewStatus,
+  useSetUpReturnsStatus,
+} from './hooks';
+
+import {
+  SetUpReturnsCard,
+  FundingPoaCard,
+  SubmitReviewCard,
+} from './components';
 
 const { Title } = Typography;
 const { Content } = Layout;
 
-const cardTextByActionStatus = {
-  setUpReturns: {
-    notStarted: 'You haven’t set up any returns.',
-    pending: 'You’ve set up returns in 5 of 10 states where you report tax.',
-    complete: 'You finished setting up returns.',
-  },
-  fundingPoa: {
-    notStarted:
-      'This is required so that Avalara can make tax payments to tax authorities on your behalf.',
-    pending:
-      'An email has been sent to an authorized signee to complete the form.',
-    complete: 'A signed document has been submitted.',
-  },
-  submitForReview: {
-    notStarted:
-      'When you’re done with the other steps, submit your info to Avalara’s compliance team to review before your first filing.',
-    pending:
-      'When you’re done with the other steps, submit your info to Avalara’s compliance team to review before your first filing.',
-    complete:
-      'Your info will be reviewed before your first filing period. If there are any issues, the compliance team will reach out to you.',
-  },
-};
-
-const GetStartedCard = ({ title, status, text, onClick, loading = false }) => {
-  const statusTag = (() => {
-    switch (status) {
-      case 'loading':
-        return '';
-      case 'complete':
-        return <Tag color="green">Complete</Tag>;
-      case 'pending':
-        return <Tag color="orange">Pending</Tag>;
-      case 'inProgress':
-        return <Tag color="orange">In progress</Tag>;
-      case 'notStarted':
-      default:
-        return <Tag color="default">Not started</Tag>;
-    }
-  })();
-
-  return (
-    <Card
-      loading={status === 'loading'}
-      title={title}
-      extra={statusTag}
-      style={{
-        flex: '1 0 320px',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-      styles={{
-        body: {
-          flex: '1 1 auto', // This makes the body take remaining space
-          display: 'flex',
-          flexDirection: 'column',
-        },
-      }}
-      actions={[
-        <Button
-          key={`${title}-1`}
-          type="primary"
-          disabled={status !== 'notStarted'}
-          loading={loading && status === 'notStarted'}
-          onClick={onClick}
-        >
-          Start
-        </Button>,
-      ]}
-    >
-      <p>{text}</p>
-    </Card>
-  );
-};
-
 const GetStarted = () => {
   const { isLoggedIn, companyId } = useOutletContext();
-  const navigate = useNavigate();
 
-  const [poaStatus, setPoaStatus] = useState('loading');
-  const [submitReviewStatus, setSubmitReviewStatus] = useState('loading');
-
-  const [getFundingStatus, fundingStatusResponse] =
-    useLazyQuery(FUNDING_STATUS);
-
-  const [getFilingStatus, filingStatusResponse] = useLazyQuery(
-    COMPANY_FILING_STATUS
-  );
-
-  const [submitReviewMutation, { loading: submitReviewLoading }] = useMutation(
-    reviewFilingRequests,
+  // API calls for the set up returns card
+  const [
+    getSuggestedReturns,
     {
-      onCompleted: (data) => {
-        notification.success({
-          message: 'Review submission successful',
-          description: (
-            <span>
-              Your information has been <strong>successfully submitted</strong>{' '}
-              for review by Avalara&apos;s compliance team.
-            </span>
-          ),
-          placement: 'topRight',
-          duration: 10,
-        });
-        // Refetch the filing status to update the UI
-        getFilingStatus({ variables: { companyId: parseInt(companyId) } });
-      },
-      onError: (error) => {
-        notification.error({
-          message: 'Review submission failed',
-          description: (
-            <span>
-              Failed to submit your information for review.{' '}
-              <strong>Please try again.</strong>
-            </span>
-          ),
-          placement: 'topRight',
-          duration: 10,
-        });
-        console.error('Error submitting for review:', error);
-      },
-    }
+      loading: isLoadingSuggestedReturns,
+      error: didErrorSuggestedReturns,
+      data: dataSuggestedReturns,
+      refetch: refetchSuggestedReturns,
+    },
+  ] = useLazyQuery(SUGGESTED_RETURNS);
+
+  const [
+    getFilingCalendarRequests,
+    {
+      loading: isLoadingFilingCalendarRequests,
+      error: didErrorFilingCalendarRequests,
+      data: dataFilingCalendarRequests,
+      refetch: refetchFilingCalendarRequests,
+    },
+  ] = useLazyQuery(FILING_CALENDAR_REQUESTS);
+
+  // API calls for the power of attorney card
+  const [
+    getFundingStatus,
+    {
+      loading: isLoadingFundingPOAStatus,
+      error: didErrorFundingPOAStatus,
+      data: dataFundingPOAStatus,
+      refetch: refetchFundingStatus,
+    },
+  ] = useLazyQuery(FUNDING_STATUS);
+
+  // API calls for submit for review card
+  const [
+    getFilingStatus,
+    {
+      loading: isLoadingFilingStatus,
+      error: didErrorFilingStatus,
+      data: dataFilingStatus,
+      refetch: refetchFilingStatus,
+    },
+  ] = useLazyQuery(COMPANY_FILING_STATUS);
+
+  // Use custom hooks for status calculations
+  const fundingPOAStatus = useFundingPoaStatus(
+    isLoadingFundingPOAStatus,
+    didErrorFundingPOAStatus,
+    dataFundingPOAStatus
   );
 
-  const handleSubmitForReview = () => {
-    submitReviewMutation({
-      variables: { companyId: parseInt(companyId) },
-    });
-  };
+  const submitReviewStatus = useSubmitReviewStatus(
+    isLoadingFilingStatus,
+    didErrorFilingStatus,
+    dataFilingStatus
+  );
+
+  const { setUpReturnsStatus, setUpReturnsCounts } = useSetUpReturnsStatus(
+    isLoadingSuggestedReturns,
+    didErrorSuggestedReturns,
+    dataSuggestedReturns,
+    isLoadingFilingCalendarRequests,
+    didErrorFilingCalendarRequests,
+    dataFilingCalendarRequests
+  );
 
   useEffect(() => {
     if (isLoggedIn && companyId) {
       getFundingStatus({ variables: { companyId: parseInt(companyId) } });
       getFilingStatus({ variables: { companyId: parseInt(companyId) } });
-    }
-  }, [isLoggedIn, companyId]);
-
-  useEffect(() => {
-    const { loading, error, data } = fundingStatusResponse;
-    if (!error && !loading && data) {
-      const fundingStatusSet = new Set();
-      data?.companies?.value?.[0]?.fundingStatus?.forEach((item) => {
-        if (item?.status) {
-          fundingStatusSet.add(item.status);
-        }
+      getSuggestedReturns({
+        variables: {
+          companyId: parseInt(companyId),
+          country: DEFAULT_COUNTRY,
+        },
       });
-
-      if (fundingStatusSet.has('Signed')) {
-        setPoaStatus('complete');
-      } else if (fundingStatusSet.has('Out for Signature')) {
-        setPoaStatus('pending');
-      } else {
-        setPoaStatus('notStarted');
-      }
+      getFilingCalendarRequests({
+        variables: { companyId: parseInt(companyId) },
+      });
     }
-  }, [fundingStatusResponse]);
+  }, [
+    isLoggedIn,
+    companyId,
+    getFundingStatus,
+    getFilingStatus,
+    getSuggestedReturns,
+    getFilingCalendarRequests,
+  ]);
 
-  useEffect(() => {
-    const { loading, error, data } = filingStatusResponse;
-    if (!error && !loading && data) {
-      const filingStatus = data?.companies?.value?.[0]?.filingStatus;
+  const completedTasksCount = [
+    setUpReturnsStatus,
+    fundingPOAStatus,
+    submitReviewStatus,
+  ].filter((status) => status === GET_STARTED_TASK_STATUS.COMPLETE).length;
 
-      if (
-        filingStatus === 'FIRSTFILING' ||
-        filingStatus === 'ACTIVE' ||
-        filingStatus === 'FILINGREQUESTED'
-      ) {
-        setSubmitReviewStatus('complete');
-      } else {
-        setSubmitReviewStatus('notStarted');
-      }
-    }
-  }, [filingStatusResponse]);
   return (
     <>
       <PageHeader>
@@ -223,7 +155,7 @@ const GetStarted = () => {
               >
                 <Statistic
                   title="Progress"
-                  value={0}
+                  value={completedTasksCount}
                   suffix="/ 3 tasks complete"
                 />
               </div>
@@ -234,32 +166,24 @@ const GetStarted = () => {
       <Content>
         <Layout>
           <Flex wrap="wrap" gap="middle" justify="flex-start">
-            <GetStartedCard
-              title="Set up returns"
-              status="notStarted"
-              text={cardTextByActionStatus.setUpReturns.notStarted}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/returns/set-up-returns');
+            <SetUpReturnsCard
+              setUpReturnsStatus={setUpReturnsStatus}
+              setUpReturnsCounts={setUpReturnsCounts}
+              refetchSetUpReturnsStatus={() => {
+                refetchSuggestedReturns();
+                refetchFilingCalendarRequests();
               }}
             />
-            <GetStartedCard
-              title="Sign funding power of attorney"
-              status={poaStatus}
-              text={cardTextByActionStatus.fundingPoa[poaStatus]}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/returns/funding');
-              }}
+            <FundingPoaCard
+              fundingPOAStatus={fundingPOAStatus}
+              refetchFundingStatus={refetchFundingStatus}
             />
-            <GetStartedCard
-              title="Submit your info for review"
-              status={submitReviewStatus}
-              text={
-                cardTextByActionStatus.submitForReview[submitReviewStatus] || ''
-              }
-              onClick={handleSubmitForReview}
-              loading={submitReviewLoading}
+            <SubmitReviewCard
+              submitReviewStatus={submitReviewStatus}
+              refetchFilingStatus={refetchFilingStatus}
+              setUpReturnsStatus={setUpReturnsStatus}
+              fundingPOAStatus={fundingPOAStatus}
+              companyId={companyId}
             />
           </Flex>
         </Layout>

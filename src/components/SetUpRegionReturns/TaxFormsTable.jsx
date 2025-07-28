@@ -21,6 +21,7 @@ const TaxFormsTable = ({ dataSource, loading }) => {
       title: 'Return',
       dataIndex: 'description',
       key: 'description',
+      width: 300,
     },
     {
       title: 'Form number',
@@ -37,6 +38,7 @@ const TaxFormsTable = ({ dataSource, loading }) => {
     {
       title: '',
       key: 'action',
+      fixed: 'right',
       render: (_, record) => (
         <Button
           color="primary"
@@ -68,6 +70,7 @@ const TaxFormsTable = ({ dataSource, loading }) => {
           setCurrentPage(page.current);
         }}
         rowKey="taxFormCode"
+        scroll={{ x: 'max-content' }}
         expandable={{
           expandedRowRender: (record) => (
             <Space direction="vertical">

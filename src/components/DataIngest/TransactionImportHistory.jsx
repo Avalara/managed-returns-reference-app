@@ -8,16 +8,22 @@ import {
   Table,
   Badge,
   Input,
+  Popover,
+  message,
 } from 'antd';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
+import { useQuery, useLazyQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import { transactionImportHistory as TRANSACTION_IMPORT_HISTORY } from '../../graphql/queries';
+import { DownloadOutlined } from '@ant-design/icons';
+import {
+  transactionImportHistory as TRANSACTION_IMPORT_HISTORY,
+  transactionBatchErrors as TRANSACTION_BATCH_ERRORS,
+} from '../../graphql/queries';
 
 // Extend dayjs with plugins
 dayjs.extend(localizedFormat);
@@ -136,12 +142,125 @@ const getStatusBadge = (status) => {
   }
 };
 
+const BatchErrorsDownload = ({ record, companyId }) => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const [popoverVisible, setPopoverVisible] = useState(false);
+  const [batchErrorsData, setBatchErrorsData] = useState(null);
+
+  const [getBatchErrors, { loading: batchErrorsLoading }] = useLazyQuery(
+    TRANSACTION_BATCH_ERRORS,
+    {
+      onCompleted: (data) => {
+        setBatchErrorsData(data);
+      },
+      onError: (error) => {
+        messageApi.error(`Error fetching batch errors: ${error.message}`);
+      },
+      fetchPolicy: 'network-only',
+    }
+  );
+
+  const handleDownloadClick = async () => {
+    if (!batchErrorsData) {
+      // Fetch data first if not already loaded
+      await getBatchErrors({
+        variables: {
+          companyId: parseInt(companyId),
+          batchId: record.transactionBatchId,
+        },
+      });
+    }
+
+    if (batchErrorsData?.transactions?.value) {
+      // Create JSON content
+      const jsonContent = JSON.stringify(
+        batchErrorsData.transactions.value,
+        null,
+        2
+      );
+
+      // Create and download file
+      const blob = new Blob([jsonContent], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `batch_errors_${record.transactionBatchId}_${dayjs().format('YYYY-MM-DD')}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      messageApi.success('Batch errors downloaded successfully');
+    }
+  };
+
+  const handlePopoverVisibleChange = async (visible) => {
+    if (visible && !batchErrorsData) {
+      // Fetch data when popover opens
+      await getBatchErrors({
+        variables: {
+          companyId: parseInt(companyId),
+          batchId: record.transactionBatchId,
+        },
+      });
+    }
+    setPopoverVisible(visible);
+  };
+
+  const popoverContent = (
+    <div style={{ maxWidth: 400, maxHeight: 300, overflow: 'auto' }}>
+      {batchErrorsLoading ? (
+        <div>Loading batch errors...</div>
+      ) : batchErrorsData ? (
+        <pre style={{ fontSize: '12px', margin: 0 }}>
+          {JSON.stringify(batchErrorsData.transactions.value, null, 2)}
+        </pre>
+      ) : (
+        <div>No batch errors data available</div>
+      )}
+    </div>
+  );
+
+  // Only show download button if it has error file
+  if (!record.hasErrorFile) {
+    return null;
+  }
+
+  return (
+    <>
+      {contextHolder}
+      <Popover
+        content={popoverContent}
+        title="Batch Errors JSON"
+        trigger="hover"
+        open={popoverVisible}
+        onOpenChange={handlePopoverVisibleChange}
+        placement="left"
+      >
+        <Button
+          color="primary"
+          variant="link"
+          icon={<DownloadOutlined />}
+          onClick={handleDownloadClick}
+          loading={batchErrorsLoading}
+          size="small"
+        />
+      </Popover>
+    </>
+  );
+};
+
+BatchErrorsDownload.propTypes = {
+  record: PropTypes.object.isRequired,
+  companyId: PropTypes.string.isRequired,
+};
+
 const columns = [
   {
     title: 'File name',
     dataIndex: 'fileName',
     key: 'fileName',
-    fixed: true,
+    fixed: 'left',
   },
   {
     title: 'Import type',
@@ -159,15 +278,12 @@ const columns = [
     title: 'Error Messages',
     dataIndex: 'errorMessages',
     key: 'errorMessages',
-    responsive: ['lg'],
-    render: (errorMessages) => {
-      if (!errorMessages || errorMessages.length === 0) return '-';
+    responsive: ['xl'],
+    render: (_, record) => {
+      if (!record.hasErrorFile) return null;
+
       return (
-        <ul style={{ margin: 0, paddingLeft: 20 }}>
-          {errorMessages.map((msg, index) => (
-            <li key={index}>{msg}</li>
-          ))}
-        </ul>
+        <BatchErrorsDownload record={record} companyId={record.companyId} />
       );
     },
   },
@@ -175,7 +291,7 @@ const columns = [
     title: 'Has Error File',
     dataIndex: 'hasErrorFile',
     key: 'hasErrorFile',
-    responsive: ['lg'],
+    responsive: ['xl'],
     render: (hasErrorFile) => (hasErrorFile ? 'Yes' : 'No'),
   },
   {
@@ -192,18 +308,40 @@ const columns = [
     title: 'Status',
     dataIndex: 'status',
     key: 'status',
-    responsive: ['lg'],
-    render: (status) => getStatusBadge(status),
+    fixed: 'right',
+    render: (status, record) => {
+      // Show "Completed with errors" if status is completed and there are errors
+      if (status?.toUpperCase() === 'COMPLETED' && record.hasErrorFile) {
+        return <Badge status="error" text="Completed with errors" />;
+      }
+      return getStatusBadge(status);
+    },
   },
 ];
 
-const HistoryTable = ({ loading, dataSource }) => (
-  <Table loading={loading} dataSource={dataSource} columns={columns} />
+const HistoryTable = ({ loading, dataSource, companyId }) => (
+  <Table
+    loading={loading}
+    dataSource={dataSource.map((item) => ({ ...item, companyId }))}
+    columns={columns}
+    scroll={{ x: 'max-content' }}
+    pagination={
+      dataSource && dataSource.length > 50
+        ? {
+            total: dataSource.length,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: () => `Total ${dataSource.length} items`,
+          }
+        : true
+    }
+  />
 );
 
 HistoryTable.propTypes = {
   loading: PropTypes.bool.isRequired,
   dataSource: PropTypes.array.isRequired,
+  companyId: PropTypes.string.isRequired,
 };
 
 function applyFilters(data, filters) {
@@ -276,7 +414,11 @@ const TransactionImportHistory = () => {
       </Card>
 
       <Card>
-        <HistoryTable loading={loading} dataSource={filteredData} />
+        <HistoryTable
+          loading={loading}
+          dataSource={filteredData}
+          companyId={companyId}
+        />
       </Card>
     </Space>
   );

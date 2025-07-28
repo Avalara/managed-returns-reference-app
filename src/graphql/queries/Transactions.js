@@ -8,11 +8,41 @@ export const transactionImportHistory = gql`
           value {
             transactionBatchId
             status
-            errorMessages
             hasErrorFile
             fileName
             importType
             createdDate
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const transactionBatchErrors = gql`
+  query transactions($companyId: Int!, $batchId: Int!) {
+    transactions(companyId: $companyId, batchId: $batchId) {
+      value {
+        batchErrors {
+          errors {
+            errorType
+            transaction {
+              transactionCode
+              transactionDate
+              country
+              region
+              addressLine1
+              county
+              city
+              postalCode
+              taxType
+              taxLevel
+              taxRate
+              grossAmount
+              exemptAmount
+              taxableAmount
+              taxAmount
+            }
           }
         }
       }

@@ -6,9 +6,16 @@ export const filingCalendars = gql`
       value {
         filingCalendars {
           value {
-            taxFormCode
+            effectiveDate
+            endDate
+            filingFrequencyId
+            filingTypeId
             formRegion
             formCountry
+            id
+            returnName
+            stateRegistrationId
+            taxFormCode
           }
         }
       }

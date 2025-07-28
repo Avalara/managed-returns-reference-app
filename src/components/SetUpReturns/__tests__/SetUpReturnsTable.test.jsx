@@ -17,8 +17,8 @@
 import {
   companyRegionStatus as COMPANY_REGION_STATUS,
   filingCalendarRequests as FILING_CALENDAR_REQUESTS,
-  filingCalendars as FILING_CALENDARS,
   regions as REGIONS,
+  companySuggestedReturns as COMPANY_SUGGESTED_RETURNS,
 } from '../../../graphql/queries';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
@@ -73,6 +73,8 @@ const mocks = [
       query: FILING_CALENDAR_REQUESTS,
       variables: {
         companyId: 1,
+        filter:
+          "filingRequestStatusId eq 'CHANGEREQUEST' or filingRequestStatusId eq 'REQUESTAPPROVED'",
       },
     },
     result: {
@@ -82,16 +84,30 @@ const mocks = [
             filingRequests: {
               value: [
                 {
+                  companyId: 1,
+                  filingRequestStatusId: 'CHANGEREQUEST',
+                  id: 1,
                   data: {
-                    country: 'US',
+                    effDate: '2023-01-01',
+                    endDate: '2023-12-31',
+                    filingFrequencyId: 'MONTHLY',
                     region: 'CA',
+                    country: 'US',
+                    returnName: 'California Sales Tax',
                     taxFormCode: 'TEST-001',
                   },
                 },
                 {
+                  companyId: 1,
+                  filingRequestStatusId: 'REQUESTAPPROVED',
+                  id: 2,
                   data: {
-                    country: 'US',
+                    effDate: '2023-01-01',
+                    endDate: '2023-12-31',
+                    filingFrequencyId: 'MONTHLY',
                     region: 'HI',
+                    country: 'US',
+                    returnName: 'Hawaii Sales Tax',
                     taxFormCode: 'TEST-002',
                   },
                 },
@@ -104,30 +120,37 @@ const mocks = [
   },
   {
     request: {
-      query: FILING_CALENDARS,
+      query: COMPANY_SUGGESTED_RETURNS,
       variables: {
         companyId: 1,
+        country: 'US',
       },
     },
     result: {
       data: {
-        filingCalendars: {
-          value: {
-            filingCalendars: {
-              value: [
+        companies: {
+          value: [
+            {
+              suggestedTaxForms: [
                 {
-                  formCountry: 'US',
-                  formRegion: 'CA',
-                  taxFormCode: 'TEST-001',
+                  region: 'CA',
+                  suggestedReturns: [
+                    {
+                      taxFormCode: 'TEST-001',
+                    },
+                  ],
                 },
                 {
-                  formCountry: 'US',
-                  formRegion: 'HI',
-                  taxFormCode: 'TEST-002',
+                  region: 'HI',
+                  suggestedReturns: [
+                    {
+                      taxFormCode: 'TEST-002',
+                    },
+                  ],
                 },
               ],
             },
-          },
+          ],
         },
       },
     },
@@ -203,15 +226,18 @@ describe('SetUpReturnsTable', () => {
           query: FILING_CALENDAR_REQUESTS,
           variables: {
             companyId: 1,
+            filter:
+              "filingRequestStatusId eq 'CHANGEREQUEST' or filingRequestStatusId eq 'REQUESTAPPROVED'",
           },
         },
         error: new Error('An error occurred'),
       },
       {
         request: {
-          query: FILING_CALENDARS,
+          query: COMPANY_SUGGESTED_RETURNS,
           variables: {
             companyId: 1,
+            country: 'US',
           },
         },
         error: new Error('An error occurred'),
@@ -276,6 +302,18 @@ describe('SetUpReturnsTable', () => {
       'You have not added this region'
     );
     expect(notAddedDescriptions).toHaveLength(1); // HI
+
+    // Verify returns count text
+    const returnsText = screen.getAllByText(/returns set up/);
+    expect(returnsText.length).toBeGreaterThan(0);
+
+    // Verify status badges
+    const notStartedBadge = screen.getByText('Not started');
+    expect(notStartedBadge).toBeInTheDocument(); // Alabama
+
+    // Check for completed status (Hawaii and California should be completed since they have both filing request and suggested return)
+    const completedBadges = screen.getAllByText('Completed');
+    expect(completedBadges).toHaveLength(2); // Both CA and HI should be completed based on the logic
   });
 
   it('navigates to the correct route when action link is clicked', async () => {
