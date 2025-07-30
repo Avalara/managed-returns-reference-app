@@ -89,7 +89,7 @@ fi
 # Squash merge from main branch (doesn't show individual commit history)
 if [[ "$DRY_RUN" == "true" ]]; then
     echo "🔄 [DRY RUN] Would squash merge from main branch..."
-    echo "   Would run: git merge --squash main"
+    echo "   Would run: git merge --squash --allow-unrelated-histories main"
     echo "✅ [DRY RUN] Squash merge would be successful"
     
     # Show what private files would be removed
@@ -104,7 +104,7 @@ if [[ "$DRY_RUN" == "true" ]]; then
     done
 else
     echo "🔄 Squash merging from main branch..."
-    if git merge --squash main; then
+    if git merge --squash --allow-unrelated-histories main; then
         echo "✅ Squash merge successful"
         
         # Remove private files immediately
